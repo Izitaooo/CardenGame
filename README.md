@@ -1,1 +1,1 @@
-the most EPIC card game EVER!
+the most **EPIC** card game **EVER!**
