@@ -42,7 +42,7 @@ function mouseMove(e) {
       domRect1.left > domRect2.right
     )
   ) {
-    console.log("meow");
+    // console.log("notbox", card.getBoundingClientRect());
     isLocked = 1;
   }
 
@@ -52,22 +52,38 @@ function mouseMove(e) {
     domRect1.bottom < domRect2.top ||
     domRect1.left > domRect2.right
   ) {
-    console.log("meowing");
+    // console.log("notbox", card.getBoundingClientRect());
     isLocked = 0;
   }
+
+  distanceFind()
 }
 
 function mouseUp(e) {
   const domRect1 = card.getBoundingClientRect();
+  let totalDistance = distanceFind()
 
   if (isLocked == 1) {
     gsap.to(card, {
       left: dropper.offsetLeft + "px",
       top: dropper.offsetTop + "px",
-      duration: 0.5,
-      ease: "power2.out",
+      duration: totalDistance * 0.0013,
+      ease: "power1.inOut",
     });
   }
 
   document.removeEventListener("mousemove", mouseMove);
 }
+
+function distanceFind(e) {
+  const domRect1 = card.getBoundingClientRect();
+
+      let shoot = dropper.offsetLeft - domRect1.left;
+      let bang = dropper.offsetTop - domRect1.top;
+
+      console.log(bang, shoot);
+
+      return (Math.hypot(shoot, bang));
+}
+
+
