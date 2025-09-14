@@ -14,7 +14,7 @@ body {
 }
 
 #card {
-  width: calc(17vw * 2/3);
+  width: 11vw;
   border-radius: 15px;
   aspect-ratio: 2/3;
   cursor: pointer;
@@ -32,11 +32,11 @@ body {
 }
 
 #drop {
-  width: calc(30vw * 5/2);
-  aspect-ratio: 5/2;
+  width: 55vw;
+  aspect-ratio: 7/2;
   background-color: lightgoldenrodyellow;
   position: fixed;
   border-radius: 15px;
   z-index: 1;
-  top: 20vh;
+  top: 32vh;
 }

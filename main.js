@@ -4,6 +4,10 @@ let startX = 0,
   newY = 0;
 
 const card = document.getElementById("card");
+gsap.to(card, {
+  width: "11vw"
+});
+
 const dropper = document.getElementById("drop");
 
 const domRect2 = dropper.getBoundingClientRect();
@@ -42,8 +46,10 @@ function mouseMove(e) {
       domRect1.left > domRect2.right
     )
   ) {
-    // console.log("notbox", card.getBoundingClientRect());
     isLocked = 1;
+    gsap.to(card, {
+      width: "14vw"
+    });
   }
 
   if (
@@ -52,8 +58,10 @@ function mouseMove(e) {
     domRect1.bottom < domRect2.top ||
     domRect1.left > domRect2.right
   ) {
-    // console.log("notbox", card.getBoundingClientRect());
     isLocked = 0;
+    gsap.to(card, {
+      width: "11vw"
+    });
   }
 
   distanceFind()
@@ -69,6 +77,9 @@ function mouseUp(e) {
       top: dropper.offsetTop + "px",
       duration: totalDistance * 0.0013,
       ease: "power1.inOut",
+    });
+    gsap.to(card, {
+      width: "11vw"
     });
   }
 
