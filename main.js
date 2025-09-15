@@ -5,7 +5,8 @@ let startX = 0,
 
 const card = document.getElementById("card");
 gsap.to(card, {
-  width: "11vw"
+      transform: "scale(1)",
+            duration: "0.2"
 });
 
 const dropper = document.getElementById("drop");
@@ -48,7 +49,8 @@ function mouseMove(e) {
   ) {
     isLocked = 1;
     gsap.to(card, {
-      width: "14vw"
+      transform: "scale(1.2)",
+      duration: "0.2"
     });
   }
 
@@ -60,7 +62,8 @@ function mouseMove(e) {
   ) {
     isLocked = 0;
     gsap.to(card, {
-      width: "11vw"
+      transform: "scale(1)",
+            duration: "0.2"
     });
   }
 
@@ -79,7 +82,8 @@ function mouseUp(e) {
       ease: "power1.inOut",
     });
     gsap.to(card, {
-      width: "11vw"
+      transform: "scale(1)",
+            duration: "0.2"
     });
   }
 

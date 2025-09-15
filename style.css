@@ -14,7 +14,7 @@ body {
 }
 
 #card {
-  width: 11vw;
+height: 15vw;
   border-radius: 15px;
   aspect-ratio: 2/3;
   cursor: pointer;
@@ -32,7 +32,7 @@ body {
 }
 
 #drop {
-  width: 55vw;
+height:15vw;
   aspect-ratio: 7/2;
   background-color: lightgoldenrodyellow;
   position: fixed;
