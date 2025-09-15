@@ -71,10 +71,9 @@ function mouseMove(e) {
 }
 
 function mouseUp(e) {
-  const domRect1 = card.getBoundingClientRect();
   let totalDistance = distanceFind()
 
-  if (isLocked == 1) {
+  if (isLocked === 1) {
     gsap.to(card, {
       left: dropper.offsetLeft + "px",
       top: dropper.offsetTop + "px",
