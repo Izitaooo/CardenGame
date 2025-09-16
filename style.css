@@ -31,12 +31,21 @@ height: 15vw;
 
 }
 
-#drop {
+.drop {
 height:15vw;
-  aspect-ratio: 7/2;
+  aspect-ratio: 2/3;
   background-color: lightgoldenrodyellow;
   position: fixed;
   border-radius: 15px;
   z-index: 1;
   top: 32vh;
+}
+#drop1 {
+  left: 20vw;
+}
+#drop2 {
+  left: 45vw;
+}
+#drop3 {
+  left: 70vw;
 }
