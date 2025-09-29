@@ -177,3 +177,7 @@ function distanceFind(e) {
 
   return Math.hypot(shoot, bang);
 }
+
+window.onresize = function(){
+  location.replace(location.href);
+}
