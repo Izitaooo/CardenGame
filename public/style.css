@@ -4,14 +4,6 @@ body {
   height: 100vh;
   background-color: #f9ccca;
 }
-#spawnerButton{
-    position: fixed;
-    top: 20vw;
-    left: 1vw;
-    user-select: none;
-    -webkit-user-drag: none;
-    pointer-events: auto;
-}
 
 .container {
   height: 100vh;
@@ -21,56 +13,15 @@ body {
   align-items: center;
 }
 
-#bottomholder {
-  position: absolute;
-  width: 100vw;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-#bottomhitbox {
-  height: 5.5vw;
-  width: 70vw;
-  position: absolute;
-  bottom: 0;
-  display: flex;
-  justify-content: center;
-  align-content: center;
-  background-color: blanchedalmond;
-  opacity: 0.67;
-  z-index: 99;
-  user-select: none;
-  -webkit-user-drag: none;
-  pointer-events: auto;
-}
-
-#hand {
+#card {
   height: 15vw;
-  aspect-ratio: 2/3;
-  position: fixed;
-  border-radius: 0.5vw;
-  background-color: lavenderblush;
-  opacity: 0.67;
-}
-
-.card {
-  height: 15vw;
-  border-radius: 0.5vw;
+  border-radius: 15px;
   aspect-ratio: 2/3;
   cursor: pointer;
   position: fixed;
   background-image: url("images/luant-s-artworks-comm-avocadocat-megu.jpg");
   background-size: cover;
   z-index: 2;
-  user-select: none;
-  -webkit-user-drag: none;
-  pointer-events: auto;
-}
-
-#card2 {
-  left: 10vw;
-  background-image: url("images/Artual.jpeg");
 }
 
 #container2 {
@@ -84,66 +35,16 @@ body {
   aspect-ratio: 2/3;
   background-color: lightgoldenrodyellow;
   position: fixed;
-  border-radius: 0.5vw;
+  border-radius: 15px;
   z-index: 1;
+  top: 32vh;
 }
-
 #drop1 {
-  left: 32.5vw;
-  top: 5vw;
+  left: 20vw;
 }
 #drop2 {
   left: 45vw;
-  top: 5vw;
 }
 #drop3 {
-  left: 57.5vw;
-  top: 5vw;
-}
-#drop4 {
-  left: 32.5vw;
-  top: 23vw;
-}
-#drop5 {
-  left: 45vw;
-  top: 23vw;
-}
-#drop6 {
-  left: 57.5vw;
-  top: 23vw;
-}
-
-.slidecontainer {
-  position: fixed;
-  top:  1vw;
-  left: 1vw;
-}
-
-.slider {
-  -webkit-appearance: none;
-  width: 15vw;
-  height: 1vw;
-  border-radius: 0.4vw;
-
-  outline: none;
-}
-
-.slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 2.5vw;
-  height: 2.6vw;
-  background: url("images/betterchibijett.png");
-  background-size: cover;
-  cursor: pointer;
-}
-
-.slider::-moz-range-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 1.5vw;
-  height: 1.5vw;
-  background: url("images/betterchibijett.png");
-  background-size: cover;
-  cursor: pointer;
+  left: 70vw;
 }
