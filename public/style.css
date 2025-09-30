@@ -13,6 +13,24 @@ body {
   align-items: center;
 }
 
+#bottomhitbox {
+    height: 15vw;
+    width: 100vw;
+    position: absolute;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+}
+
+#hand {
+    height: 15vw;
+    width: 10vw;
+    background-color: bisque;
+    position: fixed;
+    border-radius: 15px;
+}
+
+
 #card {
   height: 15vw;
   border-radius: 15px;
