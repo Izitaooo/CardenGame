@@ -1,50 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="style.css"/>
-    <title>Title</title>
-</head>
-<body>
-<div
-        style="
-display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh;
-">
-
-    <input type="text" id="playerInput" placeholder="room name...">
-    <div>
-        <button onclick="createRoom()"  id="create">create or join room</button>
+  <head>
+    <meta charset="UTF-8" />
+    <title>ImDraggingIt</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div id="card"></div>
     </div>
+    <div id="container2">
+      <div class="drop" id="drop1"></div>
+      <div class="drop" id="drop2"></div>
+      <div class="drop" id="drop3"></div>
+    </div>
+    <div id="bottomhitbox">
+        <div id="hand"></div>
+    </div>
+    <script src="plugins/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
 
-
-</div>
-
-
-<script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
-
-<script>
-    const socket = io();
-
-    const input = document.getElementById('playerInput');
-
-    createRoom = () => {
-        const roomName = input.value;
-
-        if (!roomName) {
-            alert("Please enter a room name!");
-            return;
-        }
-
-        socket.emit("joinRoom", roomName);
-    }
-
-    socket.on("roomJoined", (roomName) => {
-        console.log("Joined room:", roomName);
-        // Redirect to game page      // Pass room name in URL
-        window.location.href = `game.html?room=${roomName}`;
-    });
-
-
-</script>
-</body>
+    <script src="main.js"></script>
+  </body>
 </html>
