@@ -110,11 +110,20 @@ function mouseUp(e) {
   let totalDistance = distanceFind();
 
   if (isLocked === 1) {
+    let dropper;
     //box1
-    if (container === 1) {
+    if (container === 1){
+        dropper = dropper1;
+    }
+    else if (container === 2){
+        dropper = dropper2;
+    }
+    else if (container === 3){
+        dropper = dropper3;
+    }
       gsap.to(card, {
-        left: dropper1.offsetLeft + "px",
-        top: dropper1.offsetTop + "px",
+        left: dropper.offsetLeft + "px",
+        top: dropper.offsetTop + "px",
         duration: totalDistance * 0.0013,
         ease: "power1.inOut",
       });
@@ -123,32 +132,6 @@ function mouseUp(e) {
         duration: "0.2",
       });
     }
-    //box2
-    if (container === 2) {
-      gsap.to(card, {
-        left: dropper2.offsetLeft + "px",
-        top: dropper2.offsetTop + "px",
-        duration: totalDistance * 0.0013,
-        ease: "power1.inOut",
-      });
-      gsap.to(card, {
-        transform: "scale(1)",
-        duration: "0.2",
-      });
-    } //box3
-    if (container === 3) {
-      gsap.to(card, {
-        left: dropper3.offsetLeft + "px",
-        top: dropper3.offsetTop + "px",
-        duration: totalDistance * 0.0013,
-        ease: "power1.inOut",
-      });
-      gsap.to(card, {
-        transform: "scale(1)",
-        duration: "0.2",
-      });
-    }
-  }
 
   document.removeEventListener("mousemove", mouseMove);
 }
