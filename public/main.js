@@ -20,6 +20,7 @@ const domRect4 = dropper3.getBoundingClientRect();
 const hand = document.getElementById("hand");
 
 let isLocked = 0;
+let inDeck = 0;
 
 card.addEventListener("mousedown", mouseDown);
 
@@ -40,6 +41,8 @@ function mouseMove(e) {
 
   card.style.top = card.offsetTop - newY + "px";
   card.style.left = card.offsetLeft - newX + "px";
+
+  inDeck = 0;
 
   //box1
   const domRect1 = card.getBoundingClientRect();
@@ -98,7 +101,7 @@ function mouseMove(e) {
     container = null;
     gsap.to(card, {
       transform: "scale(1)",
-      duration: "0.2",
+      duration: "0.3",
     });
   }
 
@@ -138,6 +141,8 @@ function mouseUp(e) {
           duration: totalDistance * 0.0010,
           ease: "power1.inOut",
       });
+      inDeck = 1;
+      console.log(inDeck)
   }
 
   document.removeEventListener("mousemove", mouseMove);
@@ -168,11 +173,23 @@ function distanceFind(e) {
       bang = hand.offsetTop - domRect1.top;
   }
 
-  console.log(bang, shoot);
-
   return Math.hypot(shoot, bang);
 }
 
 window.onresize = function () {
   location.replace(location.href);
 };
+
+let hoverAnim = gsap.timeline({ paused: true });
+card.addEventListener("mouseover", () => {
+  if (inDeck === 1){
+    hoverAnim.to(card, {
+      top: window.innerHeight - card.offsetHeight + "px",
+      duration: 0.5,
+
+    });
+  }
+})
+
+card.addEventListener("mouseenter", () => hoverAnim.play());
+card.addEventListener("mouseleave", () => hoverAnim.reverse());

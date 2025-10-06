@@ -14,7 +14,7 @@ body {
 }
 
 #bottomhitbox {
-    height: 15vw;
+    height: 5.5vw;
     width: 100vw;
     position: absolute;
     bottom: 0;
@@ -66,3 +66,5 @@ body {
 #drop3 {
   left: 70vw;
 }
+
+
