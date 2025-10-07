@@ -1,3 +1,5 @@
+gsap.registerPlugin(Physics2DPlugin);
+
 let startX = 0,
   startY = 0,
   newX = 0,
@@ -23,6 +25,8 @@ let isLocked = 0;
 let inDeck = 0;
 
 card.addEventListener("mousedown", mouseDown);
+
+gsap.registerPlugin(Physics2DPlugin)
 
 function mouseDown(e) {
   startX = e.clientX;
@@ -108,7 +112,7 @@ function mouseMove(e) {
   distanceFind();
 }
 
-function mouseUp(e) {
+function mouseUp() {
   let totalDistance = distanceFind();
 
   if (isLocked === 1) {
@@ -140,15 +144,15 @@ function mouseUp(e) {
           top: hand.offsetTop + "px",
           duration: totalDistance * 0.0010,
           ease: "power1.inOut",
+          onComplete: () => inDeck = 1
       });
-      inDeck = 1;
       console.log(inDeck)
   }
 
   document.removeEventListener("mousemove", mouseMove);
 }
 
-function distanceFind(e) {
+function distanceFind() {
   const domRect1 = card.getBoundingClientRect();
   let shoot;
   let bang;
@@ -180,16 +184,29 @@ window.onresize = function () {
   location.replace(location.href);
 };
 
-let hoverAnim = gsap.timeline({ paused: true });
-card.addEventListener("mouseover", () => {
-  if (inDeck === 1){
-    hoverAnim.to(card, {
-      top: window.innerHeight - card.offsetHeight + "px",
-      duration: 0.5,
 
-    });
-  }
-})
+card.addEventListener("mouseenter", () => {
+    if (inDeck === 1){
+        gsap.to(card, {
+            top: window.innerHeight - card.offsetHeight + "px",
+            duration: 0.5,
+            ease: "power1.inOut",
+        });
+    }
+});
 
-card.addEventListener("mouseenter", () => hoverAnim.play());
-card.addEventListener("mouseleave", () => hoverAnim.reverse());
+
+
+card.addEventListener("mouseleave", () => {
+
+    let totalDistance = distanceFind();
+
+    if (inDeck === 1){
+        gsap.to(card, {
+            left: hand.offsetLeft + "px",
+            top: hand.offsetTop + "px",
+            duration: totalDistance * 0.0016,
+            ease: "power1.inOut",
+        });
+    }
+});
