@@ -1,3 +1,5 @@
+const socket = io();
+
 let startX = 0,
   startY = 0,
   newX = 0,
