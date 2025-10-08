@@ -1,13 +1,27 @@
-const express = require('express')
-const app = express()
-const port = 3000
+const express = require("express");
+const { createServer } = require("node:http");
+const { join } = require("node:path");
+const { Server } = require("socket.io");
 
-app.use(express.static('public'))
+const app = express();
+const server = createServer(app);
+const io = new Server(server); // Create Socket.IO server
 
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html')
-})
+const port = 3000;
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+app.use(express.static("public"));
+
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/index.html");
+});
+
+io.on("connection", (socket) => {
+  console.log("a user connected");
+});
+
+// Use server.listen instead of app.listen
+server.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
+
+console.log("server has loaded");
