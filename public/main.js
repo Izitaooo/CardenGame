@@ -32,6 +32,8 @@ function mouseDown(e) {
 
   document.addEventListener("mousemove", mouseMove);
   document.addEventListener("mouseup", mouseUp);
+
+  gsap.killTweensOf(card);
 }
 
 function mouseMove(e) {
@@ -116,35 +118,32 @@ function mouseUp() {
   if (isLocked === 1) {
     let dropper;
     //box1
-    if (container === 1){
-        dropper = dropper1;
+    if (container === 1) {
+      dropper = dropper1;
+    } else if (container === 2) {
+      dropper = dropper2;
+    } else if (container === 3) {
+      dropper = dropper3;
     }
-    else if (container === 2){
-        dropper = dropper2;
-    }
-    else if (container === 3){
-        dropper = dropper3;
-    }
-      gsap.to(card, {
-        left: dropper.offsetLeft + "px",
-        top: dropper.offsetTop + "px",
-        duration: totalDistance * 0.0013,
-        ease: "power1.inOut",
-      });
-      gsap.to(card, {
-        transform: "scale(1)",
-        duration: "0.2",
-      });
-    }
-  else if (isLocked === 0) {
-      gsap.to(card, {
-          left: hand.offsetLeft + "px",
-          top: hand.offsetTop + "px",
-          duration: totalDistance * 0.0010,
-          ease: "power1.inOut",
-          onComplete: () => inDeck = 1
-      });
-      console.log(inDeck)
+    gsap.to(card, {
+      left: dropper.offsetLeft + "px",
+      top: dropper.offsetTop + "px",
+      duration: totalDistance * 0.0013,
+      ease: "power1.inOut",
+    });
+    gsap.to(card, {
+      transform: "scale(1)",
+      duration: "0.2",
+    });
+  } else if (isLocked === 0) {
+    gsap.to(card, {
+      left: hand.offsetLeft + "px",
+      top: hand.offsetTop + "px",
+      duration: totalDistance * 0.001,
+      ease: "power1.inOut",
+      onComplete: () => (inDeck = 1),
+    });
+    console.log(inDeck);
   }
 
   document.removeEventListener("mousemove", mouseMove);
@@ -168,11 +167,9 @@ function distanceFind() {
   else if (container === 3) {
     shoot = dropper3.offsetLeft - domRect1.left;
     bang = dropper3.offsetTop - domRect1.top;
-  }
-
-  else if (container === null) {
-      shoot = hand.offsetLeft - domRect1.left;
-      bang = hand.offsetTop - domRect1.top;
+  } else if (container === null) {
+    shoot = hand.offsetLeft - domRect1.left;
+    bang = hand.offsetTop - domRect1.top;
   }
 
   return Math.hypot(shoot, bang);
@@ -182,28 +179,26 @@ window.onresize = function () {
   location.replace(location.href);
 };
 
-
 card.addEventListener("mouseenter", () => {
-    if (inDeck === 1){
-        gsap.to(card, {
-            top: window.innerHeight - card.offsetHeight + "px",
-            duration: 0.5,
-            ease: "power1.inOut",
-        });
-    }
+  if (inDeck === 1) {
+    gsap.to(card, {
+      top: window.innerHeight - card.offsetHeight + "px",
+      duration: 0.4,
+      ease: "power1.inOut",
+    });
+  }
 });
 
 card.addEventListener("mouseleave", () => {
+  let totalDistance = distanceFind();
 
-    let totalDistance = distanceFind();
-
-    if (inDeck === 1){
-        gsap.to(card, {
-            left: hand.offsetLeft + "px",
-            top: hand.offsetTop + "px",
-            duration: totalDistance * 0.0016,
-            ease: "power1.inOut",
-            overwrite: true,
-        });
-    }
+  if (inDeck === 1) {
+    gsap.to(card, {
+      left: hand.offsetLeft + "px",
+      top: hand.offsetTop + "px",
+      duration: totalDistance * 0.0016,
+      ease: "power1.inOut",
+      overwrite: true,
+    });
+  }
 });
