@@ -21,8 +21,13 @@ const domRect4 = dropper3.getBoundingClientRect();
 
 const hand = document.getElementById("hand");
 
+const dropSound = new Howl({
+  src: ['audio/meopw.mp3'], volume: 0.1
+});
+
 let isLocked = 0;
 let inDeck = 0;
+let container;
 
 card.addEventListener("mousedown", mouseDown);
 
@@ -125,6 +130,7 @@ function mouseUp() {
     } else if (container === 3) {
       dropper = dropper3;
     }
+
     gsap.to(card, {
       left: dropper.offsetLeft + "px",
       top: dropper.offsetTop + "px",
@@ -135,7 +141,9 @@ function mouseUp() {
       transform: "scale(1)",
       duration: "0.2",
     });
-  } else if (isLocked === 0) {
+    dropSound.play();
+  }
+  else if (isLocked === 0) {
     gsap.to(card, {
       left: hand.offsetLeft + "px",
       top: hand.offsetTop + "px",
@@ -202,3 +210,4 @@ card.addEventListener("mouseleave", () => {
     });
   }
 });
+
