@@ -1,5 +1,3 @@
-gsap.registerPlugin(Physics2DPlugin);
-
 let startX = 0,
   startY = 0,
   newX = 0,
@@ -25,8 +23,6 @@ let isLocked = 0;
 let inDeck = 0;
 
 card.addEventListener("mousedown", mouseDown);
-
-gsap.registerPlugin(Physics2DPlugin)
 
 function mouseDown(e) {
   startX = e.clientX;
@@ -195,8 +191,6 @@ card.addEventListener("mouseenter", () => {
     }
 });
 
-
-
 card.addEventListener("mouseleave", () => {
 
     let totalDistance = distanceFind();
@@ -207,6 +201,7 @@ card.addEventListener("mouseleave", () => {
             top: hand.offsetTop + "px",
             duration: totalDistance * 0.0016,
             ease: "power1.inOut",
+            overwrite: true,
         });
     }
 });
