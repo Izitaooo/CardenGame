@@ -30,6 +30,8 @@ function mouseDown(e) {
 
   document.addEventListener("mousemove", mouseMove);
   document.addEventListener("mouseup", mouseUp);
+
+  gsap.killTweensOf(card);
 }
 
 function mouseMove(e) {
@@ -185,14 +187,13 @@ card.addEventListener("mouseenter", () => {
     if (inDeck === 1){
         gsap.to(card, {
             top: window.innerHeight - card.offsetHeight + "px",
-            duration: 0.5,
+            duration: 0.4,
             ease: "power1.inOut",
         });
     }
 });
 
 card.addEventListener("mouseleave", () => {
-
     let totalDistance = distanceFind();
 
     if (inDeck === 1){
