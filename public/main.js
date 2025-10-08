@@ -1,5 +1,11 @@
 const socket = io();
 
+socket.on('updatePlayers', (players)=>{
+    console.log(players);
+})
+
+
+
 let startX = 0,
   startY = 0,
   newX = 0,
