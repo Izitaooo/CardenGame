@@ -28,12 +28,18 @@ const domRect4 = dropper3.getBoundingClientRect();
 const hand = document.getElementById("hand");
 
 const dropSound = new Howl({
-  src: ['audio/meopw.mp3'], volume: 0.1
+  src: ['audio/Mystbloom Kill 4.mp3'], volume: 0.1
+});
+const deckSound = new Howl({
+  src: ['audio/Cryostasis Kill 1.mp3'], volume: 0.2
 });
 
 let isLocked = 0;
 let inDeck = 0;
 let container;
+
+
+let dropPlay = 0;
 
 card.addEventListener("mousedown", mouseDown);
 
@@ -58,6 +64,7 @@ function mouseMove(e) {
   card.style.left = card.offsetLeft - newX + "px";
 
   inDeck = 0;
+  dropPlay = 1;
 
   //box1
   const domRect1 = card.getBoundingClientRect();
@@ -147,8 +154,8 @@ function mouseUp() {
       transform: "scale(1)",
       duration: "0.2",
     });
-    dropSound.play();
   }
+
   else if (isLocked === 0) {
     gsap.to(card, {
       left: hand.offsetLeft + "px",
@@ -159,6 +166,20 @@ function mouseUp() {
     });
     console.log(inDeck);
   }
+
+  if (dropPlay === 1 && isLocked  === 1){
+    gsap.to(card, {
+      duration: totalDistance * 0.0013,
+      onComplete: () => (dropSound.play()),
+    })
+  }
+  else if (dropPlay === 1 && isLocked === 0){
+    gsap.to(card, {
+      duration: totalDistance * 0.001,
+      onComplete: () => (deckSound.play()),
+    })
+  }
+  dropPlay = 0;
 
   document.removeEventListener("mousemove", mouseMove);
 }
