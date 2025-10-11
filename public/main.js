@@ -1,10 +1,8 @@
-const socket = io();
+const socket = io("http://localhost:3000");
 
-socket.on('updatePlayers', (players)=>{
-    console.log(players);
-})
-
-
+socket.on("updatePlayers", (players) => {
+  console.log(players);
+});
 
 let startX = 0,
   startY = 0,
@@ -131,11 +129,14 @@ function mouseMove(e) {
 }
 
 function mouseUp() {
+    socket.emit("cardPos", {
+        containerInfo: container,
+    });
   let totalDistance = distanceFind();
 
   if (isLocked === 1) {
     let dropper;
-    //box1
+
     if (container === 1) {
       dropper = dropper1;
     } else if (container === 2) {
@@ -238,3 +239,36 @@ card.addEventListener("mouseleave", () => {
   }
 });
 
+//multiplayer receive
+socket.on("playerMoved", (data) => {
+  container = data.container;
+  console.log(`Player ${data.id} moved to`, data.container);
+  console.log("container " + container);
+    let totalDistance = distanceFind();
+    let dropper;
+
+    if (container === 1) {
+        dropper = dropper1;
+    } else if (container === 2) {
+        dropper = dropper2;
+    } else if (container === 3) {
+        dropper = dropper3;
+    }
+
+
+    if (container === null) {
+        gsap.to(card, {
+            left: hand.offsetLeft + "px",
+            top: hand.offsetTop + "px",
+            duration: totalDistance * 0.0016,
+            ease: "power1.inOut",
+            overwrite: true,
+        });}
+
+    gsap.to(card, {
+        left: dropper.offsetLeft + "px",
+        top: dropper.offsetTop + "px",
+        duration: totalDistance * 0.0013,
+        ease: "power1.inOut",
+    });
+});
