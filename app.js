@@ -5,7 +5,7 @@ const { Server } = require("socket.io");
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server); // Create Socket.IO server
+const io = new Server(server);
 
 const port = 3000;
 
@@ -15,23 +15,40 @@ app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");
 });
 
-const players = {
-
-}
+const players = {};
+const cards = {};
 
 io.on("connection", (socket) => {
   console.log("a user connected");
   players[socket.id] = {
-      x: 100,
-      y: 100
-  }
+    x: 100,
+    y: 100,
+  };
 
-  io.emit('updatePlayers', players);
+  socket.on("cardPos", (data) => {
+    console.log("card position:", data.containerInfo);
+    // Store the card position
+    cards[socket.id] = {
+      container: data.containerInfo, // This is correct
+    };
+    // Broadcast using the correct property name
+    socket.broadcast.emit("playerMoved", {
+      id: socket.id,
+      container: data.containerInfo, // Use containerInfo instead of data.container
+    });
+  });
+
+  io.emit("updatePlayers", players);
+
+  socket.on("disconnect", (reason) => {
+    console.log(reason);
+    delete players[socket.id];
+    delete cards[socket.id];
+  });
 
   console.log(players);
 });
 
-// Use server.listen instead of app.listen
 server.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
