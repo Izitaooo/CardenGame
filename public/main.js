@@ -11,8 +11,13 @@ let startX = 0,
   newX = 0,
   newY = 0;
 
-let card = document.getElementById("card");
-gsap.to(card, {
+let card = document.getElementById("card1");
+  gsap.to(card, {
+  transform: "scale(1)",
+  duration: "0.2",
+});
+let card2 = document.getElementById("card2");
+gsap.to(card2, {
   transform: "scale(1)",
   duration: "0.2",
 });
@@ -20,10 +25,16 @@ gsap.to(card, {
 const dropper1 = document.getElementById("drop1");
 const dropper2 = document.getElementById("drop2");
 const dropper3 = document.getElementById("drop3");
+const dropper4 = document.getElementById("drop4");
+const dropper5 = document.getElementById("drop5");
+const dropper6 = document.getElementById("drop6");
 
 const domRect2 = dropper1.getBoundingClientRect();
 const domRect3 = dropper2.getBoundingClientRect();
 const domRect4 = dropper3.getBoundingClientRect();
+const domRect5 = dropper4.getBoundingClientRect();
+const domRect6 = dropper5.getBoundingClientRect();
+const domRect7 = dropper6.getBoundingClientRect();
 
 const hand = document.getElementById("hand");
 
@@ -37,20 +48,28 @@ const deckSound = new Howl({
 let isLocked = 0;
 let inDeck = 0;
 let container;
-
+let cardsInDeck = 0;
 
 let dropPlay = 0;
 
-card.addEventListener("mousedown", mouseDown);
+let activeCard = null;
 
-function mouseDown(e) {
+card.addEventListener("mousedown", (e) => mouseDown(e, card));
+card2.addEventListener("mousedown", (e) => mouseDown(e, card2));
+
+function mouseDown(e, cardElement) {
+  activeCard = cardElement;
+
   startX = e.clientX;
   startY = e.clientY;
 
   document.addEventListener("mousemove", mouseMove);
   document.addEventListener("mouseup", mouseUp);
 
-  gsap.killTweensOf(card);
+  gsap.killTweensOf(activeCard);
+
+
+  cardsInDeck = 0
 }
 
 function mouseMove(e) {
@@ -60,68 +79,87 @@ function mouseMove(e) {
   startX = e.clientX;
   startY = e.clientY;
 
-  card.style.top = card.offsetTop - newY + "px";
-  card.style.left = card.offsetLeft - newX + "px";
+  activeCard.style.top = activeCard.offsetTop - newY + "px";
+  activeCard.style.left = activeCard.offsetLeft - newX + "px";
 
   inDeck = 0;
   dropPlay = 1;
+  console.log(cardsInDeck)
 
   //box1
-  const domRect1 = card.getBoundingClientRect();
+  const domRect1 = activeCard.getBoundingClientRect();
 
   if (
     !(
-      domRect1.top > domRect2.bottom ||
-      domRect1.right < domRect2.left ||
-      domRect1.bottom < domRect2.top ||
-      domRect1.left > domRect2.right
+        domRect1.top > domRect2.bottom || domRect1.right < domRect2.left ||
+        domRect1.bottom < domRect2.top || domRect1.left > domRect2.right
     )
   ) {
     isLocked = 1;
     container = 1;
-    console.log(container);
-    gsap.to(card, {
-      transform: "scale(1.2)",
-      duration: "0.2",
-    });
+    scale();
   }
 
   //box2
   else if (
     !(
-      domRect1.top > domRect3.bottom ||
-      domRect1.right < domRect3.left ||
-      domRect1.bottom < domRect3.top ||
-      domRect1.left > domRect3.right
+        domRect1.top > domRect3.bottom || domRect1.right < domRect3.left ||
+        domRect1.bottom < domRect3.top || domRect1.left > domRect3.right
     )
   ) {
     isLocked = 1;
     container = 2;
-    gsap.to(card, {
-      transform: "scale(1.2)",
-      duration: "0.2",
-    });
+    scale();
   }
 
   //box3
   else if (
     !(
-      domRect1.top > domRect4.bottom ||
-      domRect1.right < domRect4.left ||
-      domRect1.bottom < domRect4.top ||
-      domRect1.left > domRect4.right
+        domRect1.top > domRect4.bottom || domRect1.right < domRect4.left ||
+        domRect1.bottom < domRect4.top || domRect1.left > domRect4.right
     )
   ) {
     isLocked = 1;
     container = 3;
-    gsap.to(card, {
-      transform: "scale(1.2)",
-      duration: "0.2",
-    });
-  } else {
+    scale();
+  }
+
+  else if (
+      !(
+          domRect1.top > domRect5.bottom || domRect1.right < domRect5.left ||
+          domRect1.bottom < domRect5.top || domRect1.left > domRect5.right
+      )
+  ) {
+    isLocked = 1;
+    container = 4;
+    scale();
+  }
+
+  else if (
+      !(
+          domRect1.top > domRect6.bottom || domRect1.right < domRect6.left ||
+          domRect1.bottom < domRect6.top || domRect1.left > domRect6.right
+      )
+  ) {
+    isLocked = 1;
+    container = 5;
+    scale();
+  }
+
+  else if (
+      !(
+          domRect1.top > domRect7.bottom || domRect1.right < domRect7.left ||
+          domRect1.bottom < domRect7.top || domRect1.left > domRect7.right
+      )
+  ) {
+    isLocked = 1;
+    container = 6;
+    scale();
+  }
+  else {
     isLocked = 0;
     container = null;
-    gsap.to(card, {
+    gsap.to(activeCard, {
       transform: "scale(1)",
       duration: "0.3",
     });
@@ -142,39 +180,48 @@ function mouseUp() {
       dropper = dropper2;
     } else if (container === 3) {
       dropper = dropper3;
+    } else if (container === 4) {
+      dropper = dropper4;
+    } else if (container === 5) {
+      dropper = dropper5;
+    } else if (container === 6) {
+      dropper = dropper6;
     }
 
-    gsap.to(card, {
+    gsap.to(activeCard, {
       left: dropper.offsetLeft + "px",
       top: dropper.offsetTop + "px",
       duration: totalDistance * 0.0013,
       ease: "power1.inOut",
     });
-    gsap.to(card, {
+    gsap.to(activeCard, {
       transform: "scale(1)",
       duration: "0.2",
     });
   }
 
   else if (isLocked === 0) {
-    gsap.to(card, {
-      left: hand.offsetLeft + "px",
+    gsap.to(activeCard, {
+      left: (hand.offsetLeft + (cardsInDeck * 200)) + "px",
       top: hand.offsetTop + "px",
       duration: totalDistance * 0.001,
       ease: "power1.inOut",
-      onComplete: () => (inDeck = 1),
+      onComplete: () => {
+        inDeck = 1
+        cardsInDeck = cardsInDeck + 1
+      }
     });
     console.log(inDeck);
   }
 
   if (dropPlay === 1 && isLocked  === 1){
-    gsap.to(card, {
+    gsap.to(activeCard, {
       duration: totalDistance * 0.0013,
       onComplete: () => (dropSound.play()),
     })
   }
   else if (dropPlay === 1 && isLocked === 0){
-    gsap.to(card, {
+    gsap.to(activeCard, {
       duration: totalDistance * 0.001,
       onComplete: () => (deckSound.play()),
     })
@@ -185,7 +232,7 @@ function mouseUp() {
 }
 
 function distanceFind() {
-  const domRect1 = card.getBoundingClientRect();
+  const domRect1 = activeCard.getBoundingClientRect();
   let shoot;
   let bang;
   //box1
@@ -202,7 +249,23 @@ function distanceFind() {
   else if (container === 3) {
     shoot = dropper3.offsetLeft - domRect1.left;
     bang = dropper3.offsetTop - domRect1.top;
-  } else if (container === null) {
+  }
+
+  else if (container === 4) {
+    shoot = dropper4.offsetLeft - domRect1.left;
+    bang = dropper4.offsetTop - domRect1.top;
+  }
+
+  else if (container === 5) {
+    shoot = dropper5.offsetLeft - domRect1.left;
+    bang = dropper5.offsetTop - domRect1.top;
+  }
+
+  else if (container === 6) {
+    shoot = dropper6.offsetLeft - domRect1.left;
+    bang = dropper6.offsetTop - domRect1.top;
+  }
+  else if (container === null) {
     shoot = hand.offsetLeft - domRect1.left;
     bang = hand.offsetTop - domRect1.top;
   }
@@ -217,7 +280,7 @@ window.onresize = function () {
 card.addEventListener("mouseenter", () => {
   if (inDeck === 1) {
     gsap.to(card, {
-      top: window.innerHeight - card.offsetHeight + "px",
+      top: window.innerHeight - activeCard.offsetHeight + "px",
       duration: 0.4,
       ease: "power1.inOut",
     });
@@ -238,3 +301,9 @@ card.addEventListener("mouseleave", () => {
   }
 });
 
+function scale() {
+  gsap.to(activeCard, {
+    transform: "scale(1.2)",
+    duration: "0.2",
+  });
+}
