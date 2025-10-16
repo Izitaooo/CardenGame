@@ -46,7 +46,7 @@ const deckSound = new Howl({
 let isLocked = 0;
 let inDeck = 0;
 let container;
-let cardsInDeck = 0;
+let dragged = false;
 
 let dropPlay = 0;
 
@@ -57,8 +57,8 @@ let deckCards = [];
 card.addEventListener("mousedown", (e) => mouseDown(e, card));
 card2.addEventListener("mousedown", (e) => mouseDown(e, card2));
 
-card.deck = true;
-card2.deck = true;
+card.deck = false;
+card2.deck = false;
 
 function mouseDown(e, cardElement) {
   activeCard = cardElement;
@@ -71,6 +71,8 @@ function mouseDown(e, cardElement) {
 
   gsap.killTweensOf(activeCard);
 
+  dragged = false;
+
   if (activeCard.deck) {
     const index = deckCards.indexOf(activeCard); // find where it is in the array
     if (index !== -1) {
@@ -78,6 +80,8 @@ function mouseDown(e, cardElement) {
     }
     activeCard.deck = false;
   }
+
+  updateDeckPositions();
 }
 
 function mouseMove(e) {
@@ -92,6 +96,10 @@ function mouseMove(e) {
 
   inDeck = 0;
   dropPlay = 1;
+  dragged = true;
+
+  activeCard.deck = false;
+  console.log(deckCards);
 
 
   //box1
@@ -177,6 +185,10 @@ function mouseMove(e) {
 }
 
 function mouseUp() {
+  if (!dragged){
+    isLocked = null;
+  }
+
     socket.emit("cardPos", {
         containerInfo: container,
         id: activeCard.id
@@ -215,17 +227,20 @@ function mouseUp() {
 
   else if (isLocked === 0) {
 
-
+    if (!deckCards.includes(activeCard)) {
+      deckCards.push(activeCard);
+      activeCard.deck = true;
+    }
     gsap.to(activeCard, {
-      left: (hand.offsetLeft + (deckCards.length * 130)) + "px",
+      left: (hand.offsetLeft + (deckCards.length * 130)) - 130 + "px",
       top: hand.offsetTop + "px",
       duration: totalDistance * 0.001,
       ease: "power1.inOut",
       onComplete: () => {
         inDeck = 1
-        deckCards.push(activeCard);
         console.log(deckCards);
-        activeCard.deck = true;
+        console.log(card.deck)
+        console.log(card2.deck)
       }
     });
   }
@@ -293,29 +308,18 @@ window.onresize = function () {
   location.replace(location.href);
 };
 
-card.addEventListener("mouseenter", () => {
-  if (inDeck === 1) {
+function updateDeckPositions() {
+  deckCards.forEach((card, i) => {
     gsap.to(card, {
-      top: window.innerHeight - activeCard.offsetHeight + "px",
-      duration: 0.4,
-      ease: "power1.inOut",
-    });
-  }
-});
-
-card.addEventListener("mouseleave", () => {
-  let totalDistance = distanceFind();
-
-  if (inDeck === 1) {
-    gsap.to(card, {
-      left: hand.offsetLeft + "px",
+      left: (hand.offsetLeft + i * 130) + "px",
       top: hand.offsetTop + "px",
-      duration: totalDistance * 0.0016,
-      ease: "power1.inOut",
-      overwrite: true,
+      duration: 0.3,
+      ease: "power2.inOut",
     });
-  }
-});
+  });
+}
+
+
 
 //multiplayer receive
 socket.on("playerMoved", (data) => {
