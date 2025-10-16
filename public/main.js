@@ -52,8 +52,13 @@ let dropPlay = 0;
 
 let activeCard = null;
 
+let deckCards = [];
+
 card.addEventListener("mousedown", (e) => mouseDown(e, card));
 card2.addEventListener("mousedown", (e) => mouseDown(e, card2));
+
+card.deck = true;
+card2.deck = true;
 
 function mouseDown(e, cardElement) {
   activeCard = cardElement;
@@ -66,8 +71,13 @@ function mouseDown(e, cardElement) {
 
   gsap.killTweensOf(activeCard);
 
-
-  cardsInDeck = 0
+  if (activeCard.deck) {
+    const index = deckCards.indexOf(activeCard); // find where it is in the array
+    if (index !== -1) {
+      deckCards.splice(index, 1); // remove that one item
+    }
+    activeCard.deck = false;
+  }
 }
 
 function mouseMove(e) {
@@ -82,7 +92,7 @@ function mouseMove(e) {
 
   inDeck = 0;
   dropPlay = 1;
-  console.log(cardsInDeck)
+
 
   //box1
   const domRect1 = activeCard.getBoundingClientRect();
@@ -202,17 +212,20 @@ function mouseUp() {
   }
 
   else if (isLocked === 0) {
+
+
     gsap.to(activeCard, {
-      left: (hand.offsetLeft + (cardsInDeck * 200)) + "px",
+      left: (hand.offsetLeft + (deckCards.length * 130)) + "px",
       top: hand.offsetTop + "px",
       duration: totalDistance * 0.001,
       ease: "power1.inOut",
       onComplete: () => {
         inDeck = 1
-        cardsInDeck = cardsInDeck + 1
+        deckCards.push(activeCard);
+        console.log(deckCards);
+        activeCard.deck = true;
       }
     });
-    console.log(inDeck);
   }
 
   if (dropPlay === 1 && isLocked  === 1){
