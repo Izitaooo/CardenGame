@@ -179,7 +179,9 @@ function mouseMove(e) {
 function mouseUp() {
     socket.emit("cardPos", {
         containerInfo: container,
+        id: activeCard.id
     });
+    console.log(activeCard.id);
   let totalDistance = distanceFind();
 
   if (isLocked === 1) {
@@ -329,6 +331,15 @@ socket.on("playerMoved", (data) => {
         dropper = dropper2;
     } else if (container === 3) {
         dropper = dropper3;
+    }
+    else if (container === 4) {
+        dropper = dropper4;
+    }
+    else if (container === 5) {
+        dropper = dropper5;
+    }
+    else if (container === 6) {
+        dropper = dropper6;
     }
 
 
