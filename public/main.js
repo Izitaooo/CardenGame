@@ -4,6 +4,8 @@ socket.on("updatePlayers", (players) => {
   console.log(players);
 });
 
+
+
 let startX = 0,
   startY = 0,
   newX = 0,
@@ -36,17 +38,37 @@ const domRect7 = dropper6.getBoundingClientRect();
 
 const hand = document.getElementById("hand");
 
+let volumeSlider = document.getElementById("volume")
+let volumeNow = volumeSlider.value;
+let min = 0.0
+let max = 1
+
+volumeSlider.style.background = `linear-gradient(to right, #FF4655 0%, #FF4655 ${(min)/(max)*100}%, #111823 ${(min)/(max)*100}%, #111823 100%)`
+
+function volumeUpdate() {
+  this.style.background = `linear-gradient(to right, #FF4655 0%, #FF4655 ${(this.value-this.min)/(this.max-this.min)*100}%, #111823 ${(this.value-this.min)/(this.max-this.min)*100}%, #111823 100%)`
+  volumeNow = this.value;
+  Howler.volume(volumeNow);
+  console.log("volume is:" + volumeNow);
+}
+
+volumeSlider.addEventListener('input', volumeUpdate);
+window.addEventListener('DOMContentLoaded', () => {
+  volumeUpdate.call(volumeSlider);
+});
+
+
 const dropSound = new Howl({
   src: ['audio/Mystbloom Kill 4.mp3'], volume: 0.1
 });
 const deckSound = new Howl({
-  src: ['audio/Cryostasis Kill 1.mp3'], volume: 0.2
+  src: ['audio/Cryostasis Kill 1.mp3'], volume: 0.15
 });
 
 let isLocked = 0;
 let inDeck = 0;
 let container;
-let cardsInDeck = 0;
+let dragged = false;
 
 let dropPlay = 0;
 
@@ -57,8 +79,9 @@ let deckCards = [];
 card.addEventListener("mousedown", (e) => mouseDown(e, card));
 card2.addEventListener("mousedown", (e) => mouseDown(e, card2));
 
-card.deck = true;
-card2.deck = true;
+card.deck = false;
+card2.deck = false;
+
 
 function mouseDown(e, cardElement) {
   activeCard = cardElement;
@@ -71,6 +94,8 @@ function mouseDown(e, cardElement) {
 
   gsap.killTweensOf(activeCard);
 
+  dragged = false;
+
   if (activeCard.deck) {
     const index = deckCards.indexOf(activeCard); // find where it is in the array
     if (index !== -1) {
@@ -78,6 +103,8 @@ function mouseDown(e, cardElement) {
     }
     activeCard.deck = false;
   }
+
+  updateDeckPositions();
 }
 
 function mouseMove(e) {
@@ -92,6 +119,11 @@ function mouseMove(e) {
 
   inDeck = 0;
   dropPlay = 1;
+  dragged = true;
+
+  activeCard.deck = false;
+  console.log(deckCards);
+  console.log("locked:" + isLocked)
 
 
   //box1
@@ -177,6 +209,10 @@ function mouseMove(e) {
 }
 
 function mouseUp() {
+  if (!dragged){
+    isLocked = null;
+  }
+
     socket.emit("cardPos", {
         containerInfo: container,
         id: activeCard.id
@@ -206,6 +242,7 @@ function mouseUp() {
       top: dropper.offsetTop + "px",
       duration: totalDistance * 0.0013,
       ease: "power1.inOut",
+      overwrite: "auto",
     });
     gsap.to(activeCard, {
       transform: "scale(1)",
@@ -215,17 +252,26 @@ function mouseUp() {
 
   else if (isLocked === 0) {
 
-
+    if (!deckCards.includes(activeCard)) {
+      deckCards.push(activeCard);
+      activeCard.deck = true;
+    }
     gsap.to(activeCard, {
-      left: (hand.offsetLeft + (deckCards.length * 130)) + "px",
+      left: (hand.offsetLeft + (deckCards.length * 130)) - 130 + "px",
       top: hand.offsetTop + "px",
       duration: totalDistance * 0.001,
       ease: "power1.inOut",
+      overwrite: "auto",
+      onStart: () => {
+        activeCard.style.pointerEvents = "none"
+        isLocked = null
+      },
+      pointerEvents:"auto",
       onComplete: () => {
         inDeck = 1
-        deckCards.push(activeCard);
         console.log(deckCards);
-        activeCard.deck = true;
+        console.log(card.deck)
+        console.log(card2.deck)
       }
     });
   }
@@ -245,6 +291,7 @@ function mouseUp() {
   dropPlay = 0;
 
   document.removeEventListener("mousemove", mouseMove);
+  document.removeEventListener("mouseup", mouseMove);
 }
 
 function distanceFind() {
@@ -293,29 +340,18 @@ window.onresize = function () {
   location.replace(location.href);
 };
 
-card.addEventListener("mouseenter", () => {
-  if (inDeck === 1) {
+function updateDeckPositions() {
+  deckCards.forEach((card, i) => {
     gsap.to(card, {
-      top: window.innerHeight - activeCard.offsetHeight + "px",
-      duration: 0.4,
-      ease: "power1.inOut",
-    });
-  }
-});
-
-card.addEventListener("mouseleave", () => {
-  let totalDistance = distanceFind();
-
-  if (inDeck === 1) {
-    gsap.to(card, {
-      left: hand.offsetLeft + "px",
+      left: (hand.offsetLeft + i * 130) + "px",
       top: hand.offsetTop + "px",
-      duration: totalDistance * 0.0016,
-      ease: "power1.inOut",
-      overwrite: true,
+      duration: 0.3,
+      ease: "power2.inOut",
     });
-  }
-});
+  });
+}
+
+
 
 //multiplayer receive
 socket.on("playerMoved", (data) => {
