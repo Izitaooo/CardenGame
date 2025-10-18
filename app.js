@@ -21,16 +21,17 @@ const cards = {};
 io.on("connection", (socket) => {
   console.log("a user connected");
   players[socket.id] = {
-    x: 100,
-    y: 100,
   };
 
   socket.on("cardPos", (data) => {
-    console.log("card position:", data.containerInfo);
+      cards[data.id] = {
+          id: data.id,
+          container: data.containerInfo, // This is correct
+          playerId: socket.id,
+      };
+    console.log("card position:", cards);
     // Store the card position
-    cards[socket.id] = {
-      container: data.containerInfo, // This is correct
-    };
+
     // Broadcast using the correct property name
     socket.broadcast.emit("playerMoved", {
       id: socket.id,
