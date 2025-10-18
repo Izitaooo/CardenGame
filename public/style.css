@@ -27,7 +27,7 @@ body {
   width: 10vw;
   background-color: bisque;
   position: fixed;
-  border-radius: 15px;
+  border-radius: 0.5vw;
 }
 
 .card {
@@ -83,4 +83,39 @@ body {
 #drop6 {
   left: 60vw;
   top: 23vw;
+}
+
+.slidecontainer {
+  position: fixed;
+  top:  1vw;
+  left: 1vw;
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 15vw;
+  height: 1vw;
+  border-radius: 0.4vw;
+
+  outline: none;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 2.5vw;
+  height: 2.6vw;
+  background: url("images/betterchibijett.png");
+  background-size: cover;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1.5vw;
+  height: 1.5vw;
+  background: url("images/betterchibijett.png");
+  background-size: cover;
+  cursor: pointer;
 }
