@@ -4,6 +4,8 @@ socket.on("updatePlayers", (players) => {
   console.log(players);
 });
 
+
+
 let startX = 0,
   startY = 0,
   newX = 0,
@@ -36,11 +38,31 @@ const domRect7 = dropper6.getBoundingClientRect();
 
 const hand = document.getElementById("hand");
 
+let volumeSlider = document.getElementById("volume")
+let volumeNow = volumeSlider.value;
+let min = 0.0
+let max = 1
+
+volumeSlider.style.background = `linear-gradient(to right, #FF4655 0%, #FF4655 ${(min)/(max)*100}%, #111823 ${(min)/(max)*100}%, #111823 100%)`
+
+function volumeUpdate() {
+  this.style.background = `linear-gradient(to right, #FF4655 0%, #FF4655 ${(this.value-this.min)/(this.max-this.min)*100}%, #111823 ${(this.value-this.min)/(this.max-this.min)*100}%, #111823 100%)`
+  volumeNow = this.value;
+  Howler.volume(volumeNow);
+  console.log("volume is:" + volumeNow);
+}
+
+volumeSlider.addEventListener('input', volumeUpdate);
+window.addEventListener('DOMContentLoaded', () => {
+  volumeUpdate.call(volumeSlider);
+});
+
+
 const dropSound = new Howl({
   src: ['audio/Mystbloom Kill 4.mp3'], volume: 0.1
 });
 const deckSound = new Howl({
-  src: ['audio/Cryostasis Kill 1.mp3'], volume: 0.2
+  src: ['audio/Cryostasis Kill 1.mp3'], volume: 0.15
 });
 
 let isLocked = 0;
@@ -59,6 +81,7 @@ card2.addEventListener("mousedown", (e) => mouseDown(e, card2));
 
 card.deck = false;
 card2.deck = false;
+
 
 function mouseDown(e, cardElement) {
   activeCard = cardElement;
@@ -100,6 +123,7 @@ function mouseMove(e) {
 
   activeCard.deck = false;
   console.log(deckCards);
+  console.log("locked:" + isLocked)
 
 
   //box1
@@ -216,6 +240,7 @@ function mouseUp() {
       top: dropper.offsetTop + "px",
       duration: totalDistance * 0.0013,
       ease: "power1.inOut",
+      overwrite: "auto",
     });
     gsap.to(activeCard, {
       transform: "scale(1)",
@@ -234,6 +259,12 @@ function mouseUp() {
       top: hand.offsetTop + "px",
       duration: totalDistance * 0.001,
       ease: "power1.inOut",
+      overwrite: "auto",
+      onStart: () => {
+        activeCard.style.pointerEvents = "none"
+        isLocked = null
+      },
+      pointerEvents:"auto",
       onComplete: () => {
         inDeck = 1
         console.log(deckCards);
@@ -258,6 +289,7 @@ function mouseUp() {
   dropPlay = 0;
 
   document.removeEventListener("mousemove", mouseMove);
+  document.removeEventListener("mouseup", mouseMove);
 }
 
 function distanceFind() {
