@@ -23,21 +23,18 @@ io.on("connection", (socket) => {
   players[socket.id] = {
   };
 
-  socket.on("cardPos", (data) => {
-      cards[data.id] = {
-          id: data.id,
-          container: data.containerInfo, // This is correct
-          playerId: socket.id,
-      };
-    console.log("card position:", cards);
-    // Store the card position
+    socket.on("cardPos", (data) => {
+        cards[data.id] = {
+            id: data.id,
+            container: data.containerInfo,
+            playerId: socket.id,
+        };
+        let lastSentCard = data.id;
+        console.log("card position:", cards);
 
-    // Broadcast using the correct property name
-    socket.broadcast.emit("playerMoved", {
-      id: socket.id,
-      container: data.containerInfo, // Use containerInfo instead of data.container
+        // Send the card object directly
+        socket.broadcast.emit("playerMoved", cards[lastSentCard]);
     });
-  });
 
   io.emit("updatePlayers", players);
 

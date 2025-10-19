@@ -4,6 +4,11 @@ body {
   height: 100vh;
   background-color: #f9ccca;
 }
+#spawnerButton{
+    position: fixed;
+    top: 20vw;
+    left: 1vw;
+}
 
 .container {
   height: 100vh;
