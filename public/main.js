@@ -128,6 +128,7 @@ function mouseMove(e) {
   activeCard.deck = false;
   console.log(deckCards);
   console.log("locked:" + isLocked);
+  console.log("all cards:" + allCards);
 
   //box1
   const domRect1 = activeCard.getBoundingClientRect();
@@ -268,7 +269,7 @@ function mouseUp() {
       ease: "power1.inOut",
       overwrite: "auto",
       onStart: () => {
-        activeCard.style.pointerEvents = "none";
+        allCards.style.pointerEvents = "none";
         isLocked = null;
       },
       pointerEvents: "auto",
@@ -395,6 +396,9 @@ function scale() {
   });
 }
 
+const spawnButton = document.getElementById("spawnerButton");
+const spawnButtonCord = spawnButton.getBoundingClientRect();
+
 function createCard(id, initialX, initialY) {
     //Create the DOM element
     const cardElement = document.createElement('div');
@@ -415,6 +419,7 @@ function createCard(id, initialX, initialY) {
         transform: "scale(1)",
         duration: "0.2",
     });
+
     return cardElement;
 }
 
@@ -424,11 +429,13 @@ function spawnCard() {
     const cardId = 'card' + nOfCards;
 
     // Spawn at center of screen (or wherever you want)
-    const x = window.innerWidth / 2;
-    const y = window.innerHeight / 2;
+    const x = spawnButtonCord.left - 80;
+    const y = spawnButtonCord.top -  110;
 
 
     createCard(cardId, x, y);
+    document.addEventListener("mousemove", mouseMove);
+    document.addEventListener("mouseup", mouseUp);
 
     console.log("spawned card: " + cardId);
 }
