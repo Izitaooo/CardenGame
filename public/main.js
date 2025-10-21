@@ -9,6 +9,11 @@ let startX = 0,
   newX = 0,
   newY = 0;
 
+
+//const card = {
+
+//}
+
 let card = document.getElementById("card1");
 gsap.to(card, {
   transform: "scale(1)",
@@ -410,32 +415,46 @@ function createCard(id, initialX, initialY) {
     cardElement.deck = false;
 
     cardElement.addEventListener("mousedown", (e) => mouseDown(e, cardElement));
+
+    //mouseDown(cardElement);
+    //cardElement.addEventListener("mousemove", mouseMove);
+    //cardElement.addEventListener("mouseup", mouseUp);
+
     //Add to the DOM
     document.querySelector('.container').appendChild(cardElement);
 
     allCards[id] = cardElement;
     //Initial GSAP
-    gsap.to(cardElement, {
+/*    gsap.to(cardElement, {
         transform: "scale(1)",
         duration: "0.2",
-    });
-
+    });*/
+    //activeCard = cardElement;
     return cardElement;
 }
 
 let nOfCards = 2;
-function spawnCard() {
+function spawnCard(e) {
     nOfCards += 1;
+
     const cardId = 'card' + nOfCards;
 
-    // Spawn at center of screen (or wherever you want)
-    const x = spawnButtonCord.left - 80;
-    const y = spawnButtonCord.top -  110;
+    const x = e.clientX - (window.innerWidth * 0.1078125 /2);
+    const y = e.clientY - (window.innerWidth * 0.15 /2);
+    //const x = e.clientX - self.innerWidth / 2;
+    //const y = e.clientY - self.innerHeight / 2;
 
+    const newCard = createCard(cardId, x, y);
 
-    createCard(cardId, x, y);
+    activeCard = newCard;
+    startX = e.clientX;
+    startY = e.clientY;
+
     document.addEventListener("mousemove", mouseMove);
     document.addEventListener("mouseup", mouseUp);
 
-    console.log("spawned card: " + cardId);
+/*    dragged = false;
+    activeCard.deck = false;*/
+
+    console.log("spawned and dragging card: " + cardId);
 }
