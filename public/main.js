@@ -276,14 +276,18 @@ function mouseUp() {
       ease: "power1.inOut",
       overwrite: "auto",
       onStart: () => {
-        cardsGame[1].style.pointerEvents = "none";
+          for(let i = 0; i < cardsGame.length; i++) {
+              cardsGame[i].style.pointerEvents = "none";
+          }
         isLocked = null;
       },
       pointerEvents: "auto",
       onComplete: () => {
         inDeck = 1;
-        for(car )
-        cardsGame[1].style.pointerEvents = "all";
+        for(let i = 0; i < cardsGame.length; i++) {
+              cardsGame[i].style.pointerEvents = "all";
+          }
+
         console.log(deckCards);
         console.log(card.deck);
         console.log(card2.deck);
@@ -450,6 +454,7 @@ function spawnCard(e) {
 
     const newCard = createCard(cardId, x, y);
 
+    cardsGame.push(newCard);
     activeCard = newCard;
     startX = e.clientX;
     startY = e.clientY;
