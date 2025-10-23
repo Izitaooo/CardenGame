@@ -75,6 +75,8 @@ const deckSound = new Howl({
   volume: 0.15,
 });
 
+let cardsGame = [card, card2]
+
 let isLocked = 0;
 let inDeck = 0;
 let container;
@@ -274,12 +276,14 @@ function mouseUp() {
       ease: "power1.inOut",
       overwrite: "auto",
       onStart: () => {
-        allCards.style.pointerEvents = "none";
+        cardsGame[1].style.pointerEvents = "none";
         isLocked = null;
       },
       pointerEvents: "auto",
       onComplete: () => {
         inDeck = 1;
+        for(car )
+        cardsGame[1].style.pointerEvents = "all";
         console.log(deckCards);
         console.log(card.deck);
         console.log(card2.deck);
