@@ -88,6 +88,8 @@ let activeCard = null;
 
 let deckCards = [];
 
+let health = 10;
+
 card.addEventListener("mousedown", (e) => mouseDown(e, card));
 card2.addEventListener("mousedown", (e) => mouseDown(e, card2));
 
@@ -264,6 +266,19 @@ function mouseUp() {
       transform: "scale(1)",
       duration: "0.2",
     });
+
+
+    if(getComputedStyle(activeCard).backgroundImage.includes("Artual.jpeg")){
+      health = health - 3;
+    }
+    else if(getComputedStyle(activeCard).backgroundImage.includes("tetoo.jpeg")){
+      health = health - 1;
+    }
+    else{
+      health = health -2;
+    }
+    console.log(health);
+
   } else if (isLocked === 0) {
     if (!deckCards.includes(activeCard)) {
       deckCards.push(activeCard);
@@ -311,6 +326,8 @@ function mouseUp() {
   document.removeEventListener("mousemove", mouseMove);
   document.removeEventListener("mouseup", mouseMove);
 }
+
+
 
 function distanceFind() {
   const domRect1 = activeCard.getBoundingClientRect();
@@ -412,13 +429,28 @@ function scale() {
 const spawnButton = document.getElementById("spawnerButton");
 const spawnButtonCord = spawnButton.getBoundingClientRect();
 
+function selectAbility(min, max) {
+  return Math.floor(Math.random() * (max - min) + min);
+}
+
+cardSymb = ["url(images/luant-s-artworks-comm-avocadocat-megu.jpg)", "url(images/Artual.jpeg)", "url(images/tetoo.jpeg)"]
+
 function createCard(id, initialX, initialY) {
+
+
     //Create the DOM element
     const cardElement = document.createElement('div');
     cardElement.className = 'card';
     cardElement.id = id;
     cardElement.style.left = initialX + 'px';
     cardElement.style.top = initialY + 'px';
+
+    let rndNum = selectAbility(0,3);
+
+    let imgSelect;
+    imgSelect = cardSymb[rndNum];
+    cardElement.style.backgroundImage = imgSelect;
+
     //Initialize the deck property
     cardElement.deck = false;
 
