@@ -90,6 +90,10 @@ let deckCards = [];
 
 let health = 10;
 
+const handhitbox = document.getElementById("bottomhitbox");
+let cardSpacing = 180;
+let dragAble = true;
+
 card.addEventListener("mousedown", (e) => mouseDown(e, card));
 card2.addEventListener("mousedown", (e) => mouseDown(e, card2));
 
@@ -221,6 +225,21 @@ function mouseMove(e) {
     });
   }
 
+  if(handDown === false){
+    handhitbox.style.height = "5.5vw"
+    handhitbox.style.zIndex = "99"
+    cardSpacing = 180;
+    updateDeckPositions();
+    gsap.to(deckCards, {
+      duration: 0.5,
+      ease: "power1.inOut",
+      top: hand.offsetTop + "px"
+    });
+    handDown = true;
+    console.log(handDown)
+  }
+
+  console.log(activeCard)
   distanceFind();
 }
 
@@ -276,17 +295,17 @@ function mouseUp() {
       health = health -2;
     }
     console.log(health);
+  }
 
-  } else if (isLocked === 0) {
+  else if (isLocked === 0) {
+    dragAble = false;
     if (!deckCards.includes(activeCard)) {
       deckCards.push(activeCard);
       activeCard.deck = true;
     }
+
     gsap.to(activeCard, {
-      left: hand.offsetLeft + deckCards.length * 130 - 130 + "px",
-      top: hand.offsetTop + "px",
-      duration: totalDistance * 0.001,
-      ease: "power1.inOut",
+      updateDeckPositions,
       overwrite: "auto",
       onStart: () => {
           for(let i = 0; i < cardsGame.length; i++) {
@@ -300,12 +319,12 @@ function mouseUp() {
         for(let i = 0; i < cardsGame.length; i++) {
               cardsGame[i].style.pointerEvents = "all";
           }
-
         console.log(deckCards);
         console.log(card.deck);
         console.log(card2.deck);
       },
     });
+
   }
 
   if (dropPlay === 1 && isLocked === 1) {
@@ -315,7 +334,7 @@ function mouseUp() {
     });
   } else if (dropPlay === 1 && isLocked === 0) {
     gsap.to(activeCard, {
-      duration: totalDistance * 0.001,
+      duration: totalDistance * 0.0008,
       onComplete: () => deckSound.play(),
     });
   }
@@ -367,12 +386,19 @@ window.onresize = function () {
 };
 
 function updateDeckPositions() {
+  let totalDistance = distanceFind();
+   // horizontal spacing between cards
+  const totalWidth = (deckCards.length - 1) * cardSpacing;
+  const centerX = hand.offsetLeft + hand.offsetWidth / 2;
+
   deckCards.forEach((card, i) => {
+    const targetX = centerX - totalWidth / 2 + i * cardSpacing - card.offsetWidth / 2;
+    const targetY = hand.offsetTop;
     gsap.to(card, {
-      left: hand.offsetLeft + i * 130 + "px",
-      top: hand.offsetTop + "px",
-      duration: 0.3,
-      ease: "power2.inOut",
+      left: targetX + "px",
+      top: targetY + "px",
+      duration: totalDistance * 0.0008,
+      ease: "power1.inOut",
     });
   });
 }
@@ -424,8 +450,7 @@ function scale() {
   });
 }
 
-const spawnButton = document.getElementById("spawnerButton");
-const spawnButtonCord = spawnButton.getBoundingClientRect();
+
 
 function selectAbility(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
@@ -503,29 +528,37 @@ function spawnCard(e) {
     console.log("spawned and dragging card: " + cardId);
 }
 
-const handhitbox = document.getElementById("bottomhitbox");
 let handDown = true;
-let deckDrag = false;
 
-handhitbox.addEventListener("click", function(){
+handhitbox.addEventListener("mousedown", function(){
+
   if(handDown === true && deckCards.length !== 0){
     console.log(deckCards)
+    cardSpacing = 270;
+    updateDeckPositions();
     handhitbox.style.height = "15.5vw"
+    handhitbox.style.zIndex = "1"
     gsap.to(deckCards, {
       duration: 0.5,
       ease: "power1.inOut",
       top: hand.offsetTop + "px"
     });
     handDown = false;
+    dragAble = true
   }
+
   else if(handDown === false && deckCards.length !== 0){
     console.log(deckCards)
     handhitbox.style.height = "5.5vw"
+    handhitbox.style.zIndex = "99"
+    cardSpacing = 180;
+    updateDeckPositions();
     gsap.to(deckCards, {
       duration: 0.5,
       ease: "power1.inOut",
       top: hand.offsetTop + "px"
     });
     handDown = true;
+    dragAble = false;
   }
 });
