@@ -21,22 +21,37 @@ body {
   align-items: center;
 }
 
+#bottomholder {
+  position: absolute;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 #bottomhitbox {
   height: 5.5vw;
-  width: 100vw;
+  width: 70vw;
   position: absolute;
   bottom: 0;
   display: flex;
   justify-content: center;
+  align-content: center;
   background-color: blanchedalmond;
+  opacity: 0.67;
+  z-index: 99;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: auto;
 }
 
 #hand {
   height: 15vw;
   aspect-ratio: 2/3;
-  background-color: bisque;
   position: fixed;
   border-radius: 0.5vw;
+  background-color: lavenderblush;
+  opacity: 0.67;
 }
 
 .card {
