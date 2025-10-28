@@ -135,9 +135,7 @@ function mouseMove(e) {
   dragged = true;
 
   activeCard.deck = false;
-  console.log(deckCards);
-  console.log("locked:" + isLocked);
-  console.log("all cards:" + allCards);
+
 
   //box1
   const domRect1 = activeCard.getBoundingClientRect();
@@ -499,3 +497,30 @@ function spawnCard(e) {
 
     console.log("spawned and dragging card: " + cardId);
 }
+
+const handhitbox = document.getElementById("bottomhitbox");
+let handDown = true;
+let deckDrag = false;
+
+handhitbox.addEventListener("click", function(){
+  if(handDown === true && deckCards.length !== 0){
+    console.log(deckCards)
+    handhitbox.style.height = "15.5vw"
+    gsap.to(deckCards, {
+      duration: 0.5,
+      ease: "power1.inOut",
+      top: hand.offsetTop + "px"
+    });
+    handDown = false;
+  }
+  else if(handDown === false && deckCards.length !== 0){
+    console.log(deckCards)
+    handhitbox.style.height = "5.5vw"
+    gsap.to(deckCards, {
+      duration: 0.5,
+      ease: "power1.inOut",
+      top: hand.offsetTop + "px"
+    });
+    handDown = true;
+  }
+});

@@ -8,6 +8,9 @@ body {
     position: fixed;
     top: 20vw;
     left: 1vw;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: auto;
 }
 
 .container {
@@ -25,11 +28,12 @@ body {
   bottom: 0;
   display: flex;
   justify-content: center;
+  background-color: blanchedalmond;
 }
 
 #hand {
   height: 15vw;
-  width: 10vw;
+  aspect-ratio: 2/3;
   background-color: bisque;
   position: fixed;
   border-radius: 0.5vw;
@@ -38,12 +42,15 @@ body {
 .card {
   height: 15vw;
   border-radius: 0.5vw;
-  aspect-ratio: 115/160;
+  aspect-ratio: 2/3;
   cursor: pointer;
   position: fixed;
   background-image: url("images/luant-s-artworks-comm-avocadocat-megu.jpg");
   background-size: cover;
   z-index: 2;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: auto;
 }
 
 #card2 {
@@ -59,7 +66,7 @@ body {
 
 .drop {
   height: 15vw;
-  aspect-ratio: 115/160;
+  aspect-ratio: 2/3;
   background-color: lightgoldenrodyellow;
   position: fixed;
   border-radius: 0.5vw;
@@ -67,7 +74,7 @@ body {
 }
 
 #drop1 {
-  left: 30vw;
+  left: 32.5vw;
   top: 5vw;
 }
 #drop2 {
@@ -75,11 +82,11 @@ body {
   top: 5vw;
 }
 #drop3 {
-  left: 60vw;
+  left: 57.5vw;
   top: 5vw;
 }
 #drop4 {
-  left: 30vw;
+  left: 32.5vw;
   top: 23vw;
 }
 #drop5 {
@@ -87,7 +94,7 @@ body {
   top: 23vw;
 }
 #drop6 {
-  left: 60vw;
+  left: 57.5vw;
   top: 23vw;
 }
 
