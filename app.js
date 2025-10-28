@@ -18,9 +18,19 @@ app.get("/", (req, res) => {
 const players = {};
 const cards = {};
 
+socket.on("createRoom", (roomName) => {
+    socket.join(roomName)
+    players[socket.id].room = roomName;
+    console.log(`Player ${socket.id} is now in room ${roomName}`);
+})
+
+
+
+
 io.on("connection", (socket) => {
   console.log("a user connected");
   players[socket.id] = {
+
   };
 
     socket.on("cardPos", (data) => {
