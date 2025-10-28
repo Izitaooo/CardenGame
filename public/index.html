@@ -1,35 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>ImDraggingIt</title>
-    <link rel="stylesheet" href="style.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
-  </head>
-  <body>
-    <button onmousedown="spawnCard(event)" id="spawnerButton">spawn</button>
-    <div class="container">
-      <div class="card" id="card1"></div>
-      <div class="card" id="card2"></div>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css"/>
+    <title>Title</title>
+</head>
+<body>
+<div
+        style="
+display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh;
+">
+
+    <input type="text" id="playerInput" placeholder="room name...">
+    <div>
+        <button onclick="createRoom()"  id="create">create server</button>
+        <button id="join">join server</button>
     </div>
-    <div id="container2">
-      <div class="drop" id="drop1"></div>
-      <div class="drop" id="drop2"></div>
-      <div class="drop" id="drop3"></div>
-      <div class="drop" id="drop4"></div>
-      <div class="drop" id="drop5"></div>
-      <div class="drop" id="drop6"></div>
-    </div>
-    <div class="slidecontainer">
-      <input type="range" min="0.0" max="1" value="0.15" step="0.01" class="slider" id="volume">
-    </div>
-    <div id="bottomhitbox">
-        <div id="hand"></div>
-    </div>
-    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/howler@2.2.4/dist/howler.min.js"></script>
-    <script src="plugins/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
-    <script src="main.js"></script>
-  </body>
+
+
+</div>
+
+
+<script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+
+<script>
+    const socket = io("http://localhost:3000");
+
+const input = document.getElementById('playerInput');
+
+    createRoom = () => {
+        const roomName = input.value;
+
+        socket.emit("createRoom", roomName);
+    }
+
+    socket.on("roomCreated", (roomName) => {
+        console.log("Room created:", roomName);
+        // Redirect to game page
+        window.location.href = "game.html";
+    });
+
+
+</script>
+</body>
 </html>

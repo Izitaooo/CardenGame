@@ -494,7 +494,12 @@ function spawnCard(e) {
 
 /*    dragged = false;
     activeCard.deck = false;*/
-
+    socket.emit("spawnedCard", {
+        id: cardId,
+        initialX: x,
+        initialY: y,
+        type: imgSelect
+    });
     console.log("spawned and dragging card: " + cardId);
 }
 
