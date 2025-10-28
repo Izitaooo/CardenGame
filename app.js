@@ -18,11 +18,7 @@ app.get("/", (req, res) => {
 const players = {};
 const cards = {};
 
-socket.on("createRoom", (roomName) => {
-    socket.join(roomName)
-    players[socket.id].room = roomName;
-    console.log(`Player ${socket.id} is now in room ${roomName}`);
-})
+
 
 
 
@@ -32,6 +28,15 @@ io.on("connection", (socket) => {
   players[socket.id] = {
 
   };
+
+    socket.on("createRoom", (roomName) => {
+        socket.join(roomName)
+        players[socket.id].room = roomName;
+
+        socket.emit("roomCreated", roomName);
+
+        console.log(`Player ${socket.id} is now in room ${roomName}`);
+    })
 
     socket.on("cardPos", (data) => {
         cards[data.id] = {
