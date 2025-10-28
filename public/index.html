@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css"/>
+    <title>Title</title>
+</head>
+<body>
+<div
+        style="
+display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh;
+">
+
+    <input type="text" id="playerInput" placeholder="room name...">
+    <div>
+        <button onclick="createRoom()"  id="create">create server</button>
+        <button id="join">join server</button>
+    </div>
+
+
+</div>
+
+
+<script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+
+<script>
+    const socket = io("http://localhost:3000");
+
+    const input = document.getElementById('playerInput');
+
+    createRoom = () => {
+        const roomName = input.value;
+
+        socket.emit("createRoom", roomName);
+    }
+
+    socket.on("roomCreated", (roomName) => {
+        console.log("Room created:", roomName);
+        // Redirect to game page
+        window.location.href = "game.html";
+    });
+
+
+</script>
+</body>
+</html>
