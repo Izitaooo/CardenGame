@@ -43,6 +43,7 @@ body {
   user-select: none;
   -webkit-user-drag: none;
   pointer-events: auto;
+  cursor: pointer;
 }
 
 #hand {
