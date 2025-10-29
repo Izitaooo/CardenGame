@@ -7,7 +7,8 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server);
 
-const port = 3000;
+// Use environment variable or default to 3000
+const port = process.env.PORT || 3000;
 
 app.use(express.static("public"));
 
@@ -26,29 +27,44 @@ const cards = {};
 io.on("connection", (socket) => {
   console.log("a user connected");
   players[socket.id] = {
-
+      room: null
   };
+    // Send room info when player requests it
+    socket.on("getRoomInfo", () => {
+        const playerRoom = players[socket.id].room;
+        if (playerRoom) {
+            socket.emit("roomInfo", playerRoom);
+        }
+    });
 
-    socket.on("createRoom", (roomName) => {
-        socket.join(roomName)
+
+
+    socket.on("joinRoom", (roomName) => {
+        socket.join(roomName);
         players[socket.id].room = roomName;
 
-        socket.emit("roomCreated", roomName);
-
-        console.log(`Player ${socket.id} is now in room ${roomName}`);
-    })
+        socket.emit("roomJoined", roomName);
+        console.log(`Player ${socket.id} joined room ${roomName}`);
+    });
 
     socket.on("cardPos", (data) => {
+        const playerRoom = players[socket.id].room; // w rooms
+
+        if (!playerRoom) {
+            console.log("dumb mf : " + socket.id + " doesn't have a room lmao");
+            return;
+        }
+
         cards[data.id] = {
             id: data.id,
             container: data.containerInfo,
             playerId: socket.id,
         };
-        let lastSentCard = data.id;
+        //let lastSentCard = data.id;
         console.log("card position:", cards);
 
-        // Send the card object directly
-        socket.broadcast.emit("playerMoved", cards[lastSentCard]);
+        // Send to room
+        socket.to(playerRoom).emit("playerMoved", cards[data.id]);
     });
 
   io.emit("updatePlayers", players);

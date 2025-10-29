@@ -13,8 +13,7 @@ display: flex; flex-direction: column; align-items: center; justify-content: cen
 
     <input type="text" id="playerInput" placeholder="room name...">
     <div>
-        <button onclick="createRoom()"  id="create">create server</button>
-        <button id="join">join server</button>
+        <button onclick="createRoom()"  id="create">create or join room</button>
     </div>
 
 
@@ -24,20 +23,25 @@ display: flex; flex-direction: column; align-items: center; justify-content: cen
 <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
 
 <script>
-    const socket = io("http://localhost:3000");
+    const socket = io();
 
     const input = document.getElementById('playerInput');
 
     createRoom = () => {
         const roomName = input.value;
 
-        socket.emit("createRoom", roomName);
+        if (!roomName) {
+            alert("Please enter a room name!");
+            return;
+        }
+
+        socket.emit("joinRoom", roomName);
     }
 
-    socket.on("roomCreated", (roomName) => {
-        console.log("Room created:", roomName);
-        // Redirect to game page
-        window.location.href = "game.html";
+    socket.on("roomJoined", (roomName) => {
+        console.log("Joined room:", roomName);
+        // Redirect to game page      // Pass room name in URL
+        window.location.href = `game.html?room=${roomName}`;
     });
 
 

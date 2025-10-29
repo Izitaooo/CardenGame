@@ -1,5 +1,25 @@
-const socket = io("http://localhost:3000");
+const socket = io();
 const allCards = {}; // Track all cards
+// Get room from URL
+const urlParams = new URLSearchParams(window.location.search);
+const currentRoom = urlParams.get('room');
+
+// Re-join the room when connected
+if (currentRoom) {
+    socket.emit("joinRoom", currentRoom);
+    console.log("Rejoining room:", currentRoom);
+}
+
+socket.on("roomJoined", (roomName) => {
+    console.log("Successfully joined room:", roomName);
+    // Update indicator if you have one
+    const indicator = document.getElementById("roomNameText");
+        indicator.textContent = `room: ${roomName}`;
+
+});
+
+
+
 socket.on("updatePlayers", (players) => {
   console.log(players);
 });
