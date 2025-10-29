@@ -1,5 +1,25 @@
-const socket = io("http://localhost:3000");
+const socket = io();
 const allCards = {}; // Track all cards
+// Get room from URL
+const urlParams = new URLSearchParams(window.location.search);
+const currentRoom = urlParams.get('room');
+
+// Re-join the room when connected
+if (currentRoom) {
+    socket.emit("joinRoom", currentRoom);
+    console.log("Rejoining room:", currentRoom);
+}
+
+socket.on("roomJoined", (roomName) => {
+    console.log("Successfully joined room:", roomName);
+    // Update indicator if you have one
+    const indicator = document.getElementById("roomNameText");
+        indicator.textContent = `room: ${roomName}`;
+
+});
+
+
+
 socket.on("updatePlayers", (players) => {
   console.log(players);
 });
@@ -92,6 +112,7 @@ let health = 10;
 
 const handhitbox = document.getElementById("bottomhitbox");
 let cardSpacing = 180;
+let dragAble = true;
 
 card.addEventListener("mousedown", (e) => mouseDown(e, card));
 card2.addEventListener("mousedown", (e) => mouseDown(e, card2));
@@ -120,7 +141,7 @@ function mouseDown(e, cardElement) {
     activeCard.deck = false;
   }
 
-  updateDeckPositions(0.5);
+  updateDeckPositions();
 }
 
 function mouseMove(e) {
@@ -224,16 +245,19 @@ function mouseMove(e) {
     });
   }
 
-// TODO [yell]: HERE IS THE THING
   if(handDown === false){
     handhitbox.style.height = "5.5vw"
     handhitbox.style.zIndex = "99"
     cardSpacing = 180;
-    updateDeckPositions(0.5);
+    updateDeckPositions();
+    gsap.to(deckCards, {
+      duration: 0.5,
+      ease: "power1.inOut",
+      top: hand.offsetTop + "px"
+    });
     handDown = true;
     console.log(handDown)
   }
-// TODO [yell]: HERE IS THE THING
 
   console.log(activeCard)
   distanceFind();
@@ -294,14 +318,14 @@ function mouseUp() {
   }
 
   else if (isLocked === 0) {
+    dragAble = false;
     if (!deckCards.includes(activeCard)) {
       deckCards.push(activeCard);
       activeCard.deck = true;
     }
 
-
-    updateDeckPositions(totalDistance * 0.0008)
     gsap.to(activeCard, {
+      updateDeckPositions,
       overwrite: "auto",
       onStart: () => {
           for(let i = 0; i < cardsGame.length; i++) {
@@ -320,18 +344,6 @@ function mouseUp() {
         console.log(card2.deck);
       },
     });
-
-    gsap.to(handhitbox, {
-      duration: totalDistance * 0.0008,
-      onStart: () => {
-        handhitbox.removeEventListener("mousedown", handOpening);
-        handhitbox.style.cursor = "default"
-      },
-      onComplete: () => {
-        handhitbox.addEventListener("mousedown", handOpening);
-        handhitbox.style.cursor = "pointer"
-      }
-    })
 
   }
 
@@ -393,6 +405,23 @@ window.onresize = function () {
   location.replace(location.href);
 };
 
+function updateDeckPositions() {
+  let totalDistance = distanceFind();
+   // horizontal spacing between cards
+  const totalWidth = (deckCards.length - 1) * cardSpacing;
+  const centerX = hand.offsetLeft + hand.offsetWidth / 2;
+
+  deckCards.forEach((card, i) => {
+    const targetX = centerX - totalWidth / 2 + i * cardSpacing - card.offsetWidth / 2;
+    const targetY = hand.offsetTop;
+    gsap.to(card, {
+      left: targetX + "px",
+      top: targetY + "px",
+      duration: totalDistance * 0.0008,
+      ease: "power1.inOut",
+    });
+  });
+}
 
 //multiplayer receive
 socket.on("playerMoved", (data) => {
@@ -521,44 +550,35 @@ function spawnCard(e) {
 
 let handDown = true;
 
-  function handOpening(){
+handhitbox.addEventListener("mousedown", function(){
 
-    if(handDown === true && deckCards.length !== 0 ){
-      console.log(deckCards)
-      handhitbox.style.height = "15.5vw"
-      handhitbox.style.zIndex = "1"
-      cardSpacing = 270;
-      updateDeckPositions(0.5);
-      handDown = false;
-    }
-
-    else if(handDown === false && deckCards.length !== 0 ){
-      console.log(deckCards)
-      handhitbox.style.height = "5.5vw"
-      handhitbox.style.zIndex = "99"
-      cardSpacing = 180;
-      updateDeckPositions(0.5);
-      handDown = true;
-    }
-  }
-  handhitbox.addEventListener("mousedown", handOpening);
-
-
-function updateDeckPositions(speed) {
-  let totalDistance = distanceFind();
-  // horizontal spacing between cards
-  const totalWidth = (deckCards.length - 1) * cardSpacing;
-  const centerX = hand.offsetLeft + hand.offsetWidth / 2;
-
-  deckCards.forEach((card, i) => {
-    const targetX = centerX - totalWidth / 2 + i * cardSpacing - card.offsetWidth / 2;
-    const targetY = hand.offsetTop;
-    gsap.to(card, {
-      left: targetX + "px",
-      top: targetY + "px",
-      duration: speed,
+  if(handDown === true && deckCards.length !== 0){
+    console.log(deckCards)
+    cardSpacing = 270;
+    updateDeckPositions();
+    handhitbox.style.height = "15.5vw"
+    handhitbox.style.zIndex = "1"
+    gsap.to(deckCards, {
+      duration: 0.5,
       ease: "power1.inOut",
+      top: hand.offsetTop + "px"
     });
-  });
-}
+    handDown = false;
+    dragAble = true
+  }
 
+  else if(handDown === false && deckCards.length !== 0){
+    console.log(deckCards)
+    handhitbox.style.height = "5.5vw"
+    handhitbox.style.zIndex = "99"
+    cardSpacing = 180;
+    updateDeckPositions();
+    gsap.to(deckCards, {
+      duration: 0.5,
+      ease: "power1.inOut",
+      top: hand.offsetTop + "px"
+    });
+    handDown = true;
+    dragAble = false;
+  }
+});

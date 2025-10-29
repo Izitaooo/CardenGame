@@ -7,7 +7,8 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server);
 
-const port = 3000;
+// Use environment variable or default to 3000
+const port = process.env.PORT || 3000;
 
 app.use(express.static("public"));
 
@@ -17,26 +18,53 @@ app.get("/", (req, res) => {
 const players = {};
 const cards = {};
 
+
+
+
+
+
 io.on("connection", (socket) => {
   console.log("a user connected");
   players[socket.id] = {
+      room: null
   };
-
-  socket.on("cardPos", (data) => {
-      cards[data.id] = {
-          id: data.id,
-          container: data.containerInfo, // This is correct
-          playerId: socket.id,
-      };
-    console.log("card position:", cards);
-    // Store the card position
-
-    // Broadcast using the correct property name
-    socket.broadcast.emit("playerMoved", {
-      id: socket.id,
-      container: data.containerInfo, // Use containerInfo instead of data.container
+    // Send room info when player requests it
+    socket.on("getRoomInfo", () => {
+        const playerRoom = players[socket.id].room;
+        if (playerRoom) {
+            socket.emit("roomInfo", playerRoom);
+        }
     });
-  });
+
+
+
+    socket.on("joinRoom", (roomName) => {
+        socket.join(roomName);
+        players[socket.id].room = roomName;
+
+        socket.emit("roomJoined", roomName);
+        console.log(`Player ${socket.id} joined room ${roomName}`);
+    });
+
+    socket.on("cardPos", (data) => {
+        const playerRoom = players[socket.id].room; // w rooms
+
+        if (!playerRoom) {
+            console.log("dumb mf : " + socket.id + " doesn't have a room lmao");
+            return;
+        }
+
+        cards[data.id] = {
+            id: data.id,
+            container: data.containerInfo,
+            playerId: socket.id,
+        };
+        //let lastSentCard = data.id;
+        console.log("card position:", cards);
+
+        // Send to room
+        socket.to(playerRoom).emit("playerMoved", cards[data.id]);
+    });
 
   io.emit("updatePlayers", players);
 
