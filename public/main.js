@@ -469,7 +469,7 @@ function selectAbility(min, max) {
 
 cardSymb = ["url(images/luant-s-artworks-comm-avocadocat-megu.jpg)", "url(images/Artual.jpeg)", "url(images/tetoo.jpeg)"]
 
-function createCard(id, initialX, initialY) {
+function createCard(id, initialX, initialY, buttonId) {
 
 
     //Create the DOM element
@@ -480,10 +480,16 @@ function createCard(id, initialX, initialY) {
     cardElement.style.top = initialY + 'px';
 
     let rndNum = selectAbility(0,3);
-
     let imgSelect;
-    imgSelect = cardSymb[rndNum];
-    cardElement.style.backgroundImage = imgSelect;
+    if(buttonId === "spawnerButton") {
+      imgSelect = cardSymb[rndNum];
+    } else {
+      imgSelect = cardSymb[0];
+    }
+
+  cardElement.style.backgroundImage = imgSelect;
+
+
 
     //Initialize the deck property
     cardElement.deck = false;
@@ -512,13 +518,14 @@ function spawnCard(e) {
     nOfCards += 1;
 
     const cardId = 'card' + nOfCards;
+    const button =  e.target.id;
 
     const x = e.clientX - (window.innerWidth * 0.1078125 /2);
     const y = e.clientY - (window.innerWidth * 0.15 /2);
     //const x = e.clientX - self.innerWidth / 2;
     //const y = e.clientY - self.innerHeight / 2;
 
-    const newCard = createCard(cardId, x, y);
+    const newCard = createCard(cardId, x, y, button);
 
     cardsGame.push(newCard);
     activeCard = newCard;

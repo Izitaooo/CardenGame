@@ -13,6 +13,15 @@ body {
     pointer-events: auto;
 }
 
+#spawnerButton2{
+  position: fixed;
+  top: 22vw;
+  left: 1vw;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: auto;
+}
+
 .container {
   height: 100vh;
   width: 100vw;
