@@ -322,12 +322,13 @@ function mouseUp() {
 
     updateDeckPositions(totalDistance * 0.0008)
     gsap.to(activeCard, {
+      duration: totalDistance * 0.0008,
       overwrite: "auto",
       onStart: () => {
           for(let i = 0; i < cardsGame.length; i++) {
               cardsGame[i].style.pointerEvents = "none";
           }
-        isLocked = null;
+          isLocked = null;
       },
       pointerEvents: "auto",
       onComplete: () => {
@@ -452,6 +453,7 @@ socket.on("playerMoved", (data) => {
       overwrite: true,
     });
   }
+
 });
 
 function scale() {
@@ -557,6 +559,7 @@ let handDown = true;
       cardSpacing = 270;
       updateDeckPositions(0.5);
       handDown = false;
+      console.log("handown:" + handDown)
     }
 
     else if(handDown === false && deckCards.length !== 0 ){
@@ -569,7 +572,7 @@ let handDown = true;
     }
   }
   handhitbox.addEventListener("mousedown", handOpening);
-
+  onMoveOutside(handhitbox,() => handOpening())
 
 function updateDeckPositions(speed) {
   let totalDistance = distanceFind();
@@ -589,3 +592,21 @@ function updateDeckPositions(speed) {
   });
 }
 
+function onMoveOutside (element1, callback) {
+    document.addEventListener('mousedown', e => {
+      if(handDown === false){
+        if (!element1.contains(e.target))callback();
+      }
+    });
+}
+
+const menu = document.getElementById("shopMenu");
+const menuExit = document.getElementById("exit");
+function spawnMenu () {
+  menu.style.top = "0"
+}
+
+menuExit.addEventListener("click",  () => {
+  console.log("cock")
+  menu.style.top = "100vh"
+});

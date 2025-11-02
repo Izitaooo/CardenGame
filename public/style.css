@@ -22,6 +22,15 @@ body {
   pointer-events: auto;
 }
 
+#buyMenu{
+  position: fixed;
+  top: 24vw;
+  left: 1vw;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: auto;
+}
+
 .container {
   height: 100vh;
   width: 100vw;
@@ -156,4 +165,45 @@ body {
   background: url("images/betterchibijett.png");
   background-size: cover;
   cursor: pointer;
+}
+
+:root {
+  --pinkie: #F2C3F7;
+  --menu: 32, 31, 33;
+}
+
+#shopMenu {
+  top: 100vh;
+  position: fixed;
+  height: 100vh;
+  width: 100vw;
+  background-color: rgba(var(--menu), 0.8);
+  transition-duration: 0.5s;
+  transition-timing-function: ease-in-out;
+  z-index: 99;
+}
+
+#exit {
+ font-family: "Open Sans", sans-serif;
+ font-size: 2vw;
+ letter-spacing: 2px;
+ text-decoration: none;
+ text-transform: uppercase;
+ top: 1vw;
+ left: 92vw;
+ color: var(--pinkie);
+ cursor: pointer;
+ border: var(--pinkie) 3px solid;
+ padding: 0.25em 0.5em;
+ box-shadow: var(--pinkie) 1px 1px 0px 0px, var(--pinkie)  2px 2px 0px 0px, var(--pinkie) 3px 3px 0px 0px, var(--pinkie) 4px 4px 0px 0px, var(--pinkie) 5px 5px 0px 0px;
+ position: relative;
+ user-select: none;
+ -webkit-user-select: none;
+ touch-action: manipulation;
+}
+
+#exit:active {
+  box-shadow: 0px 0px 0px 0px;
+  top: 1vw;
+  left: 92vw;
 }
