@@ -255,7 +255,6 @@ function mouseMove(e) {
   }
 // TODO [yell]: HERE IS THE THING
 
-  console.log(activeCard)
   distanceFind();
 }
 
@@ -300,17 +299,16 @@ function mouseUp() {
       duration: "0.2",
     });
 
-
-    if(getComputedStyle(activeCard).backgroundImage.includes("Artual.jpeg")){
-      health = health - 3;
-    }
-    else if(getComputedStyle(activeCard).backgroundImage.includes("tetoo.jpeg")){
-      health = health - 1;
-    }
-    else{
-      health = health -2;
-    }
-    console.log(health);
+    if(dragged) {
+        if(getComputedStyle(activeCard).backgroundImage.includes("Artual.jpeg")){
+        health = health - 3;}
+        else if(getComputedStyle(activeCard).backgroundImage.includes("tetoo.jpeg")){
+        health = health - 1;
+        }
+        else{
+        health = health -2;
+        }
+        console.log(health);}
   }
 
   else if (isLocked === 0) {
@@ -371,6 +369,7 @@ function mouseUp() {
 
   document.removeEventListener("mousemove", mouseMove);
   document.removeEventListener("mouseup", mouseMove);
+
 }
 
 
@@ -576,6 +575,7 @@ let handDown = true;
 
 function updateDeckPositions(speed) {
   let totalDistance = distanceFind();
+
   // horizontal spacing between cards
   const totalWidth = (deckCards.length - 1) * cardSpacing;
   const centerX = hand.offsetLeft + hand.offsetWidth / 2;
@@ -591,6 +591,8 @@ function updateDeckPositions(speed) {
     });
   });
 }
+
+
 
 function onMoveOutside (element1, callback) {
     document.addEventListener('mousedown', e => {

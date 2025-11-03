@@ -181,6 +181,8 @@ body {
   transition-duration: 0.5s;
   transition-timing-function: ease-in-out;
   z-index: 99;
+    backdrop-filter: blur(14.8px);
+     -webkit-backdrop-filter: blur(14.8px);
 }
 
 #exit {
