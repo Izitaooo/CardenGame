@@ -612,3 +612,6 @@ menuExit.addEventListener("click",  () => {
   console.log("cock")
   menu.style.top = "100vh"
 });
+
+card.addEventListener('mouseenter', () => card.classList.add('pulsing'));
+card.addEventListener('mouseleave', () => card.classList.remove('pulsing'));
