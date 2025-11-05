@@ -625,3 +625,5 @@ function updateZIndex(cardId) {
         document.getElementById(zIndexes[i]).style.zIndex = i+3;
     }
 }
+card.addEventListener('mouseenter', () => card.classList.add('pulsing'));
+card.addEventListener('mouseleave', () => card.classList.remove('pulsing'));
