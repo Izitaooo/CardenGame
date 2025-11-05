@@ -29,7 +29,7 @@ let startX = 0,
   newX = 0,
   newY = 0;
 
-
+let zIndexes = [];
 //const card = {
 
 //}
@@ -121,6 +121,7 @@ card2.deck = false;
 
 function mouseDown(e, cardElement) {
   activeCard = cardElement;
+  updateZIndex(activeCard.id);
 
   startX = e.clientX;
   startY = e.clientY;
@@ -409,9 +410,9 @@ function distanceFind() {
   return Math.hypot(shoot, bang);
 }
 
-window.onresize = function () {
+/*window.onresize = function () {
   location.replace(location.href);
-};
+};*/
 
 
 //multiplayer receive
@@ -519,6 +520,9 @@ function spawnCard(e) {
     nOfCards += 1;
 
     const cardId = 'card' + nOfCards;
+    zIndexes.push(cardId);
+    console.log(zIndexes);
+
     const button =  e.target.id;
 
     const x = e.clientX - (window.innerWidth * 0.1078125 /2);
@@ -527,6 +531,7 @@ function spawnCard(e) {
     //const y = e.clientY - self.innerHeight / 2;
 
     const newCard = createCard(cardId, x, y, button);
+    document.getElementById(cardId).style.zIndex = zIndexes.indexOf(cardId) + 3;
 
     cardsGame.push(newCard);
     activeCard = newCard;
@@ -612,3 +617,11 @@ menuExit.addEventListener("click",  () => {
   console.log("cock")
   menu.style.top = "100vh"
 });
+
+function updateZIndex(cardId) {
+    zIndexes.splice(zIndexes.indexOf(cardId), 1);
+    zIndexes.push(cardId);
+    for(i = 0; i < zIndexes.length; i++) {
+        document.getElementById(zIndexes[i]).style.zIndex = i+3;
+    }
+}

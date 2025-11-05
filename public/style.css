@@ -55,7 +55,7 @@ body {
   display: flex;
   justify-content: center;
   align-content: center;
-  background-color: blanchedalmond;
+  background-color: #38334a;
   opacity: 0.67;
   z-index: 99;
   user-select: none;
@@ -69,7 +69,7 @@ body {
   aspect-ratio: 2/3;
   position: fixed;
   border-radius: 0.5vw;
-  background-color: lavenderblush;
+  background-color: #231d2d;
   opacity: 0.67;
 }
 
@@ -101,7 +101,7 @@ body {
 .drop {
   height: 15vw;
   aspect-ratio: 2/3;
-  background-color: lightgoldenrodyellow;
+  background-color: #38334a;
   position: fixed;
   border-radius: 0.5vw;
   z-index: 1;
