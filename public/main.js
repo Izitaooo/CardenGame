@@ -19,7 +19,6 @@ socket.on("roomJoined", (roomName) => {
 });
 
 
-
 socket.on("updatePlayers", (players) => {
   console.log(players);
 });
@@ -44,6 +43,8 @@ gsap.to(card2, {
   transform: "scale(1)",
   duration: "0.2",
 });
+
+
 
 const dropper1 = document.getElementById("drop1");
 const dropper2 = document.getElementById("drop2");
@@ -259,6 +260,7 @@ function mouseMove(e) {
   distanceFind();
 }
 
+
 function mouseUp() {
   if (!dragged) {
     isLocked = null;
@@ -287,6 +289,8 @@ function mouseUp() {
     } else if (container === 6) {
       dropper = dropper6;
     }
+
+    activeCard.style.setProperty("--border-animation", "none");
 
     gsap.to(activeCard, {
       left: dropper.offsetLeft + "px",
@@ -318,6 +322,7 @@ function mouseUp() {
       activeCard.deck = true;
     }
 
+    activeCard.style.setProperty("--border-animation", "pulseBorder 1.7s ease-in-out infinite");
 
     updateDeckPositions(totalDistance * 0.0008)
     gsap.to(activeCard, {
@@ -469,7 +474,7 @@ function selectAbility(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
 
-cardSymb = ["url(images/luant-s-artworks-comm-avocadocat-megu.jpg)", "url(images/Artual.jpeg)", "url(images/tetoo.jpeg)"]
+let cardSymb = ["url(images/luant-s-artworks-comm-avocadocat-megu.jpg)", "url(images/Artual.jpeg)", "url(images/tetoo.jpeg)"]
 
 function createCard(id, initialX, initialY, buttonId) {
 
@@ -625,5 +630,10 @@ function updateZIndex(cardId) {
         document.getElementById(zIndexes[i]).style.zIndex = i+3;
     }
 }
-card.addEventListener('mouseenter', () => card.classList.add('pulsing'));
-card.addEventListener('mouseleave', () => card.classList.remove('pulsing'));
+
+window.onresize = function () {
+    location.replace(location.href);
+};
+
+
+
