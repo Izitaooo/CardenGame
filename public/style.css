@@ -143,27 +143,27 @@ body {
 
 #drop1 {
   left: 32.5vw;
-  top: 5vw;
+    top: calc(50vh - 16vw);
 }
 #drop2 {
   left: 45vw;
-  top: 5vw;
+  top: calc(50vh - 16vw);
 }
 #drop3 {
   left: 57.5vw;
-  top: 5vw;
+    top: calc(50vh - 16vw);
 }
 #drop4 {
   left: 32.5vw;
-  top: 23vw;
+    top: calc(50vh + 1vw);
 }
 #drop5 {
   left: 45vw;
-  top: 23vw;
+    top: calc(50vh + 1vw);
 }
 #drop6 {
   left: 57.5vw;
-  top: 23vw;
+    top: calc(50vh + 1vw);
 }
 
 .slidecontainer {

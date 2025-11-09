@@ -2,23 +2,20 @@ const socket = io();
 const allCards = {}; // Track all cards
 // Get room from URL
 const urlParams = new URLSearchParams(window.location.search);
-const currentRoom = urlParams.get('room');
+const currentRoom = urlParams.get("room");
 
 // Re-join the room when connected
 if (currentRoom) {
-    socket.emit("joinRoom", currentRoom);
-    console.log("Rejoining room:", currentRoom);
+  socket.emit("joinRoom", currentRoom);
+  console.log("Rejoining room:", currentRoom);
 }
 
 socket.on("roomJoined", (roomName) => {
-    console.log("Successfully joined room:", roomName);
-    // Update indicator if you have one
-    const indicator = document.getElementById("roomNameText");
-        indicator.textContent = `room: ${roomName}`;
-
+  console.log("Successfully joined room:", roomName);
+  // Update indicator if you have one
+  const indicator = document.getElementById("roomNameText");
+  indicator.textContent = `room: ${roomName}`;
 });
-
-
 
 socket.on("updatePlayers", (players) => {
   console.log(players);
@@ -95,7 +92,7 @@ const deckSound = new Howl({
   volume: 0.15,
 });
 
-let cardsGame = [card, card2]
+let cardsGame = [card, card2];
 
 let isLocked = 0;
 let inDeck = 0;
@@ -108,6 +105,8 @@ let activeCard = null;
 
 let deckCards = [];
 
+let deckCardsOponent = [];
+
 let health = 10;
 
 const handhitbox = document.getElementById("bottomhitbox");
@@ -117,9 +116,12 @@ card.addEventListener("mousedown", (e) => mouseDown(e, card));
 card2.addEventListener("mousedown", (e) => mouseDown(e, card2));
 
 card.deck = false;
+card.deckOponent = false;
 card2.deck = false;
+card2.deckOponent = false;
 
 function mouseDown(e, cardElement) {
+  console.log("MouseDown:", cardElement.id);
   activeCard = cardElement;
   updateZIndex(activeCard.id);
 
@@ -159,7 +161,6 @@ function mouseMove(e) {
   dragged = true;
 
   activeCard.deck = false;
-
 
   //box1
   const domRect1 = activeCard.getBoundingClientRect();
@@ -245,21 +246,22 @@ function mouseMove(e) {
     });
   }
 
-// TODO [yell]: HERE IS THE THING
-  if(handDown === false){
-    handhitbox.style.height = "5.5vw"
-    handhitbox.style.zIndex = "99"
+  // TODO [yell]: HERE IS THE THING
+  if (handDown === false) {
+    handhitbox.style.height = "5.5vw";
+    handhitbox.style.zIndex = "99";
     cardSpacing = 180;
     updateDeckPositions(0.5);
     handDown = true;
-    console.log(handDown)
+    //console.log(handDown)
   }
-// TODO [yell]: HERE IS THE THING
+  // TODO [yell]: HERE IS THE THING
 
   distanceFind();
 }
 
 function mouseUp() {
+  console.log("MouseUp:", activeCard?.id);
   if (!dragged) {
     isLocked = null;
   }
@@ -268,7 +270,7 @@ function mouseUp() {
     containerInfo: container,
     id: activeCard.id,
   });
-  console.log(activeCard.id);
+
   let totalDistance = distanceFind();
 
   if (isLocked === 1) {
@@ -300,44 +302,112 @@ function mouseUp() {
       duration: "0.2",
     });
 
-    if(dragged) {
-        if(getComputedStyle(activeCard).backgroundImage.includes("Artual.jpeg")){
-        health = health - 3;}
-        else if(getComputedStyle(activeCard).backgroundImage.includes("tetoo.jpeg")){
+    if (dragged) {
+      if (
+        getComputedStyle(activeCard).backgroundImage.includes("Artual.jpeg")
+      ) {
+        health = health - 3;
+      } else if (
+        getComputedStyle(activeCard).backgroundImage.includes("tetoo.jpeg")
+      ) {
         health = health - 1;
-        }
-        else{
-        health = health -2;
-        }
-        console.log(health);}
-  }
+      } else {
+        health = health - 2;
+      }
+      //console.log(health);}
+    } else if (isLocked === 0) {
+      if (!deckCards.includes(activeCard)) {
+        deckCards.push(activeCard);
+        activeCard.deck = true;
+      }
+      if (!deckCardsOponent.includes(activeCard)) {
+        deckCardsOponent.push(activeCard);
+        activeCard.deckOponent = true;
+      }
 
-  else if (isLocked === 0) {
+      totalDistance * 0.0008;
+      gsap.to(activeCard, {
+        duration: totalDistance * 0.0008,
+        overwrite: "auto",
+        onStart: () => {
+          for (let i = 0; i < cardsGame.length; i++) {
+            cardsGame[i].style.pointerEvents = "none";
+          }
+          isLocked = null;
+        },
+        pointerEvents: "auto",
+        onComplete: () => {
+          inDeck = 1;
+          for (let i = 0; i < cardsGame.length; i++) {
+            cardsGame[i].style.pointerEvents = "all";
+          }
+          console.log("player " + deckCards);
+          console.log("opponent " + deckCardsOponent);
+
+          //console.log(card.deck);
+          //console.log(card2.deck);
+        },
+      });
+
+      gsap.to(handhitbox, {
+        duration: totalDistance * 0.0008,
+        onStart: () => {
+          handhitbox.removeEventListener("mousedown", handOpening);
+          handhitbox.style.cursor = "default";
+        },
+        onComplete: () => {
+          handhitbox.addEventListener("mousedown", handOpening);
+          handhitbox.style.cursor = "pointer";
+        },
+      });
+    }
+
+    if (dropPlay === 1 && isLocked === 1) {
+      gsap.to(activeCard, {
+        duration: totalDistance * 0.0013,
+        onComplete: () => dropSound.play(),
+      });
+    } else if (dropPlay === 1 && isLocked === 0) {
+      gsap.to(activeCard, {
+        duration: totalDistance * 0.0008,
+        onComplete: () => deckSound.play(),
+      });
+    }
+    dropPlay = 0;
+  } else if (isLocked === 0) {
+    // Only add to deckCards (player's deck)
     if (!deckCards.includes(activeCard)) {
       deckCards.push(activeCard);
       activeCard.deck = true;
+      activeCard.deckOponent = false; // Make sure it's not in opponent deck
     }
 
+    // Remove from opponent's deck if it was there
+    const oponentIndex = deckCardsOponent.indexOf(activeCard);
+    if (oponentIndex !== -1) {
+      deckCardsOponent.splice(oponentIndex, 1);
+    }
 
-    updateDeckPositions(totalDistance * 0.0008)
+    // Add this line
+    updateDeckPositions(totalDistance * 0.0008);
+
     gsap.to(activeCard, {
       duration: totalDistance * 0.0008,
       overwrite: "auto",
       onStart: () => {
-          for(let i = 0; i < cardsGame.length; i++) {
-              cardsGame[i].style.pointerEvents = "none";
-          }
-          isLocked = null;
+        for (let i = 0; i < cardsGame.length; i++) {
+          cardsGame[i].style.pointerEvents = "none";
+        }
+        isLocked = null;
       },
       pointerEvents: "auto",
       onComplete: () => {
         inDeck = 1;
-        for(let i = 0; i < cardsGame.length; i++) {
-              cardsGame[i].style.pointerEvents = "all";
-          }
-        console.log(deckCards);
-        console.log(card.deck);
-        console.log(card2.deck);
+        for (let i = 0; i < cardsGame.length; i++) {
+          cardsGame[i].style.pointerEvents = "all";
+        }
+        console.log("player deck:", deckCards);
+        console.log("opponent deck:", deckCardsOponent);
       },
     });
 
@@ -345,14 +415,13 @@ function mouseUp() {
       duration: totalDistance * 0.0008,
       onStart: () => {
         handhitbox.removeEventListener("mousedown", handOpening);
-        handhitbox.style.cursor = "default"
+        handhitbox.style.cursor = "default";
       },
       onComplete: () => {
         handhitbox.addEventListener("mousedown", handOpening);
-        handhitbox.style.cursor = "pointer"
-      }
-    })
-
+        handhitbox.style.cursor = "pointer";
+      },
+    });
   }
 
   if (dropPlay === 1 && isLocked === 1) {
@@ -368,12 +437,10 @@ function mouseUp() {
   }
   dropPlay = 0;
 
+  // Fix the event listener removal
   document.removeEventListener("mousemove", mouseMove);
-  document.removeEventListener("mouseup", mouseMove);
-
+  document.removeEventListener("mouseup", mouseUp); // Not mouseMove
 }
-
-
 
 function distanceFind() {
   const domRect1 = activeCard.getBoundingClientRect();
@@ -403,17 +470,17 @@ function distanceFind() {
     shoot = dropper6.offsetLeft - domRect1.left;
     bang = dropper6.offsetTop - domRect1.top;
   } else if (container === null) {
-    shoot = hand.offsetLeft - domRect1.left;
-    bang = hand.offsetTop - domRect1.top;
+    if (activeCard.deckOponent === false) {
+      shoot = hand.offsetLeft - domRect1.left;
+      bang = hand.offsetTop - domRect1.top;
+    }
   }
-
   return Math.hypot(shoot, bang);
 }
 
 /*window.onresize = function () {
-  location.replace(location.href);
+location.replace(location.href);
 };*/
-
 
 //multiplayer receive
 socket.on("playerMoved", (data) => {
@@ -433,18 +500,24 @@ socket.on("playerMoved", (data) => {
   else if (container === 5) dropper = dropper5;
   else if (container === 6) dropper = dropper6;
 
-  // Set the active card temporarily for distance calculation
   activeCard = cardToMove;
 
   if (container === null) {
-    gsap.to(cardToMove, {
-      left: hand.offsetLeft + "px",
-      top: hand.offsetTop + "px",
-      duration: totalDistance * 0.0016,
-      ease: "power1.inOut",
-      overwrite: true,
-    });
+    // Add card to opponent's deck
+    if (!deckCardsOponent.includes(cardToMove)) {
+      deckCardsOponent.push(cardToMove);
+      cardToMove.deckOponent = true;
+    }
+
+    updateDeckPositionsOponent(0.5);
   } else {
+    // Remove from opponent's deck if it was there
+    const index = deckCardsOponent.indexOf(cardToMove);
+    if (index !== -1) {
+      deckCardsOponent.splice(index, 1);
+      cardToMove.deckOponent = false;
+    }
+
     gsap.to(cardToMove, {
       left: dropper.offsetLeft + "px",
       top: dropper.offsetTop + "px",
@@ -453,7 +526,6 @@ socket.on("playerMoved", (data) => {
       overwrite: true,
     });
   }
-
 });
 
 function scale() {
@@ -463,120 +535,115 @@ function scale() {
   });
 }
 
-
-
 function selectAbility(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
 
-cardSymb = ["url(images/luant-s-artworks-comm-avocadocat-megu.jpg)", "url(images/Artual.jpeg)", "url(images/tetoo.jpeg)"]
+cardSymb = [
+  "url(images/luant-s-artworks-comm-avocadocat-megu.jpg)",
+  "url(images/Artual.jpeg)",
+  "url(images/tetoo.jpeg)",
+];
 
 function createCard(id, initialX, initialY, buttonId) {
+  //Create the DOM element
+  const cardElement = document.createElement("div");
+  cardElement.className = "card";
+  cardElement.id = id;
+  cardElement.style.left = initialX + "px";
+  cardElement.style.top = initialY + "px";
 
-
-    //Create the DOM element
-    const cardElement = document.createElement('div');
-    cardElement.className = 'card';
-    cardElement.id = id;
-    cardElement.style.left = initialX + 'px';
-    cardElement.style.top = initialY + 'px';
-
-    let rndNum = selectAbility(0,3);
-    let imgSelect;
-    if(buttonId === "spawnerButton") {
-      imgSelect = cardSymb[rndNum];
-    } else {
-      imgSelect = cardSymb[0];
-    }
+  let rndNum = selectAbility(0, 3);
+  let imgSelect;
+  if (buttonId === "spawnerButton") {
+    imgSelect = cardSymb[rndNum];
+  } else {
+    imgSelect = cardSymb[0];
+  }
 
   cardElement.style.backgroundImage = imgSelect;
 
+  //Initialize the deck property
+  cardElement.deck = false;
 
+  cardElement.addEventListener("mousedown", (e) => mouseDown(e, cardElement));
 
-    //Initialize the deck property
-    cardElement.deck = false;
+  //mouseDown(cardElement);
+  //cardElement.addEventListener("mousemove", mouseMove);
+  //cardElement.addEventListener("mouseup", mouseUp);
 
-    cardElement.addEventListener("mousedown", (e) => mouseDown(e, cardElement));
+  //Add to the DOM
+  document.querySelector(".container").appendChild(cardElement);
 
-    //mouseDown(cardElement);
-    //cardElement.addEventListener("mousemove", mouseMove);
-    //cardElement.addEventListener("mouseup", mouseUp);
-
-    //Add to the DOM
-    document.querySelector('.container').appendChild(cardElement);
-
-    allCards[id] = cardElement;
-    //Initial GSAP
-/*    gsap.to(cardElement, {
-        transform: "scale(1)",
-        duration: "0.2",
-    });*/
-    //activeCard = cardElement;
-    return cardElement;
+  allCards[id] = cardElement;
+  //Initial GSAP
+  /*    gsap.to(cardElement, {
+      transform: "scale(1)",
+      duration: "0.2",
+  });*/
+  //activeCard = cardElement;
+  return cardElement;
 }
 
 let nOfCards = 2;
 function spawnCard(e) {
-    nOfCards += 1;
+  nOfCards += 1;
 
-    const cardId = 'card' + nOfCards;
-    zIndexes.push(cardId);
-    console.log(zIndexes);
+  const cardId = "card" + nOfCards;
+  zIndexes.push(cardId);
+  //console.log(zIndexes);
 
-    const button =  e.target.id;
+  const button = e.target.id;
 
-    const x = e.clientX - (window.innerWidth * 0.1078125 /2);
-    const y = e.clientY - (window.innerWidth * 0.15 /2);
-    //const x = e.clientX - self.innerWidth / 2;
-    //const y = e.clientY - self.innerHeight / 2;
+  const x = e.clientX - (window.innerWidth * 0.1078125) / 2;
+  const y = e.clientY - (window.innerWidth * 0.15) / 2;
+  //const x = e.clientX - self.innerWidth / 2;
+  //const y = e.clientY - self.innerHeight / 2;
 
-    const newCard = createCard(cardId, x, y, button);
-    document.getElementById(cardId).style.zIndex = zIndexes.indexOf(cardId) + 3;
+  const newCard = createCard(cardId, x, y, button);
+  document.getElementById(cardId).style.zIndex = zIndexes.indexOf(cardId) + 3;
 
-    cardsGame.push(newCard);
-    activeCard = newCard;
-    startX = e.clientX;
-    startY = e.clientY;
+  cardsGame.push(newCard);
+  activeCard = newCard;
+  startX = e.clientX;
+  startY = e.clientY;
 
-    document.addEventListener("mousemove", mouseMove);
-    document.addEventListener("mouseup", mouseUp);
+  document.addEventListener("mousemove", mouseMove);
+  document.addEventListener("mouseup", mouseUp);
 
-/*    dragged = false;
-    activeCard.deck = false;*/
-    socket.emit("spawnedCard", {
-        id: cardId,
-        initialX: x,
-        initialY: y,
-        type: imgSelect
-    });
-    console.log("spawned and dragging card: " + cardId);
+  /*    dragged = false;
+  activeCard.deck = false;*/
+  socket.emit("spawnedCard", {
+    id: cardId,
+    initialX: x,
+    initialY: y,
+    type: imgSelect,
+  });
+  //console.log("spawned and dragging card: " + cardId);
 }
 
 let handDown = true;
 
-  function handOpening(){
-
-    if(handDown === true && deckCards.length !== 0 ){
-      console.log(deckCards)
-      handhitbox.style.height = "15.5vw"
-      handhitbox.style.zIndex = "1"
-      cardSpacing = 270;
-      updateDeckPositions(0.5);
-      handDown = false;
-      console.log("handown:" + handDown)
-    }
-
-    else if(handDown === false && deckCards.length !== 0 ){
-      console.log(deckCards)
-      handhitbox.style.height = "5.5vw"
-      handhitbox.style.zIndex = "99"
-      cardSpacing = 180;
-      updateDeckPositions(0.5);
-      handDown = true;
-    }
+function handOpening() {
+  if (handDown === true && deckCards.length !== 0) {
+    console.log("player " + deckCards);
+    handhitbox.style.height = "15.5vw";
+    handhitbox.style.zIndex = "1";
+    cardSpacing = 270;
+    updateDeckPositions(0.5);
+    handDown = false;
+    //console.log("handown:" + handDown)
+  } else if (handDown === false && deckCards.length !== 0) {
+    console.log("player " + deckCards);
+    handhitbox.style.height = "5.5vw";
+    handhitbox.style.zIndex = "99";
+    cardSpacing = 180;
+    updateDeckPositions(0.5);
+    handDown = true;
   }
-  handhitbox.addEventListener("mousedown", handOpening);
-  onMoveOutside(handhitbox,() => handOpening())
+}
+handhitbox.addEventListener("mousedown", handOpening);
+onMoveOutside(handhitbox, () => handOpening());
 
 function updateDeckPositions(speed) {
   let totalDistance = distanceFind();
@@ -586,7 +653,8 @@ function updateDeckPositions(speed) {
   const centerX = hand.offsetLeft + hand.offsetWidth / 2;
 
   deckCards.forEach((card, i) => {
-    const targetX = centerX - totalWidth / 2 + i * cardSpacing - card.offsetWidth / 2;
+    const targetX =
+      centerX - totalWidth / 2 + i * cardSpacing - card.offsetWidth / 2;
     const targetY = hand.offsetTop;
     gsap.to(card, {
       left: targetX + "px",
@@ -595,35 +663,55 @@ function updateDeckPositions(speed) {
       ease: "power1.inOut",
     });
   });
+  console.log("player " + deckCards);
+}
+function updateDeckPositionsOponent(speed) {
+  let totalDistance = distanceFind();
+
+  // horizontal spacing between cards
+  const totalWidth = (deckCardsOponent.length - 1) * cardSpacing;
+  const centerX = hand.offsetLeft + hand.offsetWidth / 2;
+
+  deckCardsOponent.forEach((card, i) => {
+    const targetX =
+      centerX - totalWidth / 2 + i * cardSpacing - card.offsetWidth / 2;
+    const targetY = -100;
+    //.innerWidth - hand.offsetTop;
+    gsap.to(card, {
+      left: targetX + "px",
+      top: targetY + "px",
+      duration: speed,
+      ease: "power1.inOut",
+    });
+  });
+  console.log("opponent " + deckCardsOponent);
 }
 
-
-
-function onMoveOutside (element1, callback) {
-    document.addEventListener('mousedown', e => {
-      if(handDown === false){
-        if (!element1.contains(e.target))callback();
-      }
-    });
+function onMoveOutside(element1, callback) {
+  document.addEventListener("mousedown", (e) => {
+    if (handDown === false) {
+      if (!element1.contains(e.target)) callback();
+    }
+  });
 }
 
 const menu = document.getElementById("shopMenu");
 const menuExit = document.getElementById("exit");
-function spawnMenu () {
-  menu.style.top = "0"
+function spawnMenu() {
+  menu.style.top = "0";
 }
 
-menuExit.addEventListener("click",  () => {
-  console.log("cock")
-  menu.style.top = "100vh"
+menuExit.addEventListener("click", () => {
+  console.log("cock");
+  menu.style.top = "100vh";
 });
 
 function updateZIndex(cardId) {
-    zIndexes.splice(zIndexes.indexOf(cardId), 1);
-    zIndexes.push(cardId);
-    for(i = 0; i < zIndexes.length; i++) {
-        document.getElementById(zIndexes[i]).style.zIndex = i+3;
-    }
+  zIndexes.splice(zIndexes.indexOf(cardId), 1);
+  zIndexes.push(cardId);
+  for (i = 0; i < zIndexes.length; i++) {
+    document.getElementById(zIndexes[i]).style.zIndex = i + 3;
+  }
 }
-card.addEventListener('mouseenter', () => card.classList.add('pulsing'));
-card.addEventListener('mouseleave', () => card.classList.remove('pulsing'));
+card.addEventListener("mouseenter", () => card.classList.add("pulsing"));
+card.addEventListener("mouseleave", () => card.classList.remove("pulsing"));
