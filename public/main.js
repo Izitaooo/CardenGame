@@ -162,6 +162,7 @@ function mouseMove(e) {
 
   activeCard.deck = false;
 
+
   //box1
   const domRect1 = activeCard.getBoundingClientRect();
 
@@ -260,6 +261,7 @@ function mouseMove(e) {
   distanceFind();
 }
 
+
 function mouseUp() {
   console.log("MouseUp:", activeCard?.id);
   if (!dragged) {
@@ -289,6 +291,8 @@ function mouseUp() {
     } else if (container === 6) {
       dropper = dropper6;
     }
+
+    activeCard.style.setProperty("--border-animation", "none");
 
     gsap.to(activeCard, {
       left: dropper.offsetLeft + "px",
@@ -388,7 +392,8 @@ function mouseUp() {
       deckCardsOponent.splice(oponentIndex, 1);
     }
 
-    // Add this line
+    activeCard.style.setProperty("--border-animation", "pulseBorder 1.7s ease-in-out infinite");
+
     updateDeckPositions(totalDistance * 0.0008);
 
     gsap.to(activeCard, {
@@ -437,10 +442,11 @@ function mouseUp() {
   }
   dropPlay = 0;
 
-  // Fix the event listener removal
   document.removeEventListener("mousemove", mouseMove);
   document.removeEventListener("mouseup", mouseUp); // Not mouseMove
 }
+
+
 
 function distanceFind() {
   const domRect1 = activeCard.getBoundingClientRect();
@@ -715,3 +721,11 @@ function updateZIndex(cardId) {
 }
 card.addEventListener("mouseenter", () => card.classList.add("pulsing"));
 card.addEventListener("mouseleave", () => card.classList.remove("pulsing"));
+
+
+window.onresize = function () {
+    location.replace(location.href);
+};
+
+
+
