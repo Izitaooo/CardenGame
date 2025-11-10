@@ -417,9 +417,11 @@ function distanceFind() {
     shoot = dropper6.offsetLeft - domRect1.left;
     bang = dropper6.offsetTop - domRect1.top;
   } else if (container === null) {
-    if (activeCard.deckOponent === false) {
-      shoot = hand.offsetLeft - domRect1.left;
-      bang = hand.offsetTop - domRect1.top;
+    shoot = hand.offsetLeft - domRect1.left;
+    bang = hand.offsetTop - domRect1.top;
+    if (activeCard.deckOponent === true) {
+      shoot = null;
+      bang = null;
     }
   }
 
@@ -620,7 +622,6 @@ function updateDeckPositions(speed) {
   console.log("player " + deckCards);
 }
 function updateDeckPositionsOponent(speed) {
-  let totalDistance = distanceFind();
 
   // horizontal spacing between cards
   const totalWidth = (deckCardsOponent.length - 1) * cardSpacing;
