@@ -33,7 +33,7 @@ let zIndexes = [];
 
 //}
 
-let card = document.getElementById("card1");
+/* let card = document.getElementById("card1");
 gsap.to(card, {
   transform: "scale(1)",
   duration: "0.2",
@@ -42,7 +42,7 @@ let card2 = document.getElementById("card2");
 gsap.to(card2, {
   transform: "scale(1)",
   duration: "0.2",
-});
+}); */
 
 
 
@@ -96,7 +96,7 @@ const deckSound = new Howl({
   volume: 0.15,
 });
 
-let cardsGame = [card, card2]
+ let cardsGame = []
 
 let isLocked = 0;
 let inDeck = 0;
@@ -114,11 +114,11 @@ let health = 10;
 const handhitbox = document.getElementById("bottomhitbox");
 let cardSpacing = 180;
 
-card.addEventListener("mousedown", (e) => mouseDown(e, card));
-card2.addEventListener("mousedown", (e) => mouseDown(e, card2));
+// card.addEventListener("mousedown", (e) => mouseDown(e, card));
+// card2.addEventListener("mousedown", (e) => mouseDown(e, card2));
 
-card.deck = false;
-card2.deck = false;
+// card.deck = false;
+// card2.deck = false;
 
 function mouseDown(e, cardElement) {
   activeCard = cardElement;
@@ -260,7 +260,6 @@ function mouseMove(e) {
   distanceFind();
 }
 
-
 function mouseUp() {
   if (!dragged) {
     isLocked = null;
@@ -317,6 +316,7 @@ function mouseUp() {
   }
 
   else if (isLocked === 0) {
+
     if (!deckCards.includes(activeCard)) {
       deckCards.push(activeCard);
       activeCard.deck = true;
@@ -341,8 +341,8 @@ function mouseUp() {
               cardsGame[i].style.pointerEvents = "all";
           }
         console.log(deckCards);
-        console.log(card.deck);
-        console.log(card2.deck);
+        // console.log(card.deck);
+        // console.log(card2.deck);
       },
     });
 
@@ -615,7 +615,7 @@ function onMoveOutside (element1, callback) {
 const menu = document.getElementById("shopMenu");
 const menuExit = document.getElementById("exit");
 function spawnMenu () {
-  menu.style.top = "0"
+  menu.style.top = "4vh"
 }
 
 menuExit.addEventListener("click",  () => {
@@ -626,7 +626,7 @@ menuExit.addEventListener("click",  () => {
 function updateZIndex(cardId) {
     zIndexes.splice(zIndexes.indexOf(cardId), 1);
     zIndexes.push(cardId);
-    for(i = 0; i < zIndexes.length; i++) {
+    for(let i = 0; i < zIndexes.length; i++) {
         document.getElementById(zIndexes[i]).style.zIndex = i+3;
     }
 }

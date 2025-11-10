@@ -18,12 +18,7 @@ right: 2vw;
 ">room: </p>
     <button onclick="spawnMenu()" id="buyMenu">Twin</button>
     <div class="container">
-      <div class="card" id="card1">
 
-      </div>
-      <div class="card" id="card2">
-
-      </div>
     </div>
     <div id="container2">
       <div class="drop" id="drop1"></div>
@@ -42,8 +37,11 @@ right: 2vw;
       </div>
     </div>
     <div id="shopMenu">
-      <button onmousedown="spawnCard(event)" id="spawnerButton">spawnRand</button>
-      <button onmousedown="spawnCard(event)" id="spawnerButton2">spawnMegu</button>
+      <div id="shopContainer">
+        <button onmousedown="spawnCard(event)" id="spawnerButton">spawnRand</button>
+        <button onmousedown="spawnCard(event)" id="spawnerButton2">spawnMegu</button>
+      </div>
+      <div id="luh"></div>
       <button id="exit" role="button">exit</button>
     </div>
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>

@@ -5,23 +5,7 @@ body {
 }
 
 
-#spawnerButton{
-    position: fixed;
-    top: 20vw;
-    left: 1vw;
-    user-select: none;
-    -webkit-user-drag: none;
-    pointer-events: auto;
-}
 
-#spawnerButton2{
-  position: fixed;
-  top: 22vw;
-  left: 1vw;
-  user-select: none;
-  -webkit-user-drag: none;
-  pointer-events: auto;
-}
 
 #buyMenu{
   position: fixed;
@@ -207,14 +191,60 @@ body {
 #shopMenu {
   top: 100vh;
   position: fixed;
-  height: 100vh;
-  width: 100vw;
+  height: 92vh;
+  border-radius: 0.8vw;
+  width: 80vw;
+  right: 10vw;
   background-color: rgba(var(--menu), 0.8);
   transition-duration: 0.5s;
   transition-timing-function: ease-in-out;
   z-index: 99;
     backdrop-filter: blur(14.8px);
      -webkit-backdrop-filter: blur(14.8px);
+  display: flex;
+  justify-content: center;
+  align-content: center;
+}
+
+#spawnerButton{
+  width: 5vw;
+  height: 5vh;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: auto;
+  z-index: 100;
+}
+
+#spawnerButton2{
+  width: 5vw;
+  height: 5vh;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: auto;
+  z-index: 100;
+}
+
+#shopContainer{
+  z-index: 98;
+}
+
+#luh {
+  width: 25%;
+  left: 0;
+  position: fixed;
+  height: 100%;
+  border-radius: 0.8vw;
+  transition-duration: 0.5s;
+  transition-timing-function: ease-in-out;
+  z-index: 99;
+  transition:  1s;
+}
+
+#luh:hover{
+  backdrop-filter: blur(14.8px);
+  -webkit-backdrop-filter: blur(14.8px);
+  background-color: rgba(150, 213, 156, 0.36);
+  transition-timing-function: ease;
 }
 
 #exit {
@@ -225,12 +255,13 @@ body {
  text-transform: uppercase;
  top: 1vw;
  left: 92vw;
+  width: 10vw;
+  height: 8vh;
  color: var(--pinkie);
  cursor: pointer;
  border: var(--pinkie) 3px solid;
  padding: 0.25em 0.5em;
  box-shadow: var(--pinkie) 1px 1px 0px 0px, var(--pinkie)  2px 2px 0px 0px, var(--pinkie) 3px 3px 0px 0px, var(--pinkie) 4px 4px 0px 0px, var(--pinkie) 5px 5px 0px 0px;
- position: relative;
  user-select: none;
  -webkit-user-select: none;
  touch-action: manipulation;
