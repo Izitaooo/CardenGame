@@ -4,18 +4,6 @@ body {
   height: 100vh;
 }
 
-
-
-
-#buyMenu{
-  position: fixed;
-  top: 24vw;
-  left: 1vw;
-  user-select: none;
-  -webkit-user-drag: none;
-  pointer-events: auto;
-}
-
 .container {
   height: 100vh;
   width: 100vw;
@@ -121,6 +109,9 @@ body {
   position: fixed;
   border-radius: 0.5vw;
   z-index: 1;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: auto;
 }
 
 #drop1 {
@@ -188,6 +179,40 @@ body {
   --menu: 32, 31, 33;
 }
 
+#shopBtnCnt{
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: auto;
+  position: fixed;
+  top: 40vh;
+  left: 12vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 6vw;
+  height: 6vw;
+  background-color: #F2C3F7;
+  border-radius: 50%;
+  cursor: pointer;
+  transition-duration: 0.5s;
+}
+
+#shopText{
+  font-family: 'VALORANT', sans-serif;
+  color: #38334a;
+  font-size: 1vw;
+  transition-duration: 0.5s;
+  text-overflow: ellipsis;
+}
+
+#shopBtnCnt:hover{
+  background-color: #38334a;
+
+  #shopText{
+    color: white;
+  }
+}
+
 #shopMenu {
   top: 100vh;
   position: fixed;
@@ -203,7 +228,6 @@ body {
      -webkit-backdrop-filter: blur(14.8px);
   display: flex;
   justify-content: center;
-  align-content: center;
 }
 
 #spawnerButton{
@@ -226,6 +250,12 @@ body {
 
 #shopContainer{
   z-index: 98;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  width: 100%;
+  height: 100%;
 }
 
 #luh {
@@ -237,13 +267,11 @@ body {
   transition-duration: 0.5s;
   transition-timing-function: ease-in-out;
   z-index: 99;
-  transition:  1s;
+  transition:  0.5s;
 }
 
 #luh:hover{
-  backdrop-filter: blur(14.8px);
-  -webkit-backdrop-filter: blur(14.8px);
-  background-color: rgba(150, 213, 156, 0.36);
+  background-color: rgba(141, 133, 171, 0.4);
   transition-timing-function: ease;
 }
 
@@ -254,7 +282,8 @@ body {
  text-decoration: none;
  text-transform: uppercase;
  top: 1vw;
- left: 92vw;
+ right: 2vw;
+  position: fixed;
   width: 10vw;
   height: 8vh;
  color: var(--pinkie);
@@ -265,10 +294,11 @@ body {
  user-select: none;
  -webkit-user-select: none;
  touch-action: manipulation;
+  z-index: 102;
 }
 
 #exit:active {
   box-shadow: 0px 0px 0px 0px;
   top: 1vw;
-  left: 92vw;
+  right: 2vw;
 }

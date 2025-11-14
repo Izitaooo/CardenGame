@@ -122,8 +122,9 @@ let cardSpacing = 180;
 // card2.deck = false;
 
 function mouseDown(e, cardElement) {
-  console.log("MouseDown:", cardElement.id);
   activeCard = cardElement;
+  console.log("MouseDown:", cardElement.id, activeCard.id);
+
   updateZIndex(activeCard.id);
 
   startX = e.clientX;
@@ -135,16 +136,6 @@ function mouseDown(e, cardElement) {
   gsap.killTweensOf(activeCard);
 
   dragged = false;
-
-  if (activeCard.deck) {
-    const index = deckCards.indexOf(activeCard); // find where it is in the array
-    if (index !== -1) {
-      deckCards.splice(index, 1); // remove that one item
-    }
-    activeCard.deck = false;
-  }
-
-  updateDeckPositions(0.5);
 }
 
 function mouseMove(e) {
@@ -161,7 +152,22 @@ function mouseMove(e) {
   dropPlay = 1;
   dragged = true;
 
+  if (activeCard.deck === true) {
+    console.log("zoul  be mine")
+    const index = deckCards.indexOf(activeCard); // find where it is in the array
+    if (index !== -1) {
+      deckCards.splice(index, 1); // remove that one item
+    }
+    gsap.killTweensOf(activeCard);
+
+    activeCard.deck = false;
+    updateDeckPositions(0.5);
+  }
+
   activeCard.deck = false;
+  console.log(activeCard.deleteTrigger);
+
+  activeCard.draggedAO = true;
 
 
   //box1
@@ -307,6 +313,22 @@ function mouseUp() {
       duration: "0.2",
     });
 
+    if(activeCard.deleteTrigger === true){
+
+      activeCard.style.transition = "opacity 0.2s";
+      activeCard.style.opacity = "0";
+      for (let i = 0; i < cardsGame.length; i++) {
+        cardsGame[i].style.pointerEvents = "none";
+      }
+      // activeCard.innerHTML = ""
+      setTimeout(() => {
+        for(let i = 0; i < cardsGame.length; i++) {
+          cardsGame[i].style.pointerEvents = "all";
+        }
+        activeCard.style.display = "none";
+      }, 300);
+    }
+
     if(dragged) {
         if(getComputedStyle(activeCard).backgroundImage.includes("Artual.jpeg")){
         health = health - 3;}
@@ -323,6 +345,7 @@ function mouseUp() {
     if (!deckCards.includes(activeCard)) {
       deckCards.push(activeCard);
       activeCard.deck = true;
+      activeCard.deleteTrigger = true;
       activeCard.deckOponent = false; // Make sure it's not in opponent deck
     }
 
@@ -357,6 +380,7 @@ function mouseUp() {
       },
     });
 
+
     gsap.to(handhitbox, {
       duration: totalDistance * 0.0008,
       onStart: () => {
@@ -386,8 +410,6 @@ function mouseUp() {
   document.removeEventListener("mousemove", mouseMove);
   document.removeEventListener("mouseup", mouseUp); // Not mouseMove
 }
-
-
 
 function distanceFind() {
   const domRect1 = activeCard.getBoundingClientRect();
@@ -519,6 +541,8 @@ function createCard(id, initialX, initialY, buttonId) {
 
   //Initialize the deck property
   cardElement.deck = false;
+  cardElement.deleteTrigger = false;
+  cardElement.draggedAO = false; //maybe useless
 
   cardElement.addEventListener("mousedown", (e) => mouseDown(e, cardElement));
 
@@ -539,7 +563,7 @@ function createCard(id, initialX, initialY, buttonId) {
   return cardElement;
 }
 
-let nOfCards = 2;
+let nOfCards = 0;
 function spawnCard(e) {
   nOfCards += 1;
 
@@ -600,7 +624,9 @@ let handDown = true;
     }
   }
   handhitbox.addEventListener("mousedown", handOpening);
-  onMoveOutside(handhitbox,() => handOpening())
+
+  onMoveOutside(handhitbox, deckCards, () => handOpening())
+
 
 function updateDeckPositions(speed) {
   let totalDistance = distanceFind();
@@ -610,6 +636,7 @@ function updateDeckPositions(speed) {
   const centerX = hand.offsetLeft + hand.offsetWidth / 2;
 
   deckCards.forEach((card, i) => {
+
     const targetX = centerX - totalWidth / 2 + i * cardSpacing - card.offsetWidth / 2;
     const targetY = hand.offsetTop;
     gsap.to(card, {
@@ -642,10 +669,10 @@ function updateDeckPositionsOponent(speed) {
   console.log("opponent " + deckCardsOponent);
 }
 
-function onMoveOutside(element1, callback) {
+function onMoveOutside(element1, element2, callback) {
   document.addEventListener("mousedown", (e) => {
     if (handDown === false) {
-      if (!element1.contains(e.target)) callback();
+      if (!element1.contains(e.target) && (element2.contains(e.target))) callback();
     }
   });
 }
@@ -657,7 +684,6 @@ function spawnMenu () {
 }
 
 menuExit.addEventListener("click", () => {
-  console.log("cock");
   menu.style.top = "100vh";
 });
 
