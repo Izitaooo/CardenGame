@@ -4,6 +4,246 @@ body {
   height: 100vh;
 }
 
+#agentSelectMenuBackground {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(14.8px);
+  -webkit-backdrop-filter: blur(14.8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 100;
+}
+#agentSelectMenuBackground.agentsLocked{
+    background-color: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(0);
+    pointer-events: none;
+    transition: .7s ease-in-out;
+}
+
+#agentSelectMenuBackground h2 {
+  font-family: "VALORANT", sans-serif;
+  color: white;
+  font-size: 3vw;
+  margin-bottom: 4vh;
+}
+#agentSelectH2.agentsLocked{
+    opacity: 0;
+    transition: .7s ease-in-out;
+}
+
+#agentContainer {
+  width: 46vw;
+  /*    height: 70vh;*/
+/*  background-color: rgba(32, 31, 33, 0.8);*/
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2vw;
+  overflow: visible;
+}
+
+#clove:before {
+  background-image: url("images/agents/clove.png");
+}
+#iso:before {
+  background-image: url("images/agents/iso.png");
+}
+#jett:before {
+  background-image: url("images/agents/jett.png");
+}
+#omen:before {
+  background-image: url("images/agents/omen.png");
+}
+#sage:before {
+  background-image: url("images/agents/sage.png");
+}
+#skye:before {
+  background-image: url("images/agents/skye.png");
+}
+#sova:before {
+  background-image: url("images/agents/sova.png");
+}
+#vyse:before {
+  background-image: url("images/agents/vyse.png");
+}
+
+.agentSelect {
+  position: relative;
+  height: 15vw;
+  border-radius: 0.5vw;
+  aspect-ratio: 2/3;
+  cursor: pointer;
+  /*background-size: cover;*/
+  /*user-select: none;*/
+  /*-webkit-user-drag: none;*/
+  /*pointer-events: auto;*/
+  /*background-color: #38334a;*/
+}
+
+.agentSelect:before{
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+    cursor: pointer;
+    background-size: cover;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: auto;
+    background-color: #38334a;
+}
+
+.agentSelect:after {
+  content: "";
+  position: absolute;
+  background-image: url("images/Asset 5.svg");
+  width: 110%;
+  height: 105%;
+  background-repeat: no-repeat;
+  background-size: contain;
+  z-index: 1000;
+  background-position: center;
+  top: -50%;
+  left: -50%;
+  transform: translate(40.4%, 45.3%);
+
+  /* meow tohle je on purpose ten error */
+  animation: var(--border-animation, none);
+  filter: var(
+    --border-filter,
+    brightness(0) saturate(100%) invert(91%) sepia(24%) saturate(5001%)
+      hue-rotate(342deg) brightness(89%) contrast(92%)
+  );
+}
+.agentSelect:hover {
+
+    box-shadow: 0px 0px 7vw 1vw rgba(250,201,53,0.46);
+    transition: .3s ease-in-out;
+}
+.agentSelect:before {
+    transition: .3s ease-in-out;
+}
+.agentSelect:hover:before {
+    filter: grayscale(100%);
+}
+
+.glint {
+  width: 100%;
+  height: 100%;
+  z-index: 10000;
+    mix-blend-mode: color-dodge;
+  background-repeat: no-repeat;
+  background-position: -25vw -20vw, 0 0;
+
+  background-image: linear-gradient(
+    to top right,
+    rgba(156, 124, 0, 0.5) 0%, rgba(255, 214, 8, 0.48) 35%, rgba(255, 255, 255, 1) 36%, rgba(255, 255, 255, 1) 42%, rgba(217, 176, 13, 0.28) 42%, rgba(222, 181, 20, 0.14) 47%, rgba(255, 255, 255, 1) 48%, rgba(255, 255, 255, 1) 51%, rgba(255, 255, 255, 0) 52%, rgba(255, 255, 255, 0) 100%);
+  background-size: 550% 550%, 100% 100%;
+
+
+  transition: background-position 0.3s ease;
+}
+
+.agentSelect:hover .glint {
+  background-position: 0vw -40vw, 0 0;
+  transition-duration: 0.5s;
+
+}
+
+.agentSelect.selected:before{
+    filter: grayscale(100%); !important;
+}
+
+.agentSelect.selected .glint{
+    background-position: 0vw -40vw, 0 0 !important;
+}
+.agentSelect.selected:hover:before {
+    filter: grayscale(100%) !important;
+}
+
+.agentSelect.selected:hover .glint {
+    background-position: 0vw -40vw, 0 0 !important;
+}
+.agentSelect.agentsLocked{
+    opacity: 0;
+    transition: .7s ease-in-out;
+}
+.agentSelect.inGame:before{
+    filter: grayscale(0%); !important;
+    cursor: default !important;
+}
+.agentSelect.inGame:after {
+    z-index: 1 !important;
+}
+.agentSelect.inGame .glint {
+    background-position: -25vw -20vw, 0 0 !important;
+
+    z-index: 1 !important;
+}
+.agentSelect.inGame {
+    z-index: 1 !important;
+}
+.agentSelect.inGame:hover:before {
+    filter: grayscale(0%) !important;
+}
+.agentSelect.inGame:hover .glint {
+    background-position: -25vw -20vw, 0 0 !important;
+}
+.agentSelect.inGame:hover{
+    box-shadow: none !important;
+    transition: .3s ease-in-out;
+}
+.agentSelect.inGame{
+    cursor: default !important;
+}
+
+
+#lockIn{
+    margin-top: 4vh;
+    width: 12vw;
+    height: 4vh;
+    background-color: #5d5c67;
+    color: #9998aa;
+    border: none;
+    border-radius: 0.5vw;
+    font-family: "VALORANT", sans-serif;
+    font-size: 1.5vw;
+    cursor: default;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: auto;
+    transition-duration: 0.3s;
+}
+#lockIn.agentsLocked{
+    opacity: 0;
+    transition: .7s ease-in-out;
+}
+/*#lockIn:hover{
+    background-color: #77768a;
+    color: white;
+    transition-duration: 0.3s;
+}*/
+
+#lockIn.full{
+    background-color: #aa3630;
+    box-shadow: 0px 0px 5vw 0.5vw rgba(250,53,53,0.46);
+    color: white;
+    cursor: pointer;
+}
+#lockIn.full:hover{
+    background-color: #d94b45;
+    box-shadow: 0px 0px 7vw 2vw rgba(250,53,53,0.46);
+    transition-duration: 0.3s;
+}
+
 .container {
   height: 100vh;
   width: 100vw;
@@ -76,18 +316,22 @@ body {
 
   /* meow tohle je on purpose ten error */
   animation: var(--border-animation, none);
-  filter: var(--border-filter, brightness(0) saturate(100%) invert(91%) sepia(24%) saturate(5001%) hue-rotate(342deg) brightness(89%) contrast(92%));
+  filter: var(
+    --border-filter,
+    brightness(0) saturate(100%) invert(91%) sepia(24%) saturate(5001%)
+      hue-rotate(342deg) brightness(89%) contrast(92%)
+  );
 }
 
 @keyframes pulseBorder {
-  0%, 100% {
-
-    filter: brightness(0) saturate(100%) invert(91%) sepia(24%) saturate(5001%) hue-rotate(342deg) brightness(89%) contrast(92%);
-
+  0%,
+  100% {
+    filter: brightness(0) saturate(100%) invert(91%) sepia(24%) saturate(5001%)
+      hue-rotate(342deg) brightness(89%) contrast(92%);
   }
   50% {
-    filter: brightness(0) saturate(100%) invert(90%) sepia(12%) saturate(6531%) hue-rotate(358deg) brightness(100%) contrast(106%);
-
+    filter: brightness(0) saturate(100%) invert(90%) sepia(12%) saturate(6531%)
+      hue-rotate(358deg) brightness(100%) contrast(106%);
   }
 }
 
@@ -116,7 +360,7 @@ body {
 
 #drop1 {
   left: 32.5vw;
-    top: calc(50vh - 16vw);
+  top: calc(50vh - 16vw);
 }
 #drop2 {
   left: 45vw;
@@ -124,24 +368,24 @@ body {
 }
 #drop3 {
   left: 57.5vw;
-    top: calc(50vh - 16vw);
+  top: calc(50vh - 16vw);
 }
 #drop4 {
   left: 32.5vw;
-    top: calc(50vh + 1vw);
+  top: calc(50vh + 1vw);
 }
 #drop5 {
   left: 45vw;
-    top: calc(50vh + 1vw);
+  top: calc(50vh + 1vw);
 }
 #drop6 {
   left: 57.5vw;
-    top: calc(50vh + 1vw);
+  top: calc(50vh + 1vw);
 }
 
 .slidecontainer {
   position: fixed;
-  top:  1vw;
+  top: 1vw;
   left: 1vw;
 }
 
@@ -175,11 +419,11 @@ body {
 }
 
 :root {
-  --pinkie: #F2C3F7;
+  --pinkie: #f2c3f7;
   --menu: 32, 31, 33;
 }
 
-#shopBtnCnt{
+#shopBtnCnt {
   user-select: none;
   -webkit-user-drag: none;
   pointer-events: auto;
@@ -191,24 +435,24 @@ body {
   align-items: center;
   width: 6vw;
   height: 6vw;
-  background-color: #F2C3F7;
+  background-color: #f2c3f7;
   border-radius: 50%;
   cursor: pointer;
   transition-duration: 0.5s;
 }
 
-#shopText{
-  font-family: 'VALORANT', sans-serif;
+#shopText {
+  font-family: "VALORANT", sans-serif;
   color: #38334a;
   font-size: 1vw;
   transition-duration: 0.5s;
   text-overflow: ellipsis;
 }
 
-#shopBtnCnt:hover{
+#shopBtnCnt:hover {
   background-color: #38334a;
 
-  #shopText{
+  #shopText {
     color: white;
   }
 }
@@ -224,13 +468,13 @@ body {
   transition-duration: 0.5s;
   transition-timing-function: ease-in-out;
   z-index: 99;
-    backdrop-filter: blur(14.8px);
-     -webkit-backdrop-filter: blur(14.8px);
+  backdrop-filter: blur(14.8px);
+  -webkit-backdrop-filter: blur(14.8px);
   display: flex;
   justify-content: center;
 }
 
-#spawnerButton{
+#spawnerButton {
   width: 5vw;
   height: 5vh;
   user-select: none;
@@ -239,7 +483,7 @@ body {
   z-index: 100;
 }
 
-#spawnerButton2{
+#spawnerButton2 {
   width: 5vw;
   height: 5vh;
   user-select: none;
@@ -248,7 +492,7 @@ body {
   z-index: 100;
 }
 
-#shopContainer{
+#shopContainer {
   z-index: 98;
   display: flex;
   justify-content: center;
@@ -267,33 +511,35 @@ body {
   transition-duration: 0.5s;
   transition-timing-function: ease-in-out;
   z-index: 99;
-  transition:  0.5s;
+  transition: 0.5s;
 }
 
-#luh:hover{
+#luh:hover {
   background-color: rgba(141, 133, 171, 0.4);
   transition-timing-function: ease;
 }
 
 #exit {
- font-family: "Open Sans", sans-serif;
- font-size: 2vw;
- letter-spacing: 2px;
- text-decoration: none;
- text-transform: uppercase;
- top: 1vw;
- right: 2vw;
+  font-family: "Open Sans", sans-serif;
+  font-size: 2vw;
+  letter-spacing: 2px;
+  text-decoration: none;
+  text-transform: uppercase;
+  top: 1vw;
+  right: 2vw;
   position: fixed;
   width: 10vw;
   height: 8vh;
- color: var(--pinkie);
- cursor: pointer;
- border: var(--pinkie) 3px solid;
- padding: 0.25em 0.5em;
- box-shadow: var(--pinkie) 1px 1px 0px 0px, var(--pinkie)  2px 2px 0px 0px, var(--pinkie) 3px 3px 0px 0px, var(--pinkie) 4px 4px 0px 0px, var(--pinkie) 5px 5px 0px 0px;
- user-select: none;
- -webkit-user-select: none;
- touch-action: manipulation;
+  color: var(--pinkie);
+  cursor: pointer;
+  border: var(--pinkie) 3px solid;
+  padding: 0.25em 0.5em;
+  box-shadow: var(--pinkie) 1px 1px 0px 0px, var(--pinkie) 2px 2px 0px 0px,
+    var(--pinkie) 3px 3px 0px 0px, var(--pinkie) 4px 4px 0px 0px,
+    var(--pinkie) 5px 5px 0px 0px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
   z-index: 102;
 }
 
