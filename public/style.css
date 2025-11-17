@@ -21,6 +21,7 @@ body {
     background-color: rgba(0, 0, 0, 0);
     backdrop-filter: blur(0);
     pointer-events: none;
+    z-index: 2;
     transition: .7s ease-in-out;
 }
 
@@ -71,6 +72,33 @@ body {
 #vyse:before {
   background-image: url("images/agents/vyse.png");
 }
+
+
+#enemy_clove:before {
+  background-image: url("images/agents/clove.png");
+}
+#enemy_iso:before {
+  background-image: url("images/agents/iso.png");
+}
+#enemy_jett:before {
+  background-image: url("images/agents/jett.png");
+}
+#enemy_omen:before {
+  background-image: url("images/agents/omen.png");
+}
+#enemy_sage:before {
+    background-image: url("images/agents/sage.png");
+}
+#enemy_skye:before {
+  background-image: url("images/agents/skye.png");
+}
+#enemy_sova:before {
+  background-image: url("images/agents/sova.png");
+}
+#enemy_vyse:before {
+  background-image: url("images/agents/vyse.png");
+}
+
 
 .agentSelect {
   position: relative;
@@ -203,6 +231,9 @@ body {
 }
 .agentSelect.inGame{
     cursor: default !important;
+}
+.agentSelect.hidden{
+    opacity: 0; !important;
 }
 
 

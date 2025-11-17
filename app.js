@@ -47,6 +47,11 @@ io.on("connection", (socket) => {
         console.log(`Player ${socket.id} joined room ${roomName}`);
     });
 
+    socket.on("agentsLockedIn", (data) => {
+        const playerRoom = players[socket.id].room; // w rooms
+        socket.to(playerRoom).emit("enemyChose", data);
+    })
+
     socket.on("cardPos", (data) => {
         const playerRoom = players[socket.id].room; // w rooms
 
@@ -67,7 +72,7 @@ io.on("connection", (socket) => {
         socket.to(playerRoom).emit("playerMoved", cards[data.id]);
     });
 
-  io.emit("updatePlayers", players);
+  //io.emit("updatePlayers", players);
 
   socket.on("disconnect", (reason) => {
     console.log(reason);

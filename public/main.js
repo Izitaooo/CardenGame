@@ -147,7 +147,9 @@ function lockIn() {
         data.endY = dropperRect.top;
         idropper++;
       }
-      document.getElementById("agentSelectMenuBackground").classList.add("agentsLocked");
+      document
+        .getElementById("agentSelectMenuBackground")
+        .classList.add("agentsLocked");
       document.getElementById("agentSelectH2").classList.add("agentsLocked");
       document.getElementById("lockIn").classList.add("agentsLocked");
       /*setTimeout(() => {
@@ -155,8 +157,7 @@ function lockIn() {
         }, 700);*/
       // Second pass: convert to fixed and animate
       for (let data of agentData) {
-        // Move out of the high-z parent so z-index compares against the page root
-        document.body.appendChild(data.element);
+        /*document.body.appendChild(data.element);*/
 
         data.element.style.position = "fixed";
         data.element.style.left = data.startX + "px";
@@ -179,7 +180,9 @@ function lockIn() {
             document.getElementById(agent).remove();
           } else {
             document.getElementById(agent).style.zIndex = "1";
-            document.getElementById(agent).querySelector(".glint").style.zIndex = "1";
+            document
+              .getElementById(agent)
+              .querySelector(".glint").style.zIndex = "1";
           }
         }
         document.getElementById("agentSelectH2").remove();
@@ -193,6 +196,61 @@ function lockIn() {
           }
       }*/
   }
+  socket.emit("agentsLockedIn", {
+    agentsChosen,
+  });
+}
+
+socket.on("enemyChose", (data) => {
+  let enemyAgents = data.agentsChosen;
+  console.log("Enemy chose agents:", data.agentsChosen);
+  enemyAgents.forEach((agent, index) => {
+    const dropperNum = 1 + index;
+    const dropper = document.getElementById("drop" + dropperNum);
+
+    cardsGame.push(spawnEnemyAgent(agent, dropper));
+  });
+
+  // Animate all enemy agents
+  for (let agent of enemyAgents) {
+    let agentControl = document.getElementById("enemy_" + agent);
+    if (agentControl) {
+      const finalTop =
+        parseFloat(agentControl.style.top) + window.innerHeight * 0.1;
+
+      gsap.to(agentControl, {
+        top: finalTop + "px",
+        opacity: 1,
+        duration: 0.5,
+        ease: "power1.inOut",
+        overwrite: true,
+      });
+    }
+  }
+});
+
+function spawnEnemyAgent(agentName, dropper) {
+  const enemyAgent = document.createElement("div");
+  enemyAgent.className = "agentSelect enemy inGame";
+  enemyAgent.id = "enemy_" + agentName;
+  enemyAgent.style.position = "fixed";
+
+  const dropperRect = dropper.getBoundingClientRect();
+  enemyAgent.style.left = dropperRect.left + "px";
+  enemyAgent.style.top = dropperRect.top - window.innerHeight * 0.1 + "px";
+
+  // Start transparent
+  enemyAgent.style.opacity = "0";
+
+  enemyAgent.style.pointerEvents = "none";
+
+  const glint = document.createElement("div");
+  glint.className = "glint";
+  enemyAgent.appendChild(glint);
+
+  document.body.appendChild(enemyAgent);
+
+  return enemyAgent;
 }
 
 let volumeSlider = document.getElementById("volume");
