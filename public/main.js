@@ -17,7 +17,6 @@ socket.on("roomJoined", (roomName) => {
   indicator.textContent = `room: ${roomName}`;
 });
 
-
 socket.on("updatePlayers", (players) => {
   console.log(players);
 });
@@ -43,8 +42,6 @@ gsap.to(card2, {
   duration: "0.2",
 }); */
 
-
-
 const dropper1 = document.getElementById("drop1");
 const dropper2 = document.getElementById("drop2");
 const dropper3 = document.getElementById("drop3");
@@ -65,6 +62,201 @@ const spawnButton1 = document.getElementById("spawnerButton")
 const spawnButton2 = document.getElementById("spawnerButton2")
 
 const hand = document.getElementById("hand");
+
+let agents = ["clove", "iso", "jett", "omen", "sage", "skye", "sova", "vyse"];
+let agentsChosen = [];
+const agentHandlers = {}; // Store handler references
+
+// Add event listeners to all agents
+agents.forEach((agent) => {
+  const element = document.getElementById(agent);
+  agentHandlers[agent] = () => selectAgent(agent); // Store the handler
+  element.addEventListener("click", agentHandlers[agent]);
+});
+
+function selectAgent(agentName) {
+  if (agentsChosen.length < 3) {
+    if (!agentsChosen.includes(agentName)) {
+      agentsChosen.push(agentName);
+      document.getElementById(agentName).classList.add("selected");
+    } else {
+      if (agentsChosen.includes(agentName)) {
+        agentsChosen = agentsChosen.filter((agent) => agent !== agentName);
+        document.getElementById(agentName).classList.remove("selected");
+      }
+    }
+  } else {
+    if (agentsChosen.includes(agentName)) {
+      agentsChosen = agentsChosen.filter((agent) => agent !== agentName);
+      document.getElementById(agentName).classList.remove("selected");
+    }
+  }
+  if (agentsChosen.length === 3) {
+    document.getElementById("lockIn").classList.add("full");
+  } else {
+    document.getElementById("lockIn").classList.remove("full");
+  }
+
+  console.log("Selected agents:", agentsChosen);
+}
+
+function lockIn() {
+  console.log("lock in");
+  if (agentsChosen.length === 3) {
+    console.log("Locked in agents:", agentsChosen);
+    /*    document
+      .getElementById("agentSelectMenuBackground")
+      .classList.add("agentsLocked");*/
+    for (let agent of agents) {
+      if (agentsChosen.includes(agent)) {
+        console.log("is there");
+        document.getElementById(agent).classList.remove("selected");
+        document.getElementById(agent).classList.add("inGame");
+        document.getElementById(agent).style.zIndex = "1000"; // start high
+        const gl = document.getElementById(agent).querySelector(".glint");
+        if (gl) gl.style.zIndex = "1000";
+        document.getElementById(agent).style.pointerEvents = "none";
+        // Use the stored handler reference
+        document
+          .getElementById(agent)
+          .removeEventListener("click", agentHandlers[agent]);
+      } else {
+        document.getElementById(agent).classList.add("agentsLocked");
+
+        console.log("not there");
+      }
+    }
+
+    setTimeout(() => {
+      // First pass: calculate all positions BEFORE converting
+      let agentData = [];
+      for (let agent of agentsChosen) {
+        let agentToMove = document.getElementById(agent);
+        const rect = agentToMove.getBoundingClientRect();
+
+        agentData.push({
+          element: agentToMove,
+          startX: rect.left,
+          startY: rect.top,
+          endX: null,
+          endY: null,
+        });
+      }
+
+      // Get dropper positions
+      let idropper = 4;
+      for (let data of agentData) {
+        let dropper = document.getElementById("drop" + idropper);
+        const dropperRect = dropper.getBoundingClientRect();
+        data.endX = dropperRect.left;
+        data.endY = dropperRect.top;
+        idropper++;
+      }
+      document
+        .getElementById("agentSelectMenuBackground")
+        .classList.add("agentsLocked");
+      document.getElementById("agentSelectH2").classList.add("agentsLocked");
+      document.getElementById("lockIn").classList.add("agentsLocked");
+      /*setTimeout(() => {
+                  document.getElementById("agentSelectMenuBackground").remove()
+        }, 700);*/
+      // Second pass: convert to fixed and animate
+      for (let data of agentData) {
+        /*document.body.appendChild(data.element);*/
+
+        data.element.style.position = "fixed";
+        data.element.style.left = data.startX + "px";
+        data.element.style.top = data.startY + "px";
+        data.element.style.zIndex = "1000"; // keep high while animating
+        data.element.querySelector(".glint").style.zIndex = "1000";
+
+        gsap.to(data.element, {
+          left: data.endX + "px",
+          top: data.endY + "px",
+          duration: 0.5,
+          ease: "power1.inOut",
+          overwrite: true,
+        });
+      }
+
+      setTimeout(() => {
+        for (let agent of agents) {
+          if (!agentsChosen.includes(agent)) {
+            document.getElementById(agent).remove();
+          } else {
+            document.getElementById(agent).style.zIndex = "1";
+            document
+              .getElementById(agent)
+              .querySelector(".glint").style.zIndex = "1";
+          }
+        }
+        document.getElementById("agentSelectH2").remove();
+        document.getElementById("lockIn").remove();
+      }, 700);
+    }, 1000);
+
+    /*      for (let agent of agents) {
+          if (!agentsChosen.includes(agent)) {
+              document.getElementById(agent).remove();
+          }
+      }*/
+  }
+  socket.emit("agentsLockedIn", {
+    agentsChosen,
+  });
+}
+
+socket.on("enemyChose", (data) => {
+  let enemyAgents = data.agentsChosen;
+  console.log("Enemy chose agents:", data.agentsChosen);
+  enemyAgents.forEach((agent, index) => {
+    const dropperNum = 1 + index;
+    const dropper = document.getElementById("drop" + dropperNum);
+
+    cardsGame.push(spawnEnemyAgent(agent, dropper));
+  });
+
+  // Animate all enemy agents
+  for (let agent of enemyAgents) {
+    let agentControl = document.getElementById("enemy_" + agent);
+    if (agentControl) {
+      const finalTop =
+        parseFloat(agentControl.style.top) + window.innerHeight * 0.1;
+
+      gsap.to(agentControl, {
+        top: finalTop + "px",
+        opacity: 1,
+        duration: 0.5,
+        ease: "power1.inOut",
+        overwrite: true,
+      });
+    }
+  }
+});
+
+function spawnEnemyAgent(agentName, dropper) {
+  const enemyAgent = document.createElement("div");
+  enemyAgent.className = "agentSelect enemy inGame";
+  enemyAgent.id = "enemy_" + agentName;
+  enemyAgent.style.position = "fixed";
+
+  const dropperRect = dropper.getBoundingClientRect();
+  enemyAgent.style.left = dropperRect.left + "px";
+  enemyAgent.style.top = dropperRect.top - window.innerHeight * 0.1 + "px";
+
+  // Start transparent
+  enemyAgent.style.opacity = "0";
+
+  enemyAgent.style.pointerEvents = "none";
+
+  const glint = document.createElement("div");
+  glint.className = "glint";
+  enemyAgent.appendChild(glint);
+
+  document.body.appendChild(enemyAgent);
+
+  return enemyAgent;
+}
 
 let volumeSlider = document.getElementById("volume");
 let volumeNow = volumeSlider.value;
@@ -100,7 +292,7 @@ const deckSound = new Howl({
   volume: 0.15,
 });
 
- let cardsGame = []
+let cardsGame = [];
 
 let isLocked = 0;
 let inDeck = 0;
@@ -167,7 +359,7 @@ function mouseMove(e) {
   let purpleRect = purple.getBoundingClientRect();
 
   if (activeCard.deck === true) {
-    console.log("zoul  be mine")
+    console.log("zoul  be mine");
     const index = deckCards.indexOf(activeCard); // find where it is in the array
     if (index !== -1) {
       deckCards.splice(index, 1); // remove that one item
@@ -307,8 +499,6 @@ function mouseMove(e) {
   distanceFind();
 }
 
-// purple.style.backgroundColor = 'green';
-
 function mouseUp() {
   console.log("MouseUp:", activeCard?.id);
   if (!dragged) {
@@ -374,8 +564,7 @@ function mouseUp() {
       duration: "0.2",
     });
 
-    if(activeCard.deleteTrigger === true){
-
+    if (activeCard.deleteTrigger === true) {
       activeCard.style.transition = "opacity 0.2s";
       activeCard.style.opacity = "0";
       for (let i = 0; i < cardsGame.length; i++) {
@@ -402,8 +591,8 @@ function mouseUp() {
         healthtext.innerHTML = health;
         console.log(health);}
   }
-
-  else if (isLocked === 0) {
+  else if (isLocked === 0 &&
+      deckCardsOponent.includes(activeCard) === false) {
     if (!deckCards.includes(activeCard)) {
       deckCards.push(activeCard);
       activeCard.deck = true;
@@ -454,7 +643,6 @@ function mouseUp() {
       },
     });
 
-
     gsap.to(handhitbox, {
       duration: totalDistance * 0.0008,
       onStart: () => {
@@ -485,41 +673,37 @@ function mouseUp() {
   document.removeEventListener("mouseup", mouseUp); // Not mouseMove
 }
 
-function distanceFind() {
-  const domRect1 = activeCard.getBoundingClientRect();
-  let shoot;
-  let bang;
-  //box1
-  if (container === 1) {
+function distanceFind(card = activeCard, cont = container) {
+  if (!card) return 0;
+  const domRect1 = card.getBoundingClientRect();
+  let shoot = 0;
+  let bang = 0;
+
+  if (cont === 1) {
     shoot = dropper1.offsetLeft - domRect1.left;
     bang = dropper1.offsetTop - domRect1.top;
-  }
-  //box2
-  else if (container === 2) {
+  } else if (cont === 2) {
     shoot = dropper2.offsetLeft - domRect1.left;
     bang = dropper2.offsetTop - domRect1.top;
-  }
-  //box3
-  else if (container === 3) {
+  } else if (cont === 3) {
     shoot = dropper3.offsetLeft - domRect1.left;
     bang = dropper3.offsetTop - domRect1.top;
-  }
-  else if (container === 4) {
+  } else if (cont === 4) {
     shoot = dropper4.offsetLeft - domRect1.left;
     bang = dropper4.offsetTop - domRect1.top;
-  } else if (container === 5) {
+  } else if (cont === 5) {
     shoot = dropper5.offsetLeft - domRect1.left;
     bang = dropper5.offsetTop - domRect1.top;
-  } else if (container === 6) {
+  } else if (cont === 6) {
     shoot = dropper6.offsetLeft - domRect1.left;
     bang = dropper6.offsetTop - domRect1.top;
-  } else if (container === null) {
+  } else if (cont === null) {
     shoot = hand.offsetLeft - domRect1.left;
     bang = hand.offsetTop - domRect1.top; }
-    else if (container === 0) {
+    else if (cont === 0) {
     shoot = spawnButton1.offsetLeft - domRect1.left;
     bang = spawnButton1.offsetTop - domRect1.top;
-    if (activeCard.deckOponent === true) {
+    if (card.deckOponent === true) {
       shoot = null;
       bang = null;
     }
@@ -532,53 +716,74 @@ function distanceFind() {
 location.replace(location.href);
 };*/
 
-
 //multiplayer receive
 socket.on("playerMoved", (data) => {
   // Get the actual card element by ID
   let cardToMove = document.getElementById(data.id);
   if (!cardToMove) return; // Guard against null
-  container = data.container;
-  console.log(`Player ${data.playerId} moved ${data.id} to`, data.container);
-  console.log("container " + container);
-  let totalDistance = distanceFind();
-  let dropper;
 
-  if (container === 1) dropper = dropper1;
-  else if (container === 2) dropper = dropper2;
-  else if (container === 3) dropper = dropper3;
-  else if (container === 4) dropper = dropper4;
-  else if (container === 5) dropper = dropper5;
-  else if (container === 6) dropper = dropper6;
-  else if (container === 0) dropper = spawnButton1;
+  // Don't touch global activeCard/container here
+  const cont = data.container;
+  console.log(`Player ${data.playerId} moved ${data.id} to`, cont);
 
-  activeCard = cardToMove;
+  // Always ensure this card is not accidentally present in the local deck
+  const localIndex = deckCards.indexOf(cardToMove);
+  if (localIndex !== -1) {
+    deckCards.splice(localIndex, 1);
+    cardToMove.deck = false;
+  }
 
-  if (container === null) {
-    // Add card to opponent's deck
+  // compute distance for animation using local card+container
+  const totalDistance = distanceFind(cardToMove, cont);
+
+  let dropper = null;
+  if (cont === 1) dropper = dropper1;
+  else if (cont === 2) dropper = dropper2;
+  else if (cont === 3) dropper = dropper3;
+  else if (cont === 4) dropper = dropper4;
+  else if (cont === 5) dropper = dropper5;
+  else if (cont === 6) dropper = dropper6;
+  else if (cont === 0) dropper = spawnButton1;
+
+  if (cont === null) {
+    // Move into opponent deck (local representation)
     if (!deckCardsOponent.includes(cardToMove)) {
       deckCardsOponent.push(cardToMove);
-      cardToMove.deckOponent = true;
     }
-
+    cardToMove.deckOponent = true;
+    cardToMove.deck = false;
     updateDeckPositionsOponent(0.5);
   } else {
-    // Remove from opponent's deck if it was there
+    // Remove from opponent deck if present
     const index = deckCardsOponent.indexOf(cardToMove);
     if (index !== -1) {
       deckCardsOponent.splice(index, 1);
-      cardToMove.deckOponent = false;
     }
+    cardToMove.deckOponent = false;
 
-    gsap.to(cardToMove, {
-      left: dropper.offsetLeft + "px",
-      top: dropper.offsetTop + "px",
-      duration: totalDistance * 0.0013,
-      ease: "power1.inOut",
-      overwrite: true,
-    });
+    // Animate to dropper if we have a dropper target
+    if (dropper) {
+      gsap.to(cardToMove, {
+        left: dropper.offsetLeft + "px",
+        top: dropper.offsetTop + "px",
+        duration: totalDistance * 0.0013,
+        ease: "power1.inOut",
+        overwrite: true,
+      });
+
+      cardToMove.style.transition = "opacity 0.2s";
+      cardToMove.style.opacity = "0";
+      for (let i = 0; i < cardsGame.length; i++) {
+        cardsGame[i].style.pointerEvents = "none";
+      }
+      setTimeout(() => {
+        for (let i = 0; i < cardsGame.length; i++) {
+          cardsGame[i].style.pointerEvents = "all";
+        }
+        cardToMove.style.display = "none";
+      }, 300);
+    }
   }
-
 });
 
 function scale() {
@@ -711,20 +916,17 @@ let handDown = true;
   }
   handhitbox.addEventListener("mousedown", handOpening);
 
-
-  onMoveOutside(handhitbox, deckCards, () => handOpening())
-
+onMoveOutside(handhitbox, deckCards, () => handOpening());
 
 function updateDeckPositions(speed) {
-  let totalDistance = distanceFind();
-
-  // horizontal spacing between cards
-  const totalWidth = (deckCards.length - 1) * cardSpacing;
+  // Only layout cards that are actually in our deck and not flagged as opponent's
+  const activeDeck = deckCards.filter((c) => c && !c.deckOponent);
+  const totalWidth = (activeDeck.length - 1) * cardSpacing;
   const centerX = hand.offsetLeft + hand.offsetWidth / 2;
 
-  deckCards.forEach((card, i) => {
-
-    const targetX = centerX - totalWidth / 2 + i * cardSpacing - card.offsetWidth / 2;
+  activeDeck.forEach((card, i) => {
+    const targetX =
+      centerX - totalWidth / 2 + i * cardSpacing - card.offsetWidth / 2;
     const targetY = hand.offsetTop;
     gsap.to(card, {
       left: targetX + "px",
@@ -733,19 +935,18 @@ function updateDeckPositions(speed) {
       ease: "power1.inOut",
     });
   });
-  console.log("player " + deckCards);
 }
-function updateDeckPositionsOponent(speed) {
 
-  // horizontal spacing between cards
-  const totalWidth = (deckCardsOponent.length - 1) * cardSpacing;
+function updateDeckPositionsOponent(speed) {
+  // Only layout opponent cards that are flagged opponent-owned
+  const activeOppDeck = deckCardsOponent.filter((c) => c && c.deckOponent);
+  const totalWidth = (activeOppDeck.length - 1) * cardSpacing;
   const centerX = hand.offsetLeft + hand.offsetWidth / 2;
 
-  deckCardsOponent.forEach((card, i) => {
+  activeOppDeck.forEach((card, i) => {
     const targetX =
       centerX - totalWidth / 2 + i * cardSpacing - card.offsetWidth / 2;
     const targetY = -100;
-    //.innerWidth - hand.offsetTop;
     gsap.to(card, {
       left: targetX + "px",
       top: targetY + "px",
@@ -753,7 +954,6 @@ function updateDeckPositionsOponent(speed) {
       ease: "power1.inOut",
     });
   });
-  console.log("opponent " + deckCardsOponent);
 }
 
 function onMoveOutside(element1, element2, callback) {
@@ -776,8 +976,8 @@ function onMoveOutside(element1, element2, callback) {
 
 const menu = document.getElementById("shopMenu");
 const menuExit = document.getElementById("exit");
-function spawnMenu () {
-  menu.style.top = "4vh"
+function spawnMenu() {
+  menu.style.top = "4vh";
 }
 
 menuExit.addEventListener("click", () => {
@@ -793,5 +993,5 @@ function updateZIndex(cardId) {
 }
 
 window.onresize = function () {
-    location.replace(location.href);
+  location.replace(location.href);
 };
