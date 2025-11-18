@@ -52,12 +52,17 @@ const dropper4 = document.getElementById("drop4");
 const dropper5 = document.getElementById("drop5");
 const dropper6 = document.getElementById("drop6");
 
+
 const domRect2 = dropper1.getBoundingClientRect();
 const domRect3 = dropper2.getBoundingClientRect();
 const domRect4 = dropper3.getBoundingClientRect();
 const domRect5 = dropper4.getBoundingClientRect();
 const domRect6 = dropper5.getBoundingClientRect();
 const domRect7 = dropper6.getBoundingClientRect();
+
+
+const spawnButton1 = document.getElementById("spawnerButton")
+const spawnButton2 = document.getElementById("spawnerButton2")
 
 const hand = document.getElementById("hand");
 
@@ -101,6 +106,7 @@ let isLocked = 0;
 let inDeck = 0;
 let container;
 let dragged = false;
+let buttonEnable = true;
 
 let dropPlay = 0;
 
@@ -111,6 +117,7 @@ let deckCards = [];
 let deckCardsOponent = [];
 
 let health = 10;
+let healthtext = document.getElementById("health");
 
 const handhitbox = document.getElementById("bottomhitbox");
 let cardSpacing = 180;
@@ -122,6 +129,10 @@ let cardSpacing = 180;
 // card2.deck = false;
 
 function mouseDown(e, cardElement) {
+  if(handDown === true){
+    return;
+  }
+
   activeCard = cardElement;
   console.log("MouseDown:", cardElement.id, activeCard.id);
 
@@ -152,6 +163,9 @@ function mouseMove(e) {
   dropPlay = 1;
   dragged = true;
 
+  let purple = document.getElementById("luh");
+  let purpleRect = purple.getBoundingClientRect();
+
   if (activeCard.deck === true) {
     console.log("zoul  be mine")
     const index = deckCards.indexOf(activeCard); // find where it is in the array
@@ -165,94 +179,119 @@ function mouseMove(e) {
   }
 
   activeCard.deck = false;
-  console.log(activeCard.deleteTrigger);
 
   activeCard.draggedAO = true;
+
+  console.log(isLocked);
 
 
   //box1
   const domRect1 = activeCard.getBoundingClientRect();
 
-  if (
-    !(
-      domRect1.top > domRect2.bottom ||
-      domRect1.right < domRect2.left ||
-      domRect1.bottom < domRect2.top ||
-      domRect1.left > domRect2.right
-    )
-  ) {
-    isLocked = 1;
-    container = 1;
-    scale();
+
+
+  if(activeCard.spawning === true){
+    if(!(
+        domRect1.top > purpleRect.bottom ||
+        domRect1.right < purpleRect.left ||
+        domRect1.bottom < purpleRect.top ||
+        domRect1.left > purpleRect.right
+    )){
+      purple.style.backgroundColor = "rgba(141, 133, 171, 0.4)"
+      console.log("I HATE MONKEY ADRIAN")
+      isLocked = 0
+      container = null;
+    } else{
+      purple.style.backgroundColor = "initial"
+      isLocked = 1;
+      container = 0;
+    }
   }
 
-  //box2
-  else if (
-    !(
-      domRect1.top > domRect3.bottom ||
-      domRect1.right < domRect3.left ||
-      domRect1.bottom < domRect3.top ||
-      domRect1.left > domRect3.right
-    )
-  ) {
-    isLocked = 1;
-    container = 2;
-    scale();
+  if(activeCard.spawning === false){
+    if (
+        !(
+            domRect1.top > domRect2.bottom ||
+            domRect1.right < domRect2.left ||
+            domRect1.bottom < domRect2.top ||
+            domRect1.left > domRect2.right
+        )
+    ) {
+      isLocked = 1;
+      container = 1;
+      scale();
+    }
+
+    //box2
+    else if (
+        !(
+            domRect1.top > domRect3.bottom ||
+            domRect1.right < domRect3.left ||
+            domRect1.bottom < domRect3.top ||
+            domRect1.left > domRect3.right
+        )
+    ) {
+      isLocked = 1;
+      container = 2;
+      scale();
+    }
+
+    //box3
+    else if (
+        !(
+            domRect1.top > domRect4.bottom ||
+            domRect1.right < domRect4.left ||
+            domRect1.bottom < domRect4.top ||
+            domRect1.left > domRect4.right
+        )
+    ) {
+      isLocked = 1;
+      container = 3;
+      scale();
+    } else if (
+        !(
+            domRect1.top > domRect5.bottom ||
+            domRect1.right < domRect5.left ||
+            domRect1.bottom < domRect5.top ||
+            domRect1.left > domRect5.right
+        )
+    ) {
+      isLocked = 1;
+      container = 4;
+      scale();
+    } else if (
+        !(
+            domRect1.top > domRect6.bottom ||
+            domRect1.right < domRect6.left ||
+            domRect1.bottom < domRect6.top ||
+            domRect1.left > domRect6.right
+        )
+    ) {
+      isLocked = 1;
+      container = 5;
+      scale();
+    } else if (
+        !(
+            domRect1.top > domRect7.bottom ||
+            domRect1.right < domRect7.left ||
+            domRect1.bottom < domRect7.top ||
+            domRect1.left > domRect7.right
+        )
+    ) {
+      isLocked = 1;
+      container = 6;
+      scale();
+    } else {
+      isLocked = 0;
+      container = null;
+      gsap.to(activeCard, {
+        transform: "scale(1)",
+        duration: "0.3",
+      });
+    }
   }
 
-  //box3
-  else if (
-    !(
-      domRect1.top > domRect4.bottom ||
-      domRect1.right < domRect4.left ||
-      domRect1.bottom < domRect4.top ||
-      domRect1.left > domRect4.right
-    )
-  ) {
-    isLocked = 1;
-    container = 3;
-    scale();
-  } else if (
-    !(
-      domRect1.top > domRect5.bottom ||
-      domRect1.right < domRect5.left ||
-      domRect1.bottom < domRect5.top ||
-      domRect1.left > domRect5.right
-    )
-  ) {
-    isLocked = 1;
-    container = 4;
-    scale();
-  } else if (
-    !(
-      domRect1.top > domRect6.bottom ||
-      domRect1.right < domRect6.left ||
-      domRect1.bottom < domRect6.top ||
-      domRect1.left > domRect6.right
-    )
-  ) {
-    isLocked = 1;
-    container = 5;
-    scale();
-  } else if (
-    !(
-      domRect1.top > domRect7.bottom ||
-      domRect1.right < domRect7.left ||
-      domRect1.bottom < domRect7.top ||
-      domRect1.left > domRect7.right
-    )
-  ) {
-    isLocked = 1;
-    container = 6;
-    scale();
-  } else {
-    isLocked = 0;
-    container = null;
-    gsap.to(activeCard, {
-      transform: "scale(1)",
-      duration: "0.3",
-    });
-  }
+
 
   // TODO [yell]: HERE IS THE THING
   if (handDown === false) {
@@ -268,6 +307,7 @@ function mouseMove(e) {
   distanceFind();
 }
 
+// purple.style.backgroundColor = 'green';
 
 function mouseUp() {
   console.log("MouseUp:", activeCard?.id);
@@ -279,6 +319,25 @@ function mouseUp() {
     containerInfo: container,
     id: activeCard.id,
   });
+
+  if(activeCard.spawning ===  true){
+    let purple = document.getElementById("luh");
+
+
+    purple.style.backgroundColor = "initial"
+
+    if(isLocked === 1){
+      activeCard.style.transition = "opacity 0.2s";
+      activeCard.style.opacity = "0";
+
+      setTimeout(() => {
+        for(let i = 0; i < cardsGame.length; i++) {
+          cardsGame[i].style.pointerEvents = "all";
+        }
+        activeCard.style.display = "none";
+      }, 300);
+    }
+  }
 
   let totalDistance = distanceFind();
 
@@ -297,6 +356,8 @@ function mouseUp() {
       dropper = dropper5;
     } else if (container === 6) {
       dropper = dropper6;
+    } else if (container === 0) {
+      dropper = spawnButton1
     }
 
     activeCard.style.setProperty("--border-animation", "none");
@@ -329,7 +390,7 @@ function mouseUp() {
       }, 300);
     }
 
-    if(dragged) {
+    if(dragged && container !== 0) {
         if(getComputedStyle(activeCard).backgroundImage.includes("Artual.jpeg")){
         health = health - 3;}
         else if(getComputedStyle(activeCard).backgroundImage.includes("tetoo.jpeg")){
@@ -338,6 +399,7 @@ function mouseUp() {
         else{
         health = health -2;
         }
+        healthtext.innerHTML = health;
         console.log(health);}
   }
 
@@ -367,13 +429,25 @@ function mouseUp() {
           cardsGame[i].style.pointerEvents = "none";
         }
         isLocked = null;
+        buttonEnable = false;
+        document.querySelectorAll(".spawnButtons").forEach(btn => {
+          btn.draggable = false;
+        });
       },
       pointerEvents: "auto",
       onComplete: () => {
         inDeck = 1;
+        if(activeCard.spawning === true){
+          activeCard.style.zIndex = activeCard.style.zIndex - 80;
+        }
+        activeCard.spawning = false;
         for(let i = 0; i < cardsGame.length; i++) {
               cardsGame[i].style.pointerEvents = "all";
           }
+        buttonEnable = true;
+        document.querySelectorAll(".spawnButtons").forEach(btn => {
+          btn.draggable = true;
+        });
         console.log(deckCards);
         // console.log(card.deck);
         // console.log(card2.deck);
@@ -394,7 +468,7 @@ function mouseUp() {
     });
   }
 
-  if (dropPlay === 1 && isLocked === 1) {
+  if (dropPlay === 1 && isLocked === 1 && container !== 0) {
     gsap.to(activeCard, {
       duration: totalDistance * 0.0013,
       onComplete: () => dropSound.play(),
@@ -429,7 +503,8 @@ function distanceFind() {
   else if (container === 3) {
     shoot = dropper3.offsetLeft - domRect1.left;
     bang = dropper3.offsetTop - domRect1.top;
-  } else if (container === 4) {
+  }
+  else if (container === 4) {
     shoot = dropper4.offsetLeft - domRect1.left;
     bang = dropper4.offsetTop - domRect1.top;
   } else if (container === 5) {
@@ -440,7 +515,10 @@ function distanceFind() {
     bang = dropper6.offsetTop - domRect1.top;
   } else if (container === null) {
     shoot = hand.offsetLeft - domRect1.left;
-    bang = hand.offsetTop - domRect1.top;
+    bang = hand.offsetTop - domRect1.top; }
+    else if (container === 0) {
+    shoot = spawnButton1.offsetLeft - domRect1.left;
+    bang = spawnButton1.offsetTop - domRect1.top;
     if (activeCard.deckOponent === true) {
       shoot = null;
       bang = null;
@@ -472,6 +550,7 @@ socket.on("playerMoved", (data) => {
   else if (container === 4) dropper = dropper4;
   else if (container === 5) dropper = dropper5;
   else if (container === 6) dropper = dropper6;
+  else if (container === 0) dropper = spawnButton1;
 
   activeCard = cardToMove;
 
@@ -543,6 +622,7 @@ function createCard(id, initialX, initialY, buttonId) {
   cardElement.deck = false;
   cardElement.deleteTrigger = false;
   cardElement.draggedAO = false; //maybe useless
+  cardElement.spawning = true;
 
   cardElement.addEventListener("mousedown", (e) => mouseDown(e, cardElement));
 
@@ -565,6 +645,10 @@ function createCard(id, initialX, initialY, buttonId) {
 
 let nOfCards = 0;
 function spawnCard(e) {
+  if (!buttonEnable ) {
+    return; // stop the function from running
+  }
+
   nOfCards += 1;
 
   const cardId = "card" + nOfCards;
@@ -572,6 +656,7 @@ function spawnCard(e) {
   //console.log(zIndexes);
 
   const button = e.target.id;
+  isLocked = 1;
 
   const x = e.clientX - (window.innerWidth * 0.1078125) / 2;
   const y = e.clientY - (window.innerWidth * 0.15) / 2;
@@ -579,12 +664,13 @@ function spawnCard(e) {
   //const y = e.clientY - self.innerHeight / 2;
 
   const newCard = createCard(cardId, x, y, button);
-  document.getElementById(cardId).style.zIndex = zIndexes.indexOf(cardId) + 3;
+  document.getElementById(cardId).style.zIndex = zIndexes.indexOf(cardId) + 100;
 
   cardsGame.push(newCard);
   activeCard = newCard;
   startX = e.clientX;
   startY = e.clientY;
+
 
   document.addEventListener("mousemove", mouseMove);
   document.addEventListener("mouseup", mouseUp);
@@ -624,6 +710,7 @@ let handDown = true;
     }
   }
   handhitbox.addEventListener("mousedown", handOpening);
+
 
   onMoveOutside(handhitbox, deckCards, () => handOpening())
 
@@ -672,7 +759,17 @@ function updateDeckPositionsOponent(speed) {
 function onMoveOutside(element1, element2, callback) {
   document.addEventListener("mousedown", (e) => {
     if (handDown === false) {
-      if (!element1.contains(e.target) && (element2.contains(e.target))) callback();
+
+      let outsideAll= true;
+      element2.forEach(element =>{
+        if (element.contains(e.target)) {
+          outsideAll = false;
+        }
+      })
+
+      if(!element1.contains(e.target) && outsideAll) {
+        callback();
+      }
     }
   });
 }
@@ -698,6 +795,3 @@ function updateZIndex(cardId) {
 window.onresize = function () {
     location.replace(location.href);
 };
-
-
-
