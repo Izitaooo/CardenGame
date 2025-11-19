@@ -107,8 +107,17 @@ function lockIn() {
     /*    document
       .getElementById("agentSelectMenuBackground")
       .classList.add("agentsLocked");*/
+
+    agent0 = document.getElementById(agentsChosen[0]);
+    agent1 = document.getElementById(agentsChosen[1]);
+    agent2 = document.getElementById(agentsChosen[2]);
+
     for (let agent of agents) {
       if (agentsChosen.includes(agent)) {
+
+        const el = document.getElementById(agent);
+        el.health = 10; // Add custom property here
+
         console.log("is there");
         document.getElementById(agent).classList.remove("selected");
         document.getElementById(agent).classList.add("inGame");
@@ -310,15 +319,12 @@ let deckCardsOponent = [];
 
 let health = 10;
 let healthtext = document.getElementById("health");
+let credsText = document.getElementById("money")
+let creds = 1000;
 
 const handhitbox = document.getElementById("bottomhitbox");
 let cardSpacing = 180;
 
-// card.addEventListener("mousedown", (e) => mouseDown(e, card));
-// card2.addEventListener("mousedown", (e) => mouseDown(e, card2));
-
-// card.deck = false;
-// card2.deck = false;
 
 function mouseDown(e, cardElement) {
   if(handDown === true){
@@ -341,6 +347,8 @@ function mouseDown(e, cardElement) {
   dragged = false;
 }
 
+let agent0, agent1, agent2;
+
 function mouseMove(e) {
   newX = startX - e.clientX;
   newY = startY - e.clientY;
@@ -357,6 +365,9 @@ function mouseMove(e) {
 
   let purple = document.getElementById("luh");
   let purpleRect = purple.getBoundingClientRect();
+
+  console.log(cardSymb);
+  console.log(activeCard.style.backgroundImage);
 
   if (activeCard.deck === true) {
     console.log("zoul  be mine");
@@ -390,7 +401,6 @@ function mouseMove(e) {
         domRect1.left > purpleRect.right
     )){
       purple.style.backgroundColor = "rgba(141, 133, 171, 0.4)"
-      console.log("I HATE MONKEY ADRIAN")
       isLocked = 0
       container = null;
     } else{
@@ -499,6 +509,12 @@ function mouseMove(e) {
   distanceFind();
 }
 
+function updateSpawnerButtons() {
+  if(creds < 200){
+    spawnButton2.style.pointerEvents = "none";
+  }
+}
+
 function mouseUp() {
   console.log("MouseUp:", activeCard?.id);
   if (!dragged) {
@@ -527,27 +543,39 @@ function mouseUp() {
         activeCard.style.display = "none";
       }, 300);
     }
+    else {
+        creds = creds - activeCard.price;
+        credsText.innerHTML = creds;
+        updateSpawnerButtons();
+    }
   }
 
   let totalDistance = distanceFind();
 
   if (isLocked === 1) {
     let dropper;
+    let agent;
 
     if (container === 1) {
       dropper = dropper1;
+      agent = null;
     } else if (container === 2) {
       dropper = dropper2;
+      agent = null;
     } else if (container === 3) {
       dropper = dropper3;
+      agent = null;
     } else if (container === 4) {
       dropper = dropper4;
+      agent = agent0;
     } else if (container === 5) {
       dropper = dropper5;
+      agent = agent1;
     } else if (container === 6) {
       dropper = dropper6;
+      agent = agent2;
     } else if (container === 0) {
-      dropper = spawnButton1
+      dropper = spawnButton1;
     }
 
     activeCard.style.setProperty("--border-animation", "none");
@@ -580,19 +608,31 @@ function mouseUp() {
     }
 
     if(dragged && container !== 0) {
-        if(getComputedStyle(activeCard).backgroundImage.includes("Artual.jpeg")){
-        health = health - 3;}
-        else if(getComputedStyle(activeCard).backgroundImage.includes("tetoo.jpeg")){
-        health = health - 1;
-        }
-        else{
-        health = health -2;
-        }
-        healthtext.innerHTML = health;
-        console.log(health);}
+      let dmg;
+
+      if (getComputedStyle(activeCard).backgroundImage.includes("Artual.jpeg")) {
+        dmg = 1;
+      } else if (getComputedStyle(activeCard).backgroundImage.includes("tetoo.jpeg")) {
+        dmg = 2;
+      } else {
+        dmg = 3;
+      }
+
+      health -= dmg;
+
+      if (agent) {
+        agent.health -= dmg;
+        agent.querySelector(".agentHealth").textContent = agent.health;
+      }
+
+      console.log("Health:", agent0.health, "Name:", agent0.id);
+      console.log("Health:", agent1.health, "Name:", agent1.id);
+      console.log("Health:", agent2.health, "Name:", agent2.id);
+      healthtext.innerHTML = health;
+      console.log(health);
+    }
   }
-  else if (isLocked === 0 &&
-      deckCardsOponent.includes(activeCard) === false) {
+  else if (isLocked === 0 && deckCardsOponent.includes(activeCard) === false) {
     if (!deckCards.includes(activeCard)) {
       deckCards.push(activeCard);
       activeCard.deck = true;
@@ -621,6 +661,7 @@ function mouseUp() {
         buttonEnable = false;
         document.querySelectorAll(".spawnButtons").forEach(btn => {
           btn.draggable = false;
+          btn.style.cursor = "default";
         });
       },
       pointerEvents: "auto",
@@ -636,6 +677,7 @@ function mouseUp() {
         buttonEnable = true;
         document.querySelectorAll(".spawnButtons").forEach(btn => {
           btn.draggable = true;
+          btn.style.cursor = "pointer";
         });
         console.log(deckCards);
         // console.log(card.deck);
@@ -800,10 +842,11 @@ function selectAbility(min, max) {
 }
 
 cardSymb = [
-  "url(images/luant-s-artworks-comm-avocadocat-megu.jpg)",
-  "url(images/Artual.jpeg)",
-  "url(images/tetoo.jpeg)",
+  'url("images/luant-s-artworks-comm-avocadocat-megu.jpg")',
+  'url("images/Artual.jpeg")',
+  'url("images/tetoo.jpeg")'
 ];
+
 
 function createCard(id, initialX, initialY, buttonId) {
   //Create the DOM element
@@ -822,6 +865,13 @@ function createCard(id, initialX, initialY, buttonId) {
   }
 
   cardElement.style.backgroundImage = imgSelect;
+
+  if(imgSelect === cardSymb[0] && buttonId !== "spawnerButton"){
+    cardElement.price = 200
+  }
+  else{
+    cardElement.price = 0
+  }
 
   //Initialize the deck property
   cardElement.deck = false;
