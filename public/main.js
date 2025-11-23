@@ -941,7 +941,10 @@ const priceList = [
 ];
 
 updateSpawnerButtons();
+abNames();
 credsText.innerHTML = creds;
+
+
 
 let ab1 = document.getElementById("ab1");
 let ab2 = document.getElementById("ab2");
@@ -1012,6 +1015,7 @@ function createCard(id, initialX, initialY, buttonId) {
   else {
     imgSelect = cardSymb[ buttonMap[buttonId] ];
   }
+
 
   cardElement.style.backgroundImage = imgSelect;
 
@@ -1344,15 +1348,61 @@ agentBtn.addEventListener("click", () => {
   currentAgentIndex = (currentAgentIndex + 1) % agentsChosen.length;
   currentCircle = (currentCircle + 1) % circles.length;
   updateAgent();
+  abNames();
 });
 
 function updateAgent(){
-  agentBtn.style.backgroundImage = "url(images/agents/"+agentsChosen[currentAgentIndex]+".png)";
+  agentBtn.classList.add("fade-img");
+
+  setTimeout(() => {
+    agentBtn.style.backgroundImage = `url(images/agents/${agentsChosen[currentAgentIndex]}.png)`;
+
+    agentBtn.classList.remove("fade-img");
+  }, 200); // same as CSS
 
   for(let i = 0; i < circles.length; i++) {
     circles[i].style.backgroundColor = "white";
   }
   circles[currentCircle].style.backgroundColor = "red";
+  abNames();
+}
+
+function abNames() {
+  const bg = getComputedStyle(agentBtn).backgroundImage;
+
+  if (bg.includes("skye.png")) {
+    ab1.innerText = "TRAILBLAZER";
+    ab2.innerText = "GUIDING LIGHT";
+    ab3.innerText = "REGROWTH";
+  } else if (bg.includes("sage.png")) {
+    ab1.innerText = "SLOW ORB";
+    ab2.innerText = "HEALING ORB";
+    ab3.innerText = "BARRIER ORB";
+  } else if (bg.includes("jett.png")) {
+    ab1.innerText = "UPDRAFT";
+    ab2.innerText = "TAILWIND";
+    ab3.innerText = "CLOUDBURST";
+  } else if (bg.includes("vyse.png")) {
+    ab1.innerText = "SHEAR";
+    ab2.innerText = "ARC ROSE";
+    ab3.innerText = "RAZORVINE";
+  } else if (bg.includes("omen.png")) {
+    ab1.innerText = "PARANOIA";
+    ab2.innerText = "DARK COVER";
+    ab3.innerText = "SHROUDED STEP";
+  } else if (bg.includes("clove.png")) {
+    ab1.innerText = "MEDDLE";
+    ab2.innerText = "RUSE";
+    ab3.innerText = "PICK-ME-UP";
+  } else if (bg.includes("iso.png")) {
+    ab1.innerText = "UNDERCUT";
+    ab2.innerText = "DOUBLE TAP";
+    ab3.innerText = "CONTINGENCY";
+  } else if (bg.includes("sova.png")) {
+    ab1.innerText = "SHOCK BOLT";
+    ab2.innerText = "RECON BOLT";
+    ab3.innerText = "OWL DRONE";
+  }
 }
 
 menuExit.addEventListener("click", () => {

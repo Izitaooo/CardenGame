@@ -686,6 +686,12 @@ body {
     cursor: pointer !important;
     z-index: 10000;
     user-select: none;
+    transition: background-image 0.2s ease, opacity 0.2s ease;
+    opacity: 1;
+}
+
+.fade-img {
+    opacity: 0;
 }
 
 #arrows{
