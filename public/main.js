@@ -58,8 +58,24 @@ const domRect6 = dropper5.getBoundingClientRect();
 const domRect7 = dropper6.getBoundingClientRect();
 
 
-const spawnButton1 = document.getElementById("spawnerButton")
-const spawnButton2 = document.getElementById("spawnerButton2")
+const randBtn = document.getElementById("randBtn")
+const shortyBtn = document.getElementById("shortyBtn")
+const frenzyBtn = document.getElementById("frenzyBtn")
+const ghostBtn = document.getElementById("ghostBtn")
+const sheriffBtn = document.getElementById("sheriffBtn")
+const stingerBtn = document.getElementById("stingerBtn")
+const spectreBtn = document.getElementById("spectreBtn")
+const buckyBtn = document.getElementById("buckyBtn")
+const judgeBtn = document.getElementById("judgeBtn")
+const bulldogBtn = document.getElementById("bulldogBtn")
+const guardianBtn = document.getElementById("guardianBtn")
+const phantomBtn = document.getElementById("phantomBtn")
+const vandalBtn = document.getElementById("vandalBtn")
+const marshalBtn = document.getElementById("marshalBtn")
+const outlawBtn = document.getElementById("outlawBtn")
+const operatorBtn = document.getElementById("operatorBtn")
+const aresBtn = document.getElementById("aresBtn")
+const odinBtn = document.getElementById("odinBtn")
 
 const hand = document.getElementById("hand");
 
@@ -147,6 +163,7 @@ function lockIn() {
           element: agentToMove,
           startX: rect.left,
           startY: rect.top,
+          pointerEvents: "none",
           endX: null,
           endY: null,
         });
@@ -179,12 +196,21 @@ function lockIn() {
         data.element.style.zIndex = "1000"; // keep high while animating
         data.element.querySelector(".glint").style.zIndex = "1000";
 
+        data.element.classList.add("animating");
+        data.element.style.pointerEvents = "none";
+
         gsap.to(data.element, {
           left: data.endX + "px",
           top: data.endY + "px",
           duration: 0.5,
           ease: "power1.inOut",
           overwrite: true,
+          onComplete: () => {
+            // restore after this element finishes animating
+            data.element.classList.remove("animating");
+            data.element.style.pointerEvents = ""; // revert to stylesheet default
+            // optionally reset will-change if you set it elsewhere
+          }
         });
       }
 
@@ -236,6 +262,7 @@ socket.on("enemyChose", (data) => {
         top: finalTop + "px",
         opacity: 1,
         duration: 0.5,
+        pointerEvents: "none",
         ease: "power1.inOut",
         overwrite: true,
       });
@@ -320,18 +347,31 @@ let deckCardsOponent = [];
 let health = 10;
 let healthtext = document.getElementById("health");
 let credsText = document.getElementById("money")
-let creds = 1000;
+let creds = 100000;
 
 const handhitbox = document.getElementById("bottomhitbox");
 let cardSpacing = 180;
 
-
+let cardOpenEnabled = true;
+let canDrag = true;
 function mouseDown(e, cardElement) {
+  activeCard = cardElement;
+
+  if (!canDrag) return;
+
   if(handDown === true){
     return;
+  } else {
+      for(let i = 0; i < deckCards.length; i++) {
+        deckCards[i].addEventListener("click", () => {
+          if(handDown === false){
+            console.log("MOMMYYY")
+          }
+        });
+      }
   }
 
-  activeCard = cardElement;
+
   console.log("MouseDown:", cardElement.id, activeCard.id);
 
   updateZIndex(activeCard.id);
@@ -366,8 +406,10 @@ function mouseMove(e) {
   let purple = document.getElementById("luh");
   let purpleRect = purple.getBoundingClientRect();
 
-  console.log(cardSymb);
-  console.log(activeCard.style.backgroundImage);
+  /* if(activeCard.infoAble === true){
+    activeCard.infoBox.classList.toggle("visible");
+    activeCard.infoAble = false;
+  } */
 
   if (activeCard.deck === true) {
     console.log("zoul  be mine");
@@ -509,11 +551,6 @@ function mouseMove(e) {
   distanceFind();
 }
 
-function updateSpawnerButtons() {
-  if(creds < 200){
-    spawnButton2.style.pointerEvents = "none";
-  }
-}
 
 function mouseUp() {
   console.log("MouseUp:", activeCard?.id);
@@ -575,7 +612,7 @@ function mouseUp() {
       dropper = dropper6;
       agent = agent2;
     } else if (container === 0) {
-      dropper = spawnButton1;
+      dropper = randBtn;
     }
 
     activeCard.style.setProperty("--border-animation", "none");
@@ -743,8 +780,8 @@ function distanceFind(card = activeCard, cont = container) {
     shoot = hand.offsetLeft - domRect1.left;
     bang = hand.offsetTop - domRect1.top; }
     else if (cont === 0) {
-    shoot = spawnButton1.offsetLeft - domRect1.left;
-    bang = spawnButton1.offsetTop - domRect1.top;
+    shoot = randBtn.offsetLeft - domRect1.left;
+    bang = randBtn.offsetTop - domRect1.top;
     if (card.deckOponent === true) {
       shoot = null;
       bang = null;
@@ -785,7 +822,7 @@ socket.on("playerMoved", (data) => {
   else if (cont === 4) dropper = dropper4;
   else if (cont === 5) dropper = dropper5;
   else if (cont === 6) dropper = dropper6;
-  else if (cont === 0) dropper = spawnButton1;
+  else if (cont === 0) dropper = randBtn;
 
   if (cont === null) {
     // Move into opponent deck (local representation)
@@ -842,11 +879,27 @@ function selectAbility(min, max) {
 }
 
 cardSymb = [
-  'url("images/luant-s-artworks-comm-avocadocat-megu.jpg")',
-  'url("images/Artual.jpeg")',
-  'url("images/tetoo.jpeg")'
+  'url("images/guns/shorty.png")',
+  'url("images/guns/frenzy.png")',
+  'url("images/guns/ghost.png")',
+  'url("images/guns/sheriff.png")',
+  'url("images/guns/stinger.png")',
+  'url("images/guns/spectre.png")',
+  'url("images/guns/bucky.png")',
+  'url("images/guns/judge.png")',
+  'url("images/guns/bulldog.png")',
+  'url("images/guns/guardian.png")',
+  'url("images/guns/phantom.png")',
+  'url("images/guns/vandal.png")',
+  'url("images/guns/marshal.png")',
+  'url("images/guns/outlaw.png")',
+  'url("images/guns/operator.png")',
+  'url("images/guns/ares.png")',
+  'url("images/guns/odin.png")'
 ];
 
+updateSpawnerButtons();
+credsText.innerHTML = creds;
 
 function createCard(id, initialX, initialY, buttonId) {
   //Create the DOM element
@@ -856,22 +909,199 @@ function createCard(id, initialX, initialY, buttonId) {
   cardElement.style.left = initialX + "px";
   cardElement.style.top = initialY + "px";
 
+  // TODO [yell]: // FRONT IMAGES
+
   let rndNum = selectAbility(0, 3);
   let imgSelect;
-  if (buttonId === "spawnerButton") {
+  if (buttonId === "randBtn") {
     imgSelect = cardSymb[rndNum];
-  } else {
+  } else if (buttonId === "shortyBtn") {
     imgSelect = cardSymb[0];
+  } else if (buttonId === "frenzyBtn") {
+    imgSelect = cardSymb[1];
+  }  else if (buttonId === "ghostBtn") {
+    imgSelect = cardSymb[2];
+  } else if (buttonId === "sheriffBtn") {
+    imgSelect = cardSymb[3];
+  } else if (buttonId === "stingerBtn") {
+    imgSelect = cardSymb[4];
+  } else if (buttonId === "spectreBtn") {
+    imgSelect = cardSymb[5];
+  } else if (buttonId === "buckyBtn") {
+    imgSelect = cardSymb[6];
+  } else if (buttonId === "judgeBtn") {
+    imgSelect = cardSymb[7];
+  } else if (buttonId === "bulldogBtn") {
+    imgSelect = cardSymb[8];
+  } else if (buttonId === "guardianBtn") {
+    imgSelect = cardSymb[9];
+  } else if (buttonId === "phantomBtn") {
+    imgSelect = cardSymb[10];
+  } else if (buttonId === "vandalBtn") {
+    imgSelect = cardSymb[11];
+  } else if (buttonId === "marshalBtn") {
+    imgSelect = cardSymb[12];
+  } else if (buttonId === "outlawBtn") {
+    imgSelect = cardSymb[13];
+  } else if (buttonId === "operatorBtn") {
+    imgSelect = cardSymb[14];
+  } else if (buttonId === "aresBtn") {
+    imgSelect = cardSymb[15];
+  } else if (buttonId === "odinBtn") {
+    imgSelect = cardSymb[16];
   }
 
   cardElement.style.backgroundImage = imgSelect;
 
-  if(imgSelect === cardSymb[0] && buttonId !== "spawnerButton"){
-    cardElement.price = 200
+  // TODO [yell]: // PRICES
+
+  if(imgSelect === cardSymb[0] && buttonId !== "randBtn"){
+    cardElement.price = 300
   }
-  else{
+  else if(imgSelect === cardSymb[1] && buttonId !== "randBtn"){
+    cardElement.price = 450
+  }
+  else if(imgSelect === cardSymb[2] && buttonId !== "randBtn"){
+    cardElement.price = 500
+  }
+  else if(imgSelect === cardSymb[3] && buttonId !== "randBtn"){
+    cardElement.price = 800
+  }
+  else if(imgSelect === cardSymb[4] && buttonId !== "randBtn"){
+    cardElement.price = 1100
+  }
+  else if(imgSelect === cardSymb[5] && buttonId !== "randBtn"){
+    cardElement.price = 1600
+  }
+  else if(imgSelect === cardSymb[6] && buttonId !== "randBtn"){
+    cardElement.price = 850
+  }
+  else if(imgSelect === cardSymb[7] && buttonId !== "randBtn"){
+    cardElement.price = 1850
+  }
+  else if(imgSelect === cardSymb[8] && buttonId !== "randBtn"){
+    cardElement.price = 2050
+  }
+  else if(imgSelect === cardSymb[9] && buttonId !== "randBtn"){
+    cardElement.price = 2250
+  }
+  else if(imgSelect === cardSymb[10] && buttonId !== "randBtn"){
+    cardElement.price = 2900
+  }
+  else if(imgSelect === cardSymb[11] && buttonId !== "randBtn"){
+    cardElement.price = 2900
+  }
+  else if(imgSelect === cardSymb[12] && buttonId !== "randBtn"){
+    cardElement.price = 950
+  }
+  else if(imgSelect === cardSymb[13] && buttonId !== "randBtn"){
+    cardElement.price = 2400
+  }
+  else if(imgSelect === cardSymb[14] && buttonId !== "randBtn"){
+    cardElement.price = 4700
+  }
+  else if(imgSelect === cardSymb[15] && buttonId !== "randBtn"){
+    cardElement.price = 1600
+  }
+  else if(imgSelect === cardSymb[16] && buttonId !== "randBtn"){
+    cardElement.price = 3200
+  }
+  else {
     cardElement.price = 0
   }
+
+  /* cardElement.infoAble = false
+
+  const ib = document.createElement("div");
+  ib.className = "cardInfo"; // hidden by default
+  ib.innerHTML = `I love cock`;
+  cardElement.appendChild(ib);
+  cardElement.infoBox = ib;
+
+  cardElement.addEventListener("click", (e) => {
+    if (handDown) return; // ignore if hand is down
+    e.stopPropagation(); // prevent bubbling if needed
+    cardElement.infoBox.classList.toggle("visible");
+
+    cardElement.infoAble = cardElement.infoAble !== true;
+
+    console.log("make it happen" + cardElement.infoAble);
+  }); */
+
+  const front = document.createElement("div");
+  front.className = "face front";
+  const back = document.createElement("div");
+  back.className = "face back";
+
+  // TODO [yell]: // BACK INFO
+
+  if(imgSelect === cardSymb[0]){
+    back.innerHTML = "THIS IS A SHORTY";
+  } else if(imgSelect === cardSymb[1]) {
+    back.innerHTML = "THIS IS A FRENZY";
+  } else if(imgSelect === cardSymb[2]) {
+    back.innerHTML = "THIS IS A GHOST";
+  }
+
+
+  // style faces with CSS backface-visibility like earlier
+  cardElement.appendChild(front);
+  cardElement.appendChild(back);
+
+  // keep flip state
+  cardElement.flipped = false;
+
+  cardElement.addEventListener("click", () => {
+    if (handDown) return;
+      if (!cardElement.flipped) {
+        gsap.to(cardElement,
+            { rotationY: 180,
+              duration: 0.65,
+              ease: "back.out(1.7)",
+              transformOrigin: "50% 50%",
+              onStart: () => {
+                activeCard.style.cursor = "default";
+                handhitbox.style.pointerEvents = "none";
+                cardOpenEnabled = false;
+                for (let i = 0; i < deckCards.length; i++) {
+                  deckCards[i].style.pointerEvents = "none";
+                }
+              },
+              onComplete: () => {
+                activeCard.style.cursor = "pointer";
+                handhitbox.style.pointerEvents = "all";
+                cardOpenEnabled = true;
+                for (let i = 0; i < deckCards.length; i++) {
+                  deckCards[i].style.pointerEvents = "all";
+                }
+              }
+            });
+        } else
+        {gsap.to(cardElement,
+            { rotationY: 0,
+              duration: 0.65,
+              ease: "back.out(1.7)",
+              transformOrigin: "50% 50%",
+              onStart: () => {
+                activeCard.style.cursor = "default";
+                handhitbox.style.pointerEvents = "none";
+                cardOpenEnabled = false;
+                for (let i = 0; i < deckCards.length; i++) {
+                  deckCards[i].style.pointerEvents = "none";
+                }
+              },
+              onComplete: () => {
+                activeCard.style.cursor = "pointer";
+                handhitbox.style.pointerEvents = "all";
+                cardOpenEnabled = true;
+                for (let i = 0; i < deckCards.length; i++) {
+                  deckCards[i].style.pointerEvents = "all";
+                }
+              }
+            });
+       }
+    cardElement.flipped = !cardElement.flipped;
+  });
 
   //Initialize the deck property
   cardElement.deck = false;
@@ -941,6 +1171,109 @@ function spawnCard(e) {
   //console.log("spawned and dragging card: " + cardId);
 }
 
+// TODO [yell]: // PRICE KEEPERS
+
+function updateSpawnerButtons() {
+  if(creds < 300){
+    shortyBtn.style.pointerEvents = "none";
+  } else{
+    shortyBtn.style.pointerEvents = "all";
+  }
+
+  if(creds < 450){
+    frenzyBtn.style.pointerEvents = "none";
+  } else{
+    frenzyBtn.style.pointerEvents = "all";
+  }
+
+  if(creds < 500){
+    ghostBtn.style.pointerEvents = "none";
+  } else{
+    ghostBtn.style.pointerEvents = "all";
+  }
+
+  if(creds < 800){
+    sheriffBtn.style.pointerEvents = "none";
+  } else{
+    sheriffBtn.style.pointerEvents = "all";
+  }
+
+  if(creds < 1100){
+    stingerBtn.style.pointerEvents = "none";
+  } else{
+    stingerBtn.style.pointerEvents = "all";
+  }
+
+  if(creds < 1600){
+    spectreBtn.style.pointerEvents = "none";
+  } else{
+    spectreBtn.style.pointerEvents = "all";
+  }
+
+  if(creds < 850){
+    buckyBtn.style.pointerEvents = "none";
+  } else{
+    buckyBtn.style.pointerEvents = "all";
+  }
+
+  if(creds < 1850){
+    judgeBtn.style.pointerEvents = "none";
+  } else{
+    judgeBtn.style.pointerEvents = "all";
+  }
+
+  if(creds < 2050){
+    bulldogBtn.style.pointerEvents = "none";
+  } else{
+    bulldogBtn.style.pointerEvents = "all";
+  }
+
+  if(creds < 2250){
+    guardianBtn.style.pointerEvents = "none";
+  } else{
+    guardianBtn.style.pointerEvents = "all";
+  }
+
+  if(creds < 2900){
+    vandalBtn.style.pointerEvents = "none";
+    phantomBtn.style.pointerEvents = "none";
+  } else{
+    vandalBtn.style.pointerEvents = "all";
+    phantomBtn.style.pointerEvents = "none";
+  }
+
+  if(creds < 950){
+    marshalBtn.style.pointerEvents = "none";
+  } else{
+    marshalBtn.style.pointerEvents = "all";
+  }
+
+  if(creds < 2400){
+    outlawBtn.style.pointerEvents = "none";
+  } else{
+    outlawBtn.style.pointerEvents = "all";
+  }
+
+  if(creds < 4700){
+    operatorBtn.style.pointerEvents = "none";
+  } else{
+    operatorBtn.style.pointerEvents = "all";
+  }
+
+  if(creds < 1600){
+    aresBtn.style.pointerEvents = "none";
+  } else{
+    aresBtn.style.pointerEvents = "all";
+  }
+
+  if(creds < 3200){
+    odinBtn.style.pointerEvents = "none";
+  } else{
+    odinBtn.style.pointerEvents = "all";
+  }
+
+}
+
 let handDown = true;
 
   function handOpening(){
@@ -952,7 +1285,26 @@ let handDown = true;
       cardSpacing = 270;
       updateDeckPositions(0.5);
       handDown = false;
-      console.log("handown:" + handDown)
+      console.log("handown:" + handDown);
+
+      canDrag = false;
+      for(let i = 0; i < deckCards.length; i++) {
+        deckCards[i].style.pointerEvents = "none";
+        deckCards[i].style.cursor = "none";
+      }
+      handhitbox.style.pointerEvents = "none";
+      cardOpenEnabled = false;
+
+      setTimeout(() => {
+        canDrag = true;
+
+        for(let i = 0; i < deckCards.length; i++) {
+          deckCards[i].style.pointerEvents = "all";
+          deckCards[i].style.cursor = "pointer";
+        }
+        handhitbox.style.pointerEvents = "all";
+        cardOpenEnabled = true;
+      }, 500);
     }
 
     else if(handDown === false && deckCards.length !== 0 ){
@@ -964,9 +1316,11 @@ let handDown = true;
       handDown = true;
     }
   }
-  handhitbox.addEventListener("mousedown", handOpening);
 
-onMoveOutside(handhitbox, deckCards, () => handOpening());
+if(cardOpenEnabled === true){
+  console.log("diameters");
+  onMoveOutside(handhitbox, deckCards, () => handOpening());
+}
 
 function updateDeckPositions(speed) {
   // Only layout cards that are actually in our deck and not flagged as opponent's
@@ -1008,6 +1362,10 @@ function updateDeckPositionsOponent(speed) {
 
 function onMoveOutside(element1, element2, callback) {
   document.addEventListener("mousedown", (e) => {
+    if (!cardOpenEnabled) {
+      return;
+    }
+
     if (handDown === false) {
 
       let outsideAll= true;
@@ -1045,3 +1403,9 @@ function updateZIndex(cardId) {
 window.onresize = function () {
   location.replace(location.href);
 };
+
+function roundOver() {
+  creds = creds + 200;
+  credsText.innerHTML = creds;
+  updateSpawnerButtons();
+}

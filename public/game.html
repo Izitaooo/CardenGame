@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="style.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <link href="https://fonts.cdnfonts.com/css/valorant" rel="stylesheet" />
+    <link rel="stylesheet" href="https://use.typekit.net/vkl5kng.css">
   </head>
   <body>
     <div id="agentSelectMenuBackground">
@@ -92,7 +93,8 @@
       <input type="range" min="0.0" max="1" value="0.15" step="0.01" class="slider" id="volume">
     </div>
     <div id="health"> 10 </div>
-    <div id="money"> 1000</div>
+    <div id="money">0</div>
+    <div id="endRound" onclick="roundOver()" >Agartha</div>
     <div id="bottomholder">
       <div id="bottomhitbox">
         <div id="hand"></div>
@@ -100,8 +102,40 @@
     </div>
     <div id="shopMenu">
       <div id="shopContainer">
-        <button draggable="true" ondragstart="spawnCard(event)" id="spawnerButton" class="spawnButtons">spawnRand</button>
-        <button draggable="true" ondragstart="spawnCard(event)" id="spawnerButton2" class="spawnButtons">spawnMegu</button>
+        <div id="buttonHolder">
+          <div id="sidearms">
+            <div class="category">SIDEARMS</div>
+            <button draggable="true" ondragstart="spawnCard(event)" id="randBtn" class="spawnButtons">spawnRand</button>
+            <button draggable="true" ondragstart="spawnCard(event)" id="shortyBtn" class="spawnButtons">SHORTY</button>
+            <button draggable="true" ondragstart="spawnCard(event)" id="frenzyBtn" class="spawnButtons">FRENZY</button>
+            <button draggable="true" ondragstart="spawnCard(event)" id="ghostBtn" class="spawnButtons">GHOST</button>
+            <button draggable="true" ondragstart="spawnCard(event)" id="sheriffBtn" class="spawnButtons">SHERIFF</button>
+          </div>
+          <div id="sNs">
+            <div class="category">SMGS</div>
+            <button draggable="true" ondragstart="spawnCard(event)" id="stingerBtn" class="spawnButtons">STINGER</button>
+            <button draggable="true" ondragstart="spawnCard(event)" id="spectreBtn" class="spawnButtons">SPECTRE</button>
+            <div class="category">SHOTGUNS</div>
+            <button draggable="true" ondragstart="spawnCard(event)" id="buckyBtn" class="spawnButtons">BUCKY</button>
+            <button draggable="true" ondragstart="spawnCard(event)" id="judgeBtn" class="spawnButtons">JUDGE</button>
+          </div>
+          <div id="rifles">
+            <div class="category">RIFLES</div>
+            <button draggable="true" ondragstart="spawnCard(event)" id="bulldogBtn" class="spawnButtons">BULLDOG</button>
+            <button draggable="true" ondragstart="spawnCard(event)" id="guardianBtn" class="spawnButtons">GUARDIAN</button>
+            <button draggable="true" ondragstart="spawnCard(event)" id="phantomBtn" class="spawnButtons">PHANTOM</button>
+            <button draggable="true" ondragstart="spawnCard(event)" id="vandalBtn" class="spawnButtons">VANDAL</button>
+          </div>
+          <div id="heavies">
+            <div class="category">SNIPER RIFLES</div>
+            <button draggable="true" ondragstart="spawnCard(event)" id="marshalBtn" class="spawnButtons">MARSHAL</button>
+            <button draggable="true" ondragstart="spawnCard(event)" id="outlawBtn" class="spawnButtons">OUTLAW</button>
+            <button draggable="true" ondragstart="spawnCard(event)" id="operatorBtn" class="spawnButtons">OPERATOR</button>
+            <div class="category">MACHINE GUNS</div>
+            <button draggable="true" ondragstart="spawnCard(event)" id="aresBtn" class="spawnButtons">ARES</button>
+            <button draggable="true" ondragstart="spawnCard(event)" id="odinBtn" class="spawnButtons">ODIN</button>
+          </div>
+        </div>
       </div>
       <div id="luh"></div>
       <button id="exit" role="button">exit</button>

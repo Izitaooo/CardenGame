@@ -4,6 +4,10 @@ body {
   height: 100vh;
 }
 
+*{
+    box-sizing: border-box;
+}
+
 #agentSelectMenuBackground {
   position: fixed;
   width: 100vw;
@@ -142,6 +146,7 @@ body {
   top: -50%;
   left: -50%;
   transform: translate(40.4%, 45.3%);
+  user-select: none;
 
   /* meow tohle je on purpose ten error */
   animation: var(--border-animation, none);
@@ -234,6 +239,13 @@ body {
 }
 .agentSelect.hidden{
     opacity: 0; !important;
+}
+
+.agentSelect.animating,
+.agentSelect.animating * {
+    pointer-events: none !important;      /* ignore mouse so :hover won't trigger */
+    transition: none !important;          /* cancel CSS transitions */
+    -webkit-transition: none !important;
 }
 
 .agentHealth {
@@ -341,24 +353,7 @@ body {
   pointer-events: auto;
 }
 
-.card:after {
-  content: "";
-  position: absolute;
-  background-image: url("images/Asset 5.svg");
-  width: 110%;
-  height: 105%;
-  background-repeat: no-repeat;
-  background-size: contain;
-  z-index: 3;
-  background-position: center;
-  top: -50%;
-  left: -50%;
-  transform: translate(40.4%, 45.3%);
 
-  /* meow tohle je on purpose ten error */
-  animation: var(--border-animation, none);
-  filter: var(--border-filter, brightness(0) saturate(100%) invert(91%) sepia(24%) saturate(5001%) hue-rotate(342deg) brightness(89%) contrast(92%));
-}
 
 @keyframes pulseBorder {
   0%, 100% {
@@ -370,11 +365,6 @@ body {
     filter: brightness(0) saturate(100%) invert(90%) sepia(12%) saturate(6531%) hue-rotate(358deg) brightness(100%) contrast(106%);
 
   }
-}
-
-#card2 {
-  left: 10vw;
-  background-image: url("images/Artual.jpeg");
 }
 
 #container2 {
@@ -465,14 +455,14 @@ body {
   -webkit-user-drag: none;
   pointer-events: auto;
   position: fixed;
-  top: 40vh;
+  top: 45vh;
   left: 12vw;
   display: flex;
   justify-content: center;
   align-items: center;
   width: 6vw;
   height: 6vw;
-  background-color: #F2C3F7;
+  background-color: rgba(141, 133, 171);
   border-radius: 50%;
   cursor: pointer;
   transition-duration: 0.5s;
@@ -511,24 +501,18 @@ body {
   justify-content: center;
 }
 
-#spawnerButton{
-  width: 5vw;
-  height: 5vh;
-  user-select: none;
-  pointer-events: auto;
-  z-index: 100;
-}
-
-#spawnerButton2{
-  width: 5vw;
-  height: 5vh;
-  user-select: none;
-  pointer-events: auto;
-  z-index: 100;
-}
 
 .spawnButtons{
   cursor: pointer;
+    user-select: none;
+    pointer-events: auto;
+    z-index: 100;
+    border-radius: 0.2vw;
+    border: none;
+    font-family: "futura-100", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 1vw;
 }
 
 .spawnButtons:disabled{
@@ -543,6 +527,96 @@ body {
   position: fixed;
   width: 100%;
   height: 100%;
+}
+
+#buttonHolder{
+    display: flex;
+    position: relative;
+    left: 12.5%;
+    width: 65%;
+    height: 70%;
+    border-radius: 0.8vw;
+    justify-content: center;
+    align-items: center;
+    gap: 1vw;
+}
+
+#sidearms{
+    display: flex;
+    position: relative;
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.2vw;
+    height: 100%;
+}
+
+#sidearms button {
+    width: 8vw;
+    height: 5.5vw;
+}
+
+#sNs{
+    display: flex;
+    height: 100%;
+    position: relative;
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.2vw;
+}
+
+#sNs button {
+    width: 9.5vw;
+    height: 6.5vw;
+}
+
+#rifles{
+    display: flex;
+    height: 100%;
+    position: relative;
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.2vw;
+}
+
+#rifles button {
+    width: 11.5vw;
+    height: 6.9vw;
+}
+
+#heavies {
+    display: flex;
+    height: 100%;
+    position: relative;
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.2vw;
+}
+
+#heavies button {
+    width: 13.5vw;
+    height: 4.2vw;
+}
+
+#aresBtn, #odinBtn {
+    flex-grow: 0.345;
+}
+
+.category {
+    width: 100%;
+    height: 1.5vw;
+    background-color: rgba(141, 133, 171);
+    text-align: center;
+    border-radius: 0.2vw;
+    line-height: 1.5vw;
+    user-select: none;
+    pointer-events: auto;
+    font-family: "futura-100", sans-serif;
+    font-weight: 400;
+    font-style: normal;
 }
 
 #luh {
@@ -608,4 +682,88 @@ body {
     font-family: 'VALORANT', sans-serif;
     color: white;
     font-size: 3vw;
+}
+
+/* HTML: <div class="parallelogram"></div> */
+#endRound {
+    position: fixed;
+
+    height: 2.3vw;
+    width: 10vw;
+    mask:
+            conic-gradient(from 45deg at 2vw 2vw,#000 75%,#0000 0) -2vw 0/100% 51% repeat-x,
+            conic-gradient(from 135deg at 2vw calc(100% - 2vw),#0000 25%,#000 0) -2vw 100%/100% 51% repeat-x;
+    background: rgba(141, 133, 171);
+
+    right: 1vw;
+    top: 45vh;
+
+    text-align: center;
+    line-height: 2.5vw;
+    font-family: 'VALORANT', sans-serif;
+    color: white;
+    font-size: 1vw;
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
+    transition-duration: 0.5s;
+    cursor: pointer;
+}
+
+#endRound:hover{
+    background-color: #38334a;
+    transition-timing-function: ease;
+    transition-duration: 0.5s;
+}
+
+.cardInfo {
+    position: absolute;
+    bottom: calc(100% + 8px); /* place above card */       /* place above the card */
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 10vw;
+    max-width: 20vw;
+    padding: 0.5rem;
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    background: rgba(255,255,255,0.95);
+    color: #111;
+    font-size: 0.9rem;
+    display: none;       /* hidden */
+    z-index: 2000;
+    pointer-events: none; /* won't block pointer to card */
+}
+
+/* visible state */
+.cardInfo.visible {
+    display: block;
+    pointer-events: auto;
+}
+
+/* small decorative arrow (optional) */
+.cardInfo::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -8px;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid rgba(255,255,255,0.95);
+}
+
+.card {
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+.face {
+    position:absolute; inset:0; backface-visibility: hidden;
+}
+.back {
+    transform: rotateY(180deg);
+    background-image: url("images/guns/back.png");
+    background-size: cover;
+    text-align: center;
+    line-height: 14vw;
+    color: #F2C3F7;
 }
