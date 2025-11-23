@@ -47,6 +47,12 @@ io.on("connection", (socket) => {
         console.log(`Player ${socket.id} joined room ${roomName}`);
     });
 
+    socket.on("spawnedCard", (data) => {
+        const playerRoom = players[socket.id].room; // w rooms
+        console.log("player in room :" + playerRoom + " spawned card id: " + data.id);
+        socket.to(playerRoom).emit("enemySpawnedCard", data.id);
+    })
+
     socket.on("agentsLockedIn", (data) => {
         const playerRoom = players[socket.id].room; // w rooms
         socket.to(playerRoom).emit("enemyChose", data);

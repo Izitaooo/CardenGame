@@ -49,7 +49,6 @@ const dropper4 = document.getElementById("drop4");
 const dropper5 = document.getElementById("drop5");
 const dropper6 = document.getElementById("drop6");
 
-
 const domRect2 = dropper1.getBoundingClientRect();
 const domRect3 = dropper2.getBoundingClientRect();
 const domRect4 = dropper3.getBoundingClientRect();
@@ -57,28 +56,27 @@ const domRect5 = dropper4.getBoundingClientRect();
 const domRect6 = dropper5.getBoundingClientRect();
 const domRect7 = dropper6.getBoundingClientRect();
 
-
 const randBtn = document.getElementById("randBtn");
 const spawnButtons = document.querySelectorAll(".spawnButtons");
 
 const buttonMap = {
-  shortyBtn:     0,
-  frenzyBtn:     1,
-  ghostBtn:      2,
-  sheriffBtn:    3,
-  stingerBtn:    4,
-  spectreBtn:    5,
-  buckyBtn:      6,
-  judgeBtn:      7,
-  bulldogBtn:    8,
-  guardianBtn:   9,
-  phantomBtn:    10,
-  vandalBtn:     11,
-  marshalBtn:    12,
-  outlawBtn:     13,
-  operatorBtn:   14,
-  aresBtn:       15,
-  odinBtn:       16,
+  shortyBtn: 0,
+  frenzyBtn: 1,
+  ghostBtn: 2,
+  sheriffBtn: 3,
+  stingerBtn: 4,
+  spectreBtn: 5,
+  buckyBtn: 6,
+  judgeBtn: 7,
+  bulldogBtn: 8,
+  guardianBtn: 9,
+  phantomBtn: 10,
+  vandalBtn: 11,
+  marshalBtn: 12,
+  outlawBtn: 13,
+  operatorBtn: 14,
+  aresBtn: 15,
+  odinBtn: 16,
 };
 
 const hand = document.getElementById("hand");
@@ -134,7 +132,6 @@ function lockIn() {
 
     for (let agent of agents) {
       if (agentsChosen.includes(agent)) {
-
         const el = document.getElementById(agent);
         el.health = 10; // Add custom property here
 
@@ -214,7 +211,7 @@ function lockIn() {
             data.element.classList.remove("animating");
             data.element.style.pointerEvents = ""; // revert to stylesheet default
             // optionally reset will-change if you set it elsewhere
-          }
+          },
         });
       }
 
@@ -350,11 +347,11 @@ let deckCardsOponent = [];
 
 let health = 10;
 let healthtext = document.getElementById("health");
-let credsText = document.getElementById("money")
+let credsText = document.getElementById("money");
 let creds = 100000;
 
 const handhitbox = document.getElementById("bottomhitbox");
-let cardSpacing = 180;
+let cardSpacing = window.innerWidth * 0.06;
 
 let cardOpenEnabled = true;
 let canDrag = true;
@@ -363,18 +360,17 @@ function mouseDown(e, cardElement) {
 
   if (!canDrag) return;
 
-  if(handDown === true){
+  if (handDown === true) {
     return;
   } else {
-      for(let i = 0; i < deckCards.length; i++) {
-        deckCards[i].addEventListener("click", () => {
-          if(handDown === false){
-            console.log("MOMMYYY")
-          }
-        });
-      }
+    for (let i = 0; i < deckCards.length; i++) {
+      deckCards[i].addEventListener("click", () => {
+        if (handDown === false) {
+          console.log("MOMMYYY");
+        }
+      });
+    }
   }
-
 
   console.log("MouseDown:", cardElement.id, activeCard.id);
 
@@ -433,37 +429,36 @@ function mouseMove(e) {
 
   console.log(isLocked);
 
-
   //box1
   const domRect1 = activeCard.getBoundingClientRect();
 
-
-
-  if(activeCard.spawning === true){
-    if(!(
+  if (activeCard.spawning === true) {
+    if (
+      !(
         domRect1.top > purpleRect.bottom ||
         domRect1.right < purpleRect.left ||
         domRect1.bottom < purpleRect.top ||
         domRect1.left > purpleRect.right
-    )){
-      purple.style.backgroundColor = "rgba(141, 133, 171, 0.4)"
-      isLocked = 0
+      )
+    ) {
+      purple.style.backgroundColor = "rgba(141, 133, 171, 0.4)";
+      isLocked = 0;
       container = null;
-    } else{
-      purple.style.backgroundColor = "initial"
+    } else {
+      purple.style.backgroundColor = "initial";
       isLocked = 1;
       container = 0;
     }
   }
 
-  if(activeCard.spawning === false){
+  if (activeCard.spawning === false) {
     if (
-        !(
-            domRect1.top > domRect2.bottom ||
-            domRect1.right < domRect2.left ||
-            domRect1.bottom < domRect2.top ||
-            domRect1.left > domRect2.right
-        )
+      !(
+        domRect1.top > domRect2.bottom ||
+        domRect1.right < domRect2.left ||
+        domRect1.bottom < domRect2.top ||
+        domRect1.left > domRect2.right
+      )
     ) {
       isLocked = 1;
       container = 1;
@@ -472,12 +467,12 @@ function mouseMove(e) {
 
     //box2
     else if (
-        !(
-            domRect1.top > domRect3.bottom ||
-            domRect1.right < domRect3.left ||
-            domRect1.bottom < domRect3.top ||
-            domRect1.left > domRect3.right
-        )
+      !(
+        domRect1.top > domRect3.bottom ||
+        domRect1.right < domRect3.left ||
+        domRect1.bottom < domRect3.top ||
+        domRect1.left > domRect3.right
+      )
     ) {
       isLocked = 1;
       container = 2;
@@ -486,45 +481,45 @@ function mouseMove(e) {
 
     //box3
     else if (
-        !(
-            domRect1.top > domRect4.bottom ||
-            domRect1.right < domRect4.left ||
-            domRect1.bottom < domRect4.top ||
-            domRect1.left > domRect4.right
-        )
+      !(
+        domRect1.top > domRect4.bottom ||
+        domRect1.right < domRect4.left ||
+        domRect1.bottom < domRect4.top ||
+        domRect1.left > domRect4.right
+      )
     ) {
       isLocked = 1;
       container = 3;
       scale();
     } else if (
-        !(
-            domRect1.top > domRect5.bottom ||
-            domRect1.right < domRect5.left ||
-            domRect1.bottom < domRect5.top ||
-            domRect1.left > domRect5.right
-        )
+      !(
+        domRect1.top > domRect5.bottom ||
+        domRect1.right < domRect5.left ||
+        domRect1.bottom < domRect5.top ||
+        domRect1.left > domRect5.right
+      )
     ) {
       isLocked = 1;
       container = 4;
       scale();
     } else if (
-        !(
-            domRect1.top > domRect6.bottom ||
-            domRect1.right < domRect6.left ||
-            domRect1.bottom < domRect6.top ||
-            domRect1.left > domRect6.right
-        )
+      !(
+        domRect1.top > domRect6.bottom ||
+        domRect1.right < domRect6.left ||
+        domRect1.bottom < domRect6.top ||
+        domRect1.left > domRect6.right
+      )
     ) {
       isLocked = 1;
       container = 5;
       scale();
     } else if (
-        !(
-            domRect1.top > domRect7.bottom ||
-            domRect1.right < domRect7.left ||
-            domRect1.bottom < domRect7.top ||
-            domRect1.left > domRect7.right
-        )
+      !(
+        domRect1.top > domRect7.bottom ||
+        domRect1.right < domRect7.left ||
+        domRect1.bottom < domRect7.top ||
+        domRect1.left > domRect7.right
+      )
     ) {
       isLocked = 1;
       container = 6;
@@ -539,13 +534,13 @@ function mouseMove(e) {
     }
   }
 
-
-
   // TODO [yell]: HERE IS THE THING
   if (handDown === false) {
     handhitbox.style.height = "5.5vw";
     handhitbox.style.zIndex = "99";
-    cardSpacing = 180;
+    //cardSpacing = 180;
+      cardSpacing = window.innerWidth * 0.06;
+
     updateDeckPositions(0.5);
     handDown = true;
     //console.log(handDown)
@@ -554,7 +549,6 @@ function mouseMove(e) {
 
   distanceFind();
 }
-
 
 function mouseUp() {
   console.log("MouseUp:", activeCard?.id);
@@ -567,27 +561,25 @@ function mouseUp() {
     id: activeCard.id,
   });
 
-  if(activeCard.spawning ===  true){
+  if (activeCard.spawning === true) {
     let purple = document.getElementById("luh");
 
+    purple.style.backgroundColor = "initial";
 
-    purple.style.backgroundColor = "initial"
-
-    if(isLocked === 1){
+    if (isLocked === 1) {
       activeCard.style.transition = "opacity 0.2s";
       activeCard.style.opacity = "0";
 
       setTimeout(() => {
-        for(let i = 0; i < cardsGame.length; i++) {
+        for (let i = 0; i < cardsGame.length; i++) {
           cardsGame[i].style.pointerEvents = "all";
         }
         activeCard.style.display = "none";
       }, 300);
-    }
-    else {
-        creds = creds - activeCard.price;
-        credsText.innerHTML = creds;
-        updateSpawnerButtons();
+    } else {
+      creds = creds - activeCard.price;
+      credsText.innerHTML = creds;
+      updateSpawnerButtons();
     }
   }
 
@@ -641,19 +633,23 @@ function mouseUp() {
       }
       // activeCard.innerHTML = ""
       setTimeout(() => {
-        for(let i = 0; i < cardsGame.length; i++) {
+        for (let i = 0; i < cardsGame.length; i++) {
           cardsGame[i].style.pointerEvents = "all";
         }
         activeCard.style.display = "none";
       }, 300);
     }
 
-    if(dragged && container !== 0) {
+    if (dragged && container !== 0) {
       let dmg;
 
-      if (getComputedStyle(activeCard).backgroundImage.includes("Artual.jpeg")) {
+      if (
+        getComputedStyle(activeCard).backgroundImage.includes("Artual.jpeg")
+      ) {
         dmg = 1;
-      } else if (getComputedStyle(activeCard).backgroundImage.includes("tetoo.jpeg")) {
+      } else if (
+        getComputedStyle(activeCard).backgroundImage.includes("tetoo.jpeg")
+      ) {
         dmg = 2;
       } else {
         dmg = 3;
@@ -672,8 +668,10 @@ function mouseUp() {
       healthtext.innerHTML = health;
       console.log(health);
     }
-  }
-  else if (isLocked === 0 && deckCardsOponent.includes(activeCard) === false) {
+  } else if (
+    isLocked === 0 &&
+    deckCardsOponent.includes(activeCard) === false
+  ) {
     if (!deckCards.includes(activeCard)) {
       deckCards.push(activeCard);
       activeCard.deck = true;
@@ -687,7 +685,10 @@ function mouseUp() {
       deckCardsOponent.splice(oponentIndex, 1);
     }
 
-    activeCard.style.setProperty("--border-animation", "pulseBorder 1.7s ease-in-out infinite");
+    activeCard.style.setProperty(
+      "--border-animation",
+      "pulseBorder 1.7s ease-in-out infinite"
+    );
 
     updateDeckPositions(totalDistance * 0.0008);
 
@@ -700,7 +701,7 @@ function mouseUp() {
         }
         isLocked = null;
         buttonEnable = false;
-        document.querySelectorAll(".spawnButtons").forEach(btn => {
+        document.querySelectorAll(".spawnButtons").forEach((btn) => {
           btn.draggable = false;
           btn.style.cursor = "default";
         });
@@ -708,15 +709,15 @@ function mouseUp() {
       pointerEvents: "auto",
       onComplete: () => {
         inDeck = 1;
-        if(activeCard.spawning === true){
+        if (activeCard.spawning === true) {
           activeCard.style.zIndex = activeCard.style.zIndex - 80;
         }
         activeCard.spawning = false;
-        for(let i = 0; i < cardsGame.length; i++) {
-              cardsGame[i].style.pointerEvents = "all";
-          }
+        for (let i = 0; i < cardsGame.length; i++) {
+          cardsGame[i].style.pointerEvents = "all";
+        }
         buttonEnable = true;
-        document.querySelectorAll(".spawnButtons").forEach(btn => {
+        document.querySelectorAll(".spawnButtons").forEach((btn) => {
           btn.draggable = true;
           btn.style.cursor = "pointer";
         });
@@ -782,8 +783,8 @@ function distanceFind(card = activeCard, cont = container) {
     bang = dropper6.offsetTop - domRect1.top;
   } else if (cont === null) {
     shoot = hand.offsetLeft - domRect1.left;
-    bang = hand.offsetTop - domRect1.top; }
-    else if (cont === 0) {
+    bang = hand.offsetTop - domRect1.top;
+  } else if (cont === 0) {
     shoot = randBtn.offsetLeft - domRect1.left;
     bang = randBtn.offsetTop - domRect1.top;
     if (card.deckOponent === true) {
@@ -802,7 +803,7 @@ location.replace(location.href);
 //multiplayer receive
 socket.on("playerMoved", (data) => {
   // Get the actual card element by ID
-  let cardToMove = document.getElementById(data.id);
+  let cardToMove = document.getElementById("opponent_" + data.id);
   if (!cardToMove) return; // Guard against null
 
   // Don't touch global activeCard/container here
@@ -841,6 +842,7 @@ socket.on("playerMoved", (data) => {
     const index = deckCardsOponent.indexOf(cardToMove);
     if (index !== -1) {
       deckCardsOponent.splice(index, 1);
+      updateDeckPositionsOponent(0.5);
     }
     cardToMove.deckOponent = false;
 
@@ -876,8 +878,6 @@ function scale() {
   });
 }
 
-
-
 function selectAbility(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
@@ -899,13 +899,12 @@ cardSymb = [
   'url("images/guns/outlaw.png")',
   'url("images/guns/operator.png")',
   'url("images/guns/ares.png")',
-  'url("images/guns/odin.png")'
+  'url("images/guns/odin.png")',
 ];
 
 const priceList = [
-  300, 450, 500, 800, 1100, 1600, 850,
-  1850, 2050, 2250, 2900, 2900, 950,
-  2400, 4700, 1600, 3200
+  300, 450, 500, 800, 1100, 1600, 850, 1850, 2050, 2250, 2900, 2900, 950, 2400,
+  4700, 1600, 3200,
 ];
 
 updateSpawnerButtons();
@@ -926,7 +925,7 @@ function createCard(id, initialX, initialY, buttonId) {
   if (buttonId === "randBtn") {
     imgSelect = cardSymb[rndNum];
   } else {
-    imgSelect = cardSymb[ buttonMap[buttonId] ];
+    imgSelect = cardSymb[buttonMap[buttonId]];
   }
 
   cardElement.style.backgroundImage = imgSelect;
@@ -940,7 +939,7 @@ function createCard(id, initialX, initialY, buttonId) {
     cardElement.price = 0;
   }
 
-    /* cardElement.infoAble = false
+  /* cardElement.infoAble = false
 
     const ib = document.createElement("div");
     ib.className = "cardInfo"; // hidden by default
@@ -965,14 +964,13 @@ function createCard(id, initialX, initialY, buttonId) {
 
   // TODO [yell]: // BACK INFO
 
-  if(imgSelect === cardSymb[0]){
+  if (imgSelect === cardSymb[0]) {
     back.innerHTML = "THIS IS A SHORTY";
-  } else if(imgSelect === cardSymb[1]) {
+  } else if (imgSelect === cardSymb[1]) {
     back.innerHTML = "THIS IS A FRENZY";
-  } else if(imgSelect === cardSymb[2]) {
+  } else if (imgSelect === cardSymb[2]) {
     back.innerHTML = "THIS IS A GHOST";
   }
-
 
   // style faces with CSS backface-visibility like earlier
   cardElement.appendChild(front);
@@ -983,53 +981,53 @@ function createCard(id, initialX, initialY, buttonId) {
 
   cardElement.addEventListener("click", () => {
     if (handDown) return;
-      if (!cardElement.flipped) {
-        gsap.to(cardElement,
-            { rotationY: 180,
-              duration: 0.65,
-              ease: "back.out(1.7)",
-              transformOrigin: "50% 50%",
-              onStart: () => {
-                activeCard.style.cursor = "default";
-                handhitbox.style.pointerEvents = "none";
-                cardOpenEnabled = false;
-                for (let i = 0; i < deckCards.length; i++) {
-                  deckCards[i].style.pointerEvents = "none";
-                }
-              },
-              onComplete: () => {
-                activeCard.style.cursor = "pointer";
-                handhitbox.style.pointerEvents = "all";
-                cardOpenEnabled = true;
-                for (let i = 0; i < deckCards.length; i++) {
-                  deckCards[i].style.pointerEvents = "all";
-                }
-              }
-            });
-        } else
-        {gsap.to(cardElement,
-            { rotationY: 0,
-              duration: 0.65,
-              ease: "back.out(1.7)",
-              transformOrigin: "50% 50%",
-              onStart: () => {
-                activeCard.style.cursor = "default";
-                handhitbox.style.pointerEvents = "none";
-                cardOpenEnabled = false;
-                for (let i = 0; i < deckCards.length; i++) {
-                  deckCards[i].style.pointerEvents = "none";
-                }
-              },
-              onComplete: () => {
-                activeCard.style.cursor = "pointer";
-                handhitbox.style.pointerEvents = "all";
-                cardOpenEnabled = true;
-                for (let i = 0; i < deckCards.length; i++) {
-                  deckCards[i].style.pointerEvents = "all";
-                }
-              }
-            });
-       }
+    if (!cardElement.flipped) {
+      gsap.to(cardElement, {
+        rotationY: 180,
+        duration: 0.65,
+        ease: "back.out(1.7)",
+        transformOrigin: "50% 50%",
+        onStart: () => {
+          activeCard.style.cursor = "default";
+          handhitbox.style.pointerEvents = "none";
+          cardOpenEnabled = false;
+          for (let i = 0; i < deckCards.length; i++) {
+            deckCards[i].style.pointerEvents = "none";
+          }
+        },
+        onComplete: () => {
+          activeCard.style.cursor = "pointer";
+          handhitbox.style.pointerEvents = "all";
+          cardOpenEnabled = true;
+          for (let i = 0; i < deckCards.length; i++) {
+            deckCards[i].style.pointerEvents = "all";
+          }
+        },
+      });
+    } else {
+      gsap.to(cardElement, {
+        rotationY: 0,
+        duration: 0.65,
+        ease: "back.out(1.7)",
+        transformOrigin: "50% 50%",
+        onStart: () => {
+          activeCard.style.cursor = "default";
+          handhitbox.style.pointerEvents = "none";
+          cardOpenEnabled = false;
+          for (let i = 0; i < deckCards.length; i++) {
+            deckCards[i].style.pointerEvents = "none";
+          }
+        },
+        onComplete: () => {
+          activeCard.style.cursor = "pointer";
+          handhitbox.style.pointerEvents = "all";
+          cardOpenEnabled = true;
+          for (let i = 0; i < deckCards.length; i++) {
+            deckCards[i].style.pointerEvents = "all";
+          }
+        },
+      });
+    }
     cardElement.flipped = !cardElement.flipped;
   });
 
@@ -1060,7 +1058,7 @@ function createCard(id, initialX, initialY, buttonId) {
 
 let nOfCards = 0;
 function spawnCard(e) {
-  if (!buttonEnable ) {
+  if (!buttonEnable) {
     return; // stop the function from running
   }
 
@@ -1086,7 +1084,6 @@ function spawnCard(e) {
   startX = e.clientX;
   startY = e.clientY;
 
-
   document.addEventListener("mousemove", mouseMove);
   document.addEventListener("mouseup", mouseUp);
 
@@ -1094,74 +1091,87 @@ function spawnCard(e) {
   activeCard.deck = false;*/
   socket.emit("spawnedCard", {
     id: cardId,
-    initialX: x,
-    initialY: y,
-    type: imgSelect,
   });
   //console.log("spawned and dragging card: " + cardId);
 }
+socket.on("enemySpawnedCard", (data) => {
+  console.log("enemy spawned card: " + data);
+
+  const enemycard = document.createElement("div");
+  enemycard.className = "card";
+  enemycard.id = "opponent_" + data;
+  enemycard.style.left = window.innerWidth/2 + "px";
+  enemycard.style.top = window.innerHeight/2 + "px";
+
+  enemycard.style.backgroundImage = "url(images/abilitycards/back.png)";
+  enemycard.deckOponent = true;
+  deckCardsOponent.push(enemycard);
+  cardsGame.push(enemycard);
+  document.querySelector(".container").appendChild(enemycard);
+    updateDeckPositionsOponent(0.5);
+});
 
 // TODO [yell]: // PRICE KEEPERS
 
-  function updateSpawnerButtons() {
-    for (let btn of spawnButtons) {
-      const price = parseInt(btn.dataset.price) || 0;
-      if (creds >= price) {
-        // enable
-        // we should add classlist here later
-        btn.style.pointerEvents = "all";
-      } else {
-        // disable
-        // we should add classlist here later
-        btn.style.pointerEvents = "none";
-      }
+function updateSpawnerButtons() {
+  for (let btn of spawnButtons) {
+    const price = parseInt(btn.dataset.price) || 0;
+    if (creds >= price) {
+      // enable
+      // we should add classlist here later
+      btn.style.pointerEvents = "all";
+    } else {
+      // disable
+      // we should add classlist here later
+      btn.style.pointerEvents = "none";
     }
   }
+}
 
 let handDown = true;
 
-  function handOpening(){
+function handOpening() {
+  if (handDown === true && deckCards.length !== 0) {
+    console.log(deckCards);
+    handhitbox.style.height = "15.5vw";
+    handhitbox.style.zIndex = "1";
+    //cardSpacing = 270;
+      cardSpacing = window.innerWidth * 0.11;
 
-    if(handDown === true && deckCards.length !== 0 ){
-      console.log(deckCards)
-      handhitbox.style.height = "15.5vw"
-      handhitbox.style.zIndex = "1"
-      cardSpacing = 270;
-      updateDeckPositions(0.5);
-      handDown = false;
-      console.log("handown:" + handDown);
+    updateDeckPositions(0.5);
+    handDown = false;
+    console.log("handown:" + handDown);
 
-      canDrag = false;
-      for(let i = 0; i < deckCards.length; i++) {
-        deckCards[i].style.pointerEvents = "none";
-        deckCards[i].style.cursor = "none";
+    canDrag = false;
+    for (let i = 0; i < deckCards.length; i++) {
+      deckCards[i].style.pointerEvents = "none";
+      deckCards[i].style.cursor = "none";
+    }
+    handhitbox.style.pointerEvents = "none";
+    cardOpenEnabled = false;
+
+    setTimeout(() => {
+      canDrag = true;
+
+      for (let i = 0; i < deckCards.length; i++) {
+        deckCards[i].style.pointerEvents = "all";
+        deckCards[i].style.cursor = "pointer";
       }
-      handhitbox.style.pointerEvents = "none";
-      cardOpenEnabled = false;
-
-      setTimeout(() => {
-        canDrag = true;
-
-        for(let i = 0; i < deckCards.length; i++) {
-          deckCards[i].style.pointerEvents = "all";
-          deckCards[i].style.cursor = "pointer";
-        }
-        handhitbox.style.pointerEvents = "all";
-        cardOpenEnabled = true;
-      }, 500);
-    }
-
-    else if(handDown === false && deckCards.length !== 0 ){
-      console.log(deckCards)
-      handhitbox.style.height = "5.5vw"
-      handhitbox.style.zIndex = "99"
-      cardSpacing = 180;
-      updateDeckPositions(0.5);
-      handDown = true;
-    }
+      handhitbox.style.pointerEvents = "all";
+      cardOpenEnabled = true;
+    }, 500);
+  } else if (handDown === false && deckCards.length !== 0) {
+    console.log(deckCards);
+    handhitbox.style.height = "5.5vw";
+    handhitbox.style.zIndex = "99";
+    //cardSpacing = 180;
+      cardSpacing = window.innerWidth * 0.06;
+    updateDeckPositions(0.5);
+    handDown = true;
   }
+}
 
-if(cardOpenEnabled === true){
+if (cardOpenEnabled === true) {
   console.log("diameters");
   onMoveOutside(handhitbox, deckCards, () => handOpening());
 }
@@ -1211,15 +1221,14 @@ function onMoveOutside(element1, element2, callback) {
     }
 
     if (handDown === false) {
-
-      let outsideAll= true;
-      element2.forEach(element =>{
+      let outsideAll = true;
+      element2.forEach((element) => {
         if (element.contains(e.target)) {
           outsideAll = false;
         }
-      })
+      });
 
-      if(!element1.contains(e.target) && outsideAll) {
+      if (!element1.contains(e.target) && outsideAll) {
         callback();
       }
     }
@@ -1235,7 +1244,11 @@ let ab3 = document.getElementById("ab3");
 
 function spawnMenu() {
   menu.style.top = "4vh";
-  if(getComputedStyle(agentBtn).backgroundImage.includes("luant-s-artworks-comm-avocadocat-megu.jpg")){
+  if (
+    getComputedStyle(agentBtn).backgroundImage.includes(
+      "luant-s-artworks-comm-avocadocat-megu.jpg"
+    )
+  ) {
     ab1.style.backgroundImage = "url(images/Artual.jpeg)";
   } else {
     ab1.style.backgroundImage = "none";
@@ -1246,16 +1259,14 @@ menuExit.addEventListener("click", () => {
   menu.style.top = "100vh";
 });
 
-function changeChar(){
-
-}
+function changeChar() {}
 
 function updateZIndex(cardId) {
-    zIndexes.splice(zIndexes.indexOf(cardId), 1);
-    zIndexes.push(cardId);
-    for(let i = 0; i < zIndexes.length; i++) {
-        document.getElementById(zIndexes[i]).style.zIndex = i+3;
-    }
+  zIndexes.splice(zIndexes.indexOf(cardId), 1);
+  zIndexes.push(cardId);
+  for (let i = 0; i < zIndexes.length; i++) {
+    document.getElementById(zIndexes[i]).style.zIndex = i + 3;
+  }
 }
 
 /* window.onresize = function () {
