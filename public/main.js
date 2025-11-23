@@ -1293,7 +1293,7 @@ function updateDeckPositionsOponent(speed) {
   activeOppDeck.forEach((card, i) => {
     const targetX =
       centerX - totalWidth / 2 + i * cardSpacing - card.offsetWidth / 2;
-    const targetY = -100;
+    const targetY = window.innerHeight - hand.offsetTop - 0.15 * window.innerWidth;
     gsap.to(card, {
       left: targetX + "px",
       top: targetY + "px",
