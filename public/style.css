@@ -6,6 +6,7 @@ body {
 
 *{
     box-sizing: border-box;
+    user-select: none;
 }
 
 #agentSelectMenuBackground {
@@ -633,11 +634,13 @@ body {
     justify-content: center;
     align-items: center;
     gap: 0.2vw;
+    z-index: 100;
 }
 
 #abilities{
     display: flex;
     gap: 0.2vw;
+    z-index: 1000000;
 }
 
 #abilityHolder .category {
@@ -649,7 +652,6 @@ body {
 #ab1 {
     width: 11.5vw;
     height: 6.5vw;
-    background-image: url("images/88f2a76f441ca6af3354c3f46971a432.jpg");
     background-position: center;
     background-size: cover;
 }
@@ -657,15 +659,14 @@ body {
 #ab2 {
     width: 11.5vw;
     height: 6.5vw;
-    background-image: url("images/99c2d97921b263371ad4b329a30b72e4.jpg");
     background-position: center;
     background-size: cover;
+    cursor: pointer !important;
 }
 
 #ab3 {
     width: 11.5vw;
     height: 6.5vw;
-    background-image: url("images/c5aab9e0c4df8cdb660ce2be3a603425.jpg");
     background-position: center;
     background-size: cover;
 }
@@ -681,13 +682,17 @@ body {
     align-items: center;
     display: flex;
     flex-direction: column;
-    background-image: url("images/luant-s-artworks-comm-avocadocat-megu.jpg");
     background-size: cover;
+    cursor: pointer !important;
+    z-index: 10000;
+    user-select: none;
 }
 
 #arrows{
     display: flex;
     gap: 0.5vw;
+    pointer-events: none;
+    z-index: 1;
 }
 
 #agentTxt{
@@ -698,7 +703,8 @@ body {
 }
 
 .arrow {
-    background-color: greenyellow;
+    background-color: white;
+    border: 1px solid black;
     width: 0.5vw;
     height: 0.5vw;
     border-radius: 50%;

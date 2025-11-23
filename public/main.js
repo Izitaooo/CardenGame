@@ -60,23 +60,23 @@ const randBtn = document.getElementById("randBtn");
 const spawnButtons = document.querySelectorAll(".spawnButtons");
 
 const buttonMap = {
-  shortyBtn: 0,
-  frenzyBtn: 1,
-  ghostBtn: 2,
-  sheriffBtn: 3,
-  stingerBtn: 4,
-  spectreBtn: 5,
-  buckyBtn: 6,
-  judgeBtn: 7,
-  bulldogBtn: 8,
-  guardianBtn: 9,
-  phantomBtn: 10,
-  vandalBtn: 11,
-  marshalBtn: 12,
-  outlawBtn: 13,
-  operatorBtn: 14,
-  aresBtn: 15,
-  odinBtn: 16,
+  shortyBtn:     0,
+  frenzyBtn:     1,
+  ghostBtn:      2,
+  sheriffBtn:    3,
+  stingerBtn:    4,
+  spectreBtn:    5,
+  buckyBtn:      6,
+  judgeBtn:      7,
+  bulldogBtn:    8,
+  guardianBtn:   9,
+  phantomBtn:    10,
+  vandalBtn:     11,
+  marshalBtn:    12,
+  outlawBtn:     13,
+  operatorBtn:   14,
+  aresBtn:       15,
+  odinBtn:       16,
 };
 
 const hand = document.getElementById("hand");
@@ -132,6 +132,7 @@ function lockIn() {
 
     for (let agent of agents) {
       if (agentsChosen.includes(agent)) {
+
         const el = document.getElementById(agent);
         el.health = 10; // Add custom property here
 
@@ -211,7 +212,7 @@ function lockIn() {
             data.element.classList.remove("animating");
             data.element.style.pointerEvents = ""; // revert to stylesheet default
             // optionally reset will-change if you set it elsewhere
-          },
+          }
         });
       }
 
@@ -360,7 +361,7 @@ function mouseDown(e, cardElement) {
 
   if (!canDrag) return;
 
-  if (handDown === true) {
+  if(handDown === true){
     return;
   } else {
     for (let i = 0; i < deckCards.length; i++) {
@@ -402,6 +403,8 @@ function mouseMove(e) {
   inDeck = 0;
   dropPlay = 1;
   dragged = true;
+
+  console.log(agentsChosen);
 
   let purple = document.getElementById("luh");
   let purpleRect = purple.getBoundingClientRect();
@@ -899,16 +902,50 @@ cardSymb = [
   'url("images/guns/outlaw.png")',
   'url("images/guns/operator.png")',
   'url("images/guns/ares.png")',
-  'url("images/guns/odin.png")',
+  'url("images/guns/odin.png")'
 ];
 
+abilitySymb = [
+  'url("images/abilitycards/arc rose.png")', //0
+  'url("images/abilitycards/barrier orb.png")', //1
+  'url("images/abilitycards/cloudburst.png")', //2
+  'url("images/abilitycards/contigency.png")', //3
+  'url("images/abilitycards/dark cover.png")', //4
+  'url("images/abilitycards/double tap.png")', //5
+  'url("images/abilitycards/guiding light.png")', //6
+  'url("images/abilitycards/healing orb.png")', //7
+  'url("images/abilitycards/meddle.png")', //8
+  'url("images/abilitycards/owl drone.png")', //9
+  'url("images/abilitycards/paranoia.png")', //10
+  'url("images/abilitycards/pick me up.png")', //11
+  'url("images/abilitycards/razorvine.png")', //12
+  'url("images/abilitycards/recon bolt.png")', //13
+  'url("images/abilitycards/regrowth.png")', //14
+  'url("images/abilitycards/ruse.png")',  //15
+  'url("images/abilitycards/shear.png")', //16
+  'url("images/abilitycards/shock bolt.png")', //17
+  'url("images/abilitycards/slow orb.png")', //18
+  'url("images/abilitycards/shrouded step.png")', //19
+  'url("images/abilitycards/tailwind.png")', //20
+  'url("images/abilitycards/trailblazer.png")', //21
+  'url("images/abilitycards/undercut.png")', //22
+  'url("images/abilitycards/updraft.png")' //23
+];
+
+let agentBtn = document.getElementById("agentBtn");
+
 const priceList = [
-  300, 450, 500, 800, 1100, 1600, 850, 1850, 2050, 2250, 2900, 2900, 950, 2400,
-  4700, 1600, 3200,
+  300, 450, 500, 800, 1100, 1600, 850,
+  1850, 2050, 2250, 2900, 2900, 950,
+  2400, 4700, 1600, 3200
 ];
 
 updateSpawnerButtons();
 credsText.innerHTML = creds;
+
+let ab1 = document.getElementById("ab1");
+let ab2 = document.getElementById("ab2");
+let ab3 = document.getElementById("ab3");
 
 function createCard(id, initialX, initialY, buttonId) {
   //Create the DOM element
@@ -920,12 +957,60 @@ function createCard(id, initialX, initialY, buttonId) {
 
   // TODO [yell]: // FRONT IMAGES
 
-  let rndNum = selectAbility(0, 16);
+  const bg = getComputedStyle(agentBtn).backgroundImage;
+
+  let rndNum = selectAbility(0, 23);
   let imgSelect;
   if (buttonId === "randBtn") {
-    imgSelect = cardSymb[rndNum];
-  } else {
-    imgSelect = cardSymb[buttonMap[buttonId]];
+    imgSelect = abilitySymb[rndNum];
+  }
+  else if(buttonId === "ab1" || buttonId === "ab2" || buttonId === "ab3"){
+    if(bg.includes("skye.png")){
+      if(buttonId === "ab1"){
+        imgSelect = abilitySymb[21];
+      } else if (buttonId === "ab2"){
+        imgSelect = abilitySymb[6];
+      } else if (buttonId === "ab3"){
+        imgSelect = abilitySymb[14];
+      }
+
+    } else if (bg.includes("sage.png")) {
+        if (buttonId === "ab1") imgSelect = abilitySymb[18];
+        else if (buttonId === "ab2") imgSelect = abilitySymb[7];
+        else if (buttonId === "ab3") imgSelect = abilitySymb[1];
+    } else if (bg.includes("jett.png")) {
+        if (buttonId === "ab1") imgSelect = abilitySymb[23];
+        else if (buttonId === "ab2") imgSelect = abilitySymb[20];
+        else if (buttonId === "ab3") imgSelect = abilitySymb[2];
+
+    } else if (bg.includes("vyse.png")) {
+        if (buttonId === "ab1") imgSelect = abilitySymb[16];
+        else if (buttonId === "ab2") imgSelect = abilitySymb[0];
+        else if (buttonId === "ab3") imgSelect = abilitySymb[12];
+
+    } else if (bg.includes("omen.png")) {
+        if (buttonId === "ab1") imgSelect = abilitySymb[10];
+        else if (buttonId === "ab2") imgSelect = abilitySymb[4];
+        else if (buttonId === "ab3") imgSelect = abilitySymb[19];
+
+    } else if (bg.includes("clove.png")) {
+        if (buttonId === "ab1") imgSelect = abilitySymb[8];
+        else if (buttonId === "ab2") imgSelect = abilitySymb[15];
+        else if (buttonId === "ab3") imgSelect = abilitySymb[11];
+
+    } else if (bg.includes("iso.png")) {
+        if (buttonId === "ab1") imgSelect = abilitySymb[22];
+        else if (buttonId === "ab2") imgSelect = abilitySymb[5];
+        else if (buttonId === "ab3") imgSelect = abilitySymb[3];
+
+    } else if (bg.includes("sova.png")) {
+        if (buttonId === "ab1") imgSelect = abilitySymb[17];
+        else if (buttonId === "ab2") imgSelect = abilitySymb[13];
+        else if (buttonId === "ab3") imgSelect = abilitySymb[9];
+    }
+  }
+  else {
+    imgSelect = cardSymb[ buttonMap[buttonId] ];
   }
 
   cardElement.style.backgroundImage = imgSelect;
@@ -936,6 +1021,10 @@ function createCard(id, initialX, initialY, buttonId) {
     const index = cardSymb.indexOf(imgSelect);
     cardElement.price = priceList[index];
   } else {
+    cardElement.price = 0;
+  }
+
+  if (buttonId === "ab1" || buttonId === "ab2" || buttonId === "ab3"){
     cardElement.price = 0;
   }
 
@@ -1237,29 +1326,38 @@ function onMoveOutside(element1, element2, callback) {
 
 const menu = document.getElementById("shopMenu");
 const menuExit = document.getElementById("exit");
-let agentBtn = document.getElementById("agentBtn");
-let ab1 = document.getElementById("ab1");
-let ab2 = document.getElementById("ab2");
-let ab3 = document.getElementById("ab3");
+
+let currentAgentIndex = 0;
+let currentCircle = 0;
+
+let circle1 = document.getElementById("left");
+let circle2 = document.getElementById("middle");
+let circle3 = document.getElementById("right");
+let circles = [circle1, circle2, circle3];
 
 function spawnMenu() {
   menu.style.top = "4vh";
-  if (
-    getComputedStyle(agentBtn).backgroundImage.includes(
-      "luant-s-artworks-comm-avocadocat-megu.jpg"
-    )
-  ) {
-    ab1.style.backgroundImage = "url(images/Artual.jpeg)";
-  } else {
-    ab1.style.backgroundImage = "none";
+  updateAgent();
+}
+
+agentBtn.addEventListener("click", () => {
+  currentAgentIndex = (currentAgentIndex + 1) % agentsChosen.length;
+  currentCircle = (currentCircle + 1) % circles.length;
+  updateAgent();
+});
+
+function updateAgent(){
+  agentBtn.style.backgroundImage = "url(images/agents/"+agentsChosen[currentAgentIndex]+".png)";
+
+  for(let i = 0; i < circles.length; i++) {
+    circles[i].style.backgroundColor = "white";
   }
+  circles[currentCircle].style.backgroundColor = "red";
 }
 
 menuExit.addEventListener("click", () => {
   menu.style.top = "100vh";
 });
-
-function changeChar() {}
 
 function updateZIndex(cardId) {
   zIndexes.splice(zIndexes.indexOf(cardId), 1);
