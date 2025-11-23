@@ -76,8 +76,6 @@ body {
 #vyse:before {
   background-image: url("images/agents/vyse.png");
 }
-
-
 #enemy_clove:before {
   background-image: url("images/agents/clove.png");
 }
@@ -533,12 +531,14 @@ body {
     display: flex;
     position: relative;
     left: 12.5%;
+    top: -4vw;
     width: 65%;
     height: 70%;
     border-radius: 0.8vw;
     justify-content: center;
     align-items: center;
-    gap: 1vw;
+    gap: 0.2vw;
+    /*background-color: bisque;*/
 }
 
 #sidearms{
@@ -549,6 +549,7 @@ body {
     justify-content: center;
     gap: 0.2vw;
     height: 100%;
+    left: -1vw;
 }
 
 #sidearms button {
@@ -596,13 +597,14 @@ body {
     gap: 0.2vw;
 }
 
-#heavies button {
+#marshalBtn, #outlawBtn, #operatorBtn {
     width: 13.5vw;
-    height: 4.2vw;
+    height: 4.25vw;
 }
 
 #aresBtn, #odinBtn {
-    flex-grow: 0.345;
+    height: 6.45vw;
+    width: 13.5vw;
 }
 
 .category {
@@ -617,6 +619,91 @@ body {
     font-family: "futura-100", sans-serif;
     font-weight: 400;
     font-style: normal;
+}
+
+#abilityHolder{
+    display: flex;
+    position: fixed;
+    top: 36vw;
+    left: 24vw;
+    width: 65%;
+    height: 10%;
+    border-radius: 0.8vw;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.2vw;
+}
+
+#abilities{
+    display: flex;
+    gap: 0.2vw;
+}
+
+#abilityHolder .category {
+    width: 85%;
+    position: relative;
+    left: -0.5vw;
+}
+
+#ab1 {
+    width: 11.5vw;
+    height: 6.5vw;
+    background-image: url("images/88f2a76f441ca6af3354c3f46971a432.jpg");
+    background-position: center;
+    background-size: cover;
+}
+
+#ab2 {
+    width: 11.5vw;
+    height: 6.5vw;
+    background-image: url("images/99c2d97921b263371ad4b329a30b72e4.jpg");
+    background-position: center;
+    background-size: cover;
+}
+
+#ab3 {
+    width: 11.5vw;
+    height: 6.5vw;
+    background-image: url("images/c5aab9e0c4df8cdb660ce2be3a603425.jpg");
+    background-position: center;
+    background-size: cover;
+}
+
+#agentBtn{
+    width: 8vw;
+    height: 6.5vw;
+    position: relative;
+    left: -1vw;
+    background-color: darkseagreen;
+    border-radius: 0.2vw;
+    justify-content: flex-end;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    background-image: url("images/luant-s-artworks-comm-avocadocat-megu.jpg");
+    background-size: cover;
+}
+
+#arrows{
+    display: flex;
+    gap: 0.5vw;
+}
+
+#agentTxt{
+    font-family: "futura-100", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 1vw;
+}
+
+.arrow {
+    background-color: greenyellow;
+    width: 0.5vw;
+    height: 0.5vw;
+    border-radius: 50%;
+    position: relative;
+    top: -0.2vw;
 }
 
 #luh {
