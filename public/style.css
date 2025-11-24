@@ -511,7 +511,19 @@ body {
     font-family: "futura-100", sans-serif;
     font-weight: 400;
     font-style: normal;
-    font-size: 1vw;
+    font-size: 0.8vw;
+    text-align: center;
+    color: pink;
+    background-position: center;
+    background-color: #38334a;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+}
+
+#sidearms button:not(#frenzyBtn, #sheriffBtn) {
+    background-size: 7vw;
 }
 
 .spawnButtons:disabled{
@@ -647,6 +659,109 @@ body {
     width: 85%;
     position: relative;
     left: -0.5vw;
+}
+
+#shortyBtn {
+    background-image: url("images/gunIcon/Shorty_killfeed.webp");
+}
+
+#frenzyBtn {
+    background-image: url("images/gunIcon/Frenzy_killfeed.webp");
+    background-size: 4.5vw;  !important;
+    background-position-x: 1.5vw; !important;
+    background-position-y: 1.2vw; !important;
+}
+
+#ghostBtn {
+    background-image: url("images/gunIcon/Ghost_killfeed.webp");
+}
+
+#sheriffBtn {
+    background-image: url("images/gunIcon/Sheriff_killfeed.webp");
+    background-size: 8vw; !important;
+}
+
+#stingerBtn {
+    background-image: url("images/gunIcon/Stinger_killfeed.webp");
+}
+
+#spectreBtn {
+    background-image: url("images/gunIcon/Spectre_killfeed.webp");
+}
+
+#buckyBtn {
+    background-image: url("images/gunIcon/Bucky_killfeed.webp");
+    background-size: 9vw;
+    background-position-y: 2.2vw;
+}
+
+#judgeBtn {
+    background-image: url("images/gunIcon/Judge_killfeed.webp");
+    background-size: 10.5vw;
+    background-position-y: 2vw;
+}
+
+#sNs button:not(#judgeBtn,#buckyBtn) {
+    background-size: 8.5vw;
+    background-position-y: 2vw;
+}
+
+#bulldogBtn {
+    background-image: url("images/gunIcon/Bulldog_killfeed.webp");
+    background-size: 13vw;
+    background-position-y: 2vw;
+}
+
+#guardianBtn {
+    background-image: url("images/gunIcon/Guardian_killfeed.webp");
+    background-size: 11vw;
+    background-position-y: 2.3vw;
+}
+
+#phantomBtn {
+    background-image: url("images/gunIcon/Phantom_killfeed.webp");
+}
+
+#vandalBtn {
+    background-image: url("images/gunIcon/Vandal_killfeed.webp");
+    background-size: 12.5vw;
+    background-position-y: 2.2vw;
+}
+
+#rifles button:not(#bulldogBtn, #guardianBtn, #vandalBtn) {
+    background-size: 10.5vw;
+    background-position-y: 2.2vw;
+}
+
+#marshalBtn {
+    background-image: url("images/gunIcon/Marshal_killfeed.webp");
+    background-size: 12vw;
+    background-position-y: 1.1vw;
+}
+
+#outlawBtn {
+    background-image: url("images/gunIcon/Outlaw_killfeed.webp");
+    background-size: 14vw;
+    background-position-y: 1.1vw;
+}
+
+#operatorBtn {
+    background-image: url("images/gunIcon/Operator_killfeed.webp");
+    background-size: 13vw;
+    background-position-y: 1.1vw;
+}
+
+#aresBtn {
+    background-image: url("images/gunIcon/Ares_killfeed.webp");
+}
+
+#odinBtn {
+    background-image: url("images/gunIcon/Odin_killfeed.webp");
+}
+
+#heavies button:not(#outlawBtn, #operatorBtn, #marshalBtn)  {
+    background-size: 13vw;
+    background-position-y: 2.2vw;
 }
 
 #ab1 {

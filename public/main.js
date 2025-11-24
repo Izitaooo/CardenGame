@@ -905,6 +905,12 @@ cardSymb = [
   'url("images/guns/odin.png")'
 ];
 
+const priceList = [
+  300, 450, 500, 800, 1100, 1600, 850,
+  1850, 2050, 2250, 2900, 2900, 950,
+  2400, 4700, 1600, 3200
+];
+
 abilitySymb = [
   'url("images/abilitycards/arc rose.png")', //0
   'url("images/abilitycards/barrier orb.png")', //1
@@ -932,19 +938,17 @@ abilitySymb = [
   'url("images/abilitycards/updraft.png")' //23
 ];
 
+const abilityPrice = [
+  150,300,200,200,150,200,250,250
+  ,250,400,250,200,150,250,150,150
+  ,200,150,200,100,200,300,300,150
+]
+
 let agentBtn = document.getElementById("agentBtn");
 
-const priceList = [
-  300, 450, 500, 800, 1100, 1600, 850,
-  1850, 2050, 2250, 2900, 2900, 950,
-  2400, 4700, 1600, 3200
-];
 
 updateSpawnerButtons();
-abNames();
 credsText.innerHTML = creds;
-
-
 
 let ab1 = document.getElementById("ab1");
 let ab2 = document.getElementById("ab2");
@@ -976,40 +980,65 @@ function createCard(id, initialX, initialY, buttonId) {
       } else if (buttonId === "ab3"){
         imgSelect = abilitySymb[14];
       }
+      ab1.dataset.price = String(abilityPrice[21]);
+      ab2.dataset.price = String(abilityPrice[6]);
+      ab3.dataset.price = String(abilityPrice[14]);
 
     } else if (bg.includes("sage.png")) {
         if (buttonId === "ab1") imgSelect = abilitySymb[18];
         else if (buttonId === "ab2") imgSelect = abilitySymb[7];
         else if (buttonId === "ab3") imgSelect = abilitySymb[1];
+      ab1.dataset.price = String(abilityPrice[18]);
+      ab2.dataset.price = String(abilityPrice[7]);
+      ab3.dataset.price = String(abilityPrice[1]);
+
     } else if (bg.includes("jett.png")) {
         if (buttonId === "ab1") imgSelect = abilitySymb[23];
         else if (buttonId === "ab2") imgSelect = abilitySymb[20];
         else if (buttonId === "ab3") imgSelect = abilitySymb[2];
+      ab1.dataset.price = String(abilityPrice[23]);
+      ab2.dataset.price = String(abilityPrice[20]);
+      ab3.dataset.price = String(abilityPrice[2]);
 
     } else if (bg.includes("vyse.png")) {
         if (buttonId === "ab1") imgSelect = abilitySymb[16];
         else if (buttonId === "ab2") imgSelect = abilitySymb[0];
         else if (buttonId === "ab3") imgSelect = abilitySymb[12];
+      ab1.dataset.price = String(abilityPrice[16]);
+      ab2.dataset.price = String(abilityPrice[0]);
+      ab3.dataset.price = String(abilityPrice[12]);
 
     } else if (bg.includes("omen.png")) {
         if (buttonId === "ab1") imgSelect = abilitySymb[10];
         else if (buttonId === "ab2") imgSelect = abilitySymb[4];
         else if (buttonId === "ab3") imgSelect = abilitySymb[19];
+      ab1.dataset.price = String(abilityPrice[10]);
+      ab2.dataset.price = String(abilityPrice[4]);
+      ab3.dataset.price = String(abilityPrice[19]);
 
     } else if (bg.includes("clove.png")) {
         if (buttonId === "ab1") imgSelect = abilitySymb[8];
         else if (buttonId === "ab2") imgSelect = abilitySymb[15];
         else if (buttonId === "ab3") imgSelect = abilitySymb[11];
+      ab1.dataset.price = String(abilityPrice[8]);
+      ab2.dataset.price = String(abilityPrice[15]);
+      ab3.dataset.price = String(abilityPrice[11]);
 
     } else if (bg.includes("iso.png")) {
         if (buttonId === "ab1") imgSelect = abilitySymb[22];
         else if (buttonId === "ab2") imgSelect = abilitySymb[5];
         else if (buttonId === "ab3") imgSelect = abilitySymb[3];
+      ab1.dataset.price = String(abilityPrice[22]);
+      ab2.dataset.price = String(abilityPrice[5]);
+      ab3.dataset.price = String(abilityPrice[3]);
 
     } else if (bg.includes("sova.png")) {
         if (buttonId === "ab1") imgSelect = abilitySymb[17];
         else if (buttonId === "ab2") imgSelect = abilitySymb[13];
         else if (buttonId === "ab3") imgSelect = abilitySymb[9];
+      ab1.dataset.price = String(abilityPrice[17]);
+      ab2.dataset.price = String(abilityPrice[13]);
+      ab3.dataset.price = String(abilityPrice[9]);
     }
   }
   else {
@@ -1021,15 +1050,14 @@ function createCard(id, initialX, initialY, buttonId) {
 
   // TODO [yell]: // PRICES
 
-  if (buttonId !== "randBtn") {
+  if (buttonId !== "randBtn" && buttonId !== "ab1" && buttonId !== "ab2" && buttonId !== "ab3") {
     const index = cardSymb.indexOf(imgSelect);
     cardElement.price = priceList[index];
+  } else if (buttonId === "randBtn"){
+    cardElement.price = 0;
   } else {
-    cardElement.price = 0;
-  }
-
-  if (buttonId === "ab1" || buttonId === "ab2" || buttonId === "ab3"){
-    cardElement.price = 0;
+    const abIndex = abilitySymb.indexOf(imgSelect);
+    cardElement.price = abilityPrice[abIndex];
   }
 
   /* cardElement.infoAble = false
@@ -1351,54 +1379,58 @@ agentBtn.addEventListener("click", () => {
   abNames();
 });
 
-function updateAgent(){
+function updateAgent() {
+  const agentName = agentsChosen[currentAgentIndex]; // reliable source
+
+  // Fade out image
   agentBtn.classList.add("fade-img");
 
-  setTimeout(() => {
-    agentBtn.style.backgroundImage = `url(images/agents/${agentsChosen[currentAgentIndex]}.png)`;
+  // Set ability texts immediately (no waiting for fade)
+  abNames(agentName);
 
+  // After the fade duration, switch the image and fade back in
+  setTimeout(() => {
+    agentBtn.style.backgroundImage = `url(images/agents/${agentName}.png)`;
     agentBtn.classList.remove("fade-img");
-  }, 200); // same as CSS
+  }, 200); // matches your CSS transition
 
   for(let i = 0; i < circles.length; i++) {
     circles[i].style.backgroundColor = "white";
   }
   circles[currentCircle].style.backgroundColor = "red";
-  abNames();
 }
 
-function abNames() {
-  const bg = getComputedStyle(agentBtn).backgroundImage;
-
-  if (bg.includes("skye.png")) {
+// Update abNames to take agentName as parameter
+function abNames(agent) {
+  if (agent === "skye") {
     ab1.innerText = "TRAILBLAZER";
     ab2.innerText = "GUIDING LIGHT";
     ab3.innerText = "REGROWTH";
-  } else if (bg.includes("sage.png")) {
+  } else if (agent === "sage") {
     ab1.innerText = "SLOW ORB";
     ab2.innerText = "HEALING ORB";
     ab3.innerText = "BARRIER ORB";
-  } else if (bg.includes("jett.png")) {
+  } else if (agent === "jett") {
     ab1.innerText = "UPDRAFT";
     ab2.innerText = "TAILWIND";
     ab3.innerText = "CLOUDBURST";
-  } else if (bg.includes("vyse.png")) {
+  } else if (agent === "vyse") {
     ab1.innerText = "SHEAR";
     ab2.innerText = "ARC ROSE";
     ab3.innerText = "RAZORVINE";
-  } else if (bg.includes("omen.png")) {
+  } else if (agent === "omen") {
     ab1.innerText = "PARANOIA";
     ab2.innerText = "DARK COVER";
     ab3.innerText = "SHROUDED STEP";
-  } else if (bg.includes("clove.png")) {
+  } else if (agent === "clove") {
     ab1.innerText = "MEDDLE";
     ab2.innerText = "RUSE";
     ab3.innerText = "PICK-ME-UP";
-  } else if (bg.includes("iso.png")) {
+  } else if (agent === "iso") {
     ab1.innerText = "UNDERCUT";
     ab2.innerText = "DOUBLE TAP";
     ab3.innerText = "CONTINGENCY";
-  } else if (bg.includes("sova.png")) {
+  } else if (agent === "sova") {
     ab1.innerText = "SHOCK BOLT";
     ab2.innerText = "RECON BOLT";
     ab3.innerText = "OWL DRONE";
