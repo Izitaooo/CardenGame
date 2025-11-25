@@ -45,7 +45,26 @@ io.on("connection", (socket) => {
 
         socket.emit("roomJoined", roomName);
         console.log(`Player ${socket.id} joined room ${roomName}`);
+
+        // Notify everyone in the room about player count
+        updateRoomPlayerCount(roomName);
     });
+
+    function updateRoomPlayerCount(roomName) {
+        const room = io.sockets.adapter.rooms.get(roomName);
+        const playerCount = room ? room.size : 0;
+
+        // Send to everyone in the room
+        io.to(roomName).emit("roomPlayerCount", {
+            count: playerCount,
+            roomName: roomName
+        });
+    }
+
+    socket.on("switchRoles", () => {
+        const playerRoom = players[socket.id].room; // w rooms
+        socket.to(playerRoom).emit("rolesSwitched");
+    })
 
     socket.on("spawnedCard", (data) => {
         const playerRoom = players[socket.id].room; // w rooms
@@ -81,9 +100,16 @@ io.on("connection", (socket) => {
   //io.emit("updatePlayers", players);
 
   socket.on("disconnect", (reason) => {
-    console.log(reason);
-    delete players[socket.id];
-    delete cards[socket.id];
+      console.log(reason);
+      const playerRoom = players[socket.id].room;
+
+      delete players[socket.id];
+      delete cards[socket.id];
+
+      // Update player count for the room they left
+      if (playerRoom) {
+          updateRoomPlayerCount(playerRoom);
+      }
   });
 
   console.log(players);

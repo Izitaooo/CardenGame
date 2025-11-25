@@ -60,24 +60,35 @@ const randBtn = document.getElementById("randBtn");
 const spawnButtons = document.querySelectorAll(".spawnButtons");
 
 const buttonMap = {
-  shortyBtn:     0,
-  frenzyBtn:     1,
-  ghostBtn:      2,
-  sheriffBtn:    3,
-  stingerBtn:    4,
-  spectreBtn:    5,
-  buckyBtn:      6,
-  judgeBtn:      7,
-  bulldogBtn:    8,
-  guardianBtn:   9,
-  phantomBtn:    10,
-  vandalBtn:     11,
-  marshalBtn:    12,
-  outlawBtn:     13,
-  operatorBtn:   14,
-  aresBtn:       15,
-  odinBtn:       16,
+  shortyBtn: 0,
+  frenzyBtn: 1,
+  ghostBtn: 2,
+  sheriffBtn: 3,
+  stingerBtn: 4,
+  spectreBtn: 5,
+  buckyBtn: 6,
+  judgeBtn: 7,
+  bulldogBtn: 8,
+  guardianBtn: 9,
+  phantomBtn: 10,
+  vandalBtn: 11,
+  marshalBtn: 12,
+  outlawBtn: 13,
+  operatorBtn: 14,
+  aresBtn: 15,
+  odinBtn: 16,
 };
+
+let playersInRoom = 0;
+
+socket.on("roomPlayerCount", (data) => {
+  playersInRoom = data.count;
+  console.log(`Players in room ${data.roomName}: ${playersInRoom}`);
+
+  if (playersInRoom === 2) {
+    document.getElementById("waitForPlayerText").classList = "playersThere";
+  }
+});
 
 const hand = document.getElementById("hand");
 
@@ -109,7 +120,7 @@ function selectAgent(agentName) {
       document.getElementById(agentName).classList.remove("selected");
     }
   }
-  if (agentsChosen.length === 3) {
+  if (agentsChosen.length === 3 && playersInRoom === 2) {
     document.getElementById("lockIn").classList.add("full");
   } else {
     document.getElementById("lockIn").classList.remove("full");
@@ -120,7 +131,7 @@ function selectAgent(agentName) {
 
 function lockIn() {
   console.log("lock in");
-  if (agentsChosen.length === 3) {
+  if (agentsChosen.length === 3 && playersInRoom === 2) {
     console.log("Locked in agents:", agentsChosen);
     /*    document
       .getElementById("agentSelectMenuBackground")
@@ -132,9 +143,8 @@ function lockIn() {
 
     for (let agent of agents) {
       if (agentsChosen.includes(agent)) {
-
         const el = document.getElementById(agent);
-        el.health = 10; // Add custom property here
+        //el.health = 10; // Add custom property here
 
         console.log("is there");
         document.getElementById(agent).classList.remove("selected");
@@ -212,7 +222,7 @@ function lockIn() {
             data.element.classList.remove("animating");
             data.element.style.pointerEvents = ""; // revert to stylesheet default
             // optionally reset will-change if you set it elsewhere
-          }
+          },
         });
       }
 
@@ -241,10 +251,12 @@ function lockIn() {
   socket.emit("agentsLockedIn", {
     agentsChosen,
   });
+  ImPlaying = false;
+  MainGameLoop();
 }
-
+let enemyAgents = [];
 socket.on("enemyChose", (data) => {
-  let enemyAgents = data.agentsChosen;
+  enemyAgents = data.agentsChosen;
   console.log("Enemy chose agents:", data.agentsChosen);
   enemyAgents.forEach((agent, index) => {
     const dropperNum = 1 + index;
@@ -270,30 +282,154 @@ socket.on("enemyChose", (data) => {
       });
     }
   }
+  ImPlaying = true;
+  MainGameLoop();
 });
 
 function spawnEnemyAgent(agentName, dropper) {
-  const enemyAgent = document.createElement("div");
-  enemyAgent.className = "agentSelect enemy inGame";
-  enemyAgent.id = "enemy_" + agentName;
-  enemyAgent.style.position = "fixed";
+    const enemyAgent = document.createElement("div");
+    enemyAgent.className = "agentSelect enemy inGame";
+    enemyAgent.id = "enemy_" + agentName;
+    enemyAgent.style.position = "fixed";
 
-  const dropperRect = dropper.getBoundingClientRect();
-  enemyAgent.style.left = dropperRect.left + "px";
-  enemyAgent.style.top = dropperRect.top - window.innerHeight * 0.1 + "px";
+    const dropperRect = dropper.getBoundingClientRect();
+    enemyAgent.style.left = dropperRect.left + "px";
+    enemyAgent.style.top = dropperRect.top - window.innerHeight * 0.1 + "px";
 
-  // Start transparent
-  enemyAgent.style.opacity = "0";
+    // Start transparent
+    enemyAgent.style.opacity = "0";
+    enemyAgent.style.pointerEvents = "none";
 
-  enemyAgent.style.pointerEvents = "none";
+    // Add health property
+    enemyAgent.health = 10;
 
-  const glint = document.createElement("div");
-  glint.className = "glint";
-  enemyAgent.appendChild(glint);
+    const glint = document.createElement("div");
+    glint.className = "glint";
+    enemyAgent.appendChild(glint);
 
-  document.body.appendChild(enemyAgent);
+    // Add health display element
+    const healthDisplay = document.createElement("div");
+    healthDisplay.className = "agentHealth";
+    healthDisplay.textContent = "10";
+    enemyAgent.appendChild(healthDisplay);
 
-  return enemyAgent;
+    document.body.appendChild(enemyAgent);
+
+    return enemyAgent;
+}
+let ImPlaying;
+let gameLoopStarted = false;
+let agentClickHandlers = {}; // Move this outside so it persists
+
+function MainGameLoop() {
+    if (agentsChosen.length === 3 && enemyAgents.length === 3 && !gameLoopStarted) {
+        gameLoopStarted = true;
+
+        const agentElements = document.querySelectorAll(".agentSelect");
+        const myAgents = Array.from(agentElements).filter(el =>
+            agentsChosen.includes(el.id)
+        );
+
+        // Create handlers ONCE and store them globally
+        myAgents.forEach(agentEl => {
+            agentClickHandlers[agentEl.id] = () => SelectToAttack(agentEl.id);
+        });
+
+        // Initial setup
+        updateTurnState(myAgents);
+    }
+}
+
+function updateTurnState(myAgents) {
+    if (ImPlaying) {
+        // Enable my agents
+        myAgents.forEach(agentEl => {
+            agentEl.classList.add("selectable");
+            // Use the globally stored handler
+            if (agentClickHandlers[agentEl.id]) {
+                agentEl.removeEventListener("click", agentClickHandlers[agentEl.id]);
+                agentEl.addEventListener("click", agentClickHandlers[agentEl.id]);
+            }
+        });
+        document.getElementById("youPlaying").classList.add("active");
+        document.getElementById("enemyPlaying").classList.remove("active");
+    } else {
+        // Disable my agents
+        myAgents.forEach(agentEl => {
+            agentEl.classList.remove("selectable");
+            agentEl.classList.remove("selected");
+            // Use the globally stored handler
+            if (agentClickHandlers[agentEl.id]) {
+                agentEl.removeEventListener("click", agentClickHandlers[agentEl.id]);
+            }
+        });
+        document.getElementById("enemyPlaying").classList.add("active");
+        document.getElementById("youPlaying").classList.remove("active");
+    }
+
+    UpdatePermisions();
+}
+
+socket.on("rolesSwitched", () => {
+    ImPlaying = !ImPlaying;
+
+    const agentElements = document.querySelectorAll(".agentSelect");
+    const myAgents = Array.from(agentElements).filter(el =>
+        agentsChosen.includes(el.id)
+    );
+
+    // Don't recreate handlers - just use the existing ones
+    updateTurnState(myAgents);
+
+    console.log("Switched to:", ImPlaying ? "You" : "Enemy");
+})
+
+
+function switchPlayer() {
+    ImPlaying = !ImPlaying;
+
+    const agentElements = document.querySelectorAll(".agentSelect");
+    const myAgents = Array.from(agentElements).filter(el =>
+        agentsChosen.includes(el.id)
+    );
+
+    // Don't recreate handlers - just use the existing ones
+    updateTurnState(myAgents);
+
+    console.log("Switched to:", ImPlaying ? "You" : "Enemy");
+
+    socket.emit("switchRoles");
+}
+
+function SelectToAttack(agent) {
+    const agentEl = document.getElementById(agent);
+    const wasSelected = agentEl.classList.contains("selected");
+
+    // Remove selected from all agents
+    document.querySelectorAll(".agentSelect").forEach((el) => {
+        el.classList.remove("selected");
+    });
+
+    // If it wasn't selected, select it now
+    if (!wasSelected) {
+        agentEl.classList.add("selected");
+    }
+}
+
+function UpdatePermisions() {
+  if (ImPlaying) {
+    document.getElementById("youPlaying").classList.add("active");
+    for (let i = 0; i < deckCards.length; i++) {
+      deckCards[i].style.pointerEvents = "all";
+      deckCards[i].style.cursor = "pointer";
+    }
+  } else {
+    document.getElementById("enemyPlaying").classList.add("active");
+    for (let i = 0; i < deckCards.length; i++) {
+      deckCards[i].style.pointerEvents = "none";
+      deckCards[i].style.cursor = "pointer";
+    }
+  }
 }
 
 let volumeSlider = document.getElementById("volume");
@@ -346,8 +482,8 @@ let deckCards = [];
 
 let deckCardsOponent = [];
 
-let health = 10;
-let healthtext = document.getElementById("health");
+//let health = 10;
+//let healthtext = document.getElementById("health");
 let credsText = document.getElementById("money");
 let creds = 100000;
 
@@ -361,7 +497,7 @@ function mouseDown(e, cardElement) {
 
   if (!canDrag) return;
 
-  if(handDown === true){
+  if (handDown === true) {
     return;
   } else {
     for (let i = 0; i < deckCards.length; i++) {
@@ -542,7 +678,7 @@ function mouseMove(e) {
     handhitbox.style.height = "5.5vw";
     handhitbox.style.zIndex = "99";
     //cardSpacing = 180;
-      cardSpacing = window.innerWidth * 0.06;
+    cardSpacing = window.innerWidth * 0.06;
 
     updateDeckPositions(0.5);
     handDown = true;
@@ -644,7 +780,7 @@ function mouseUp() {
     }
 
     if (dragged && container !== 0) {
-      let dmg;
+/*      let dmg;
 
       if (
         getComputedStyle(activeCard).backgroundImage.includes("Artual.jpeg")
@@ -669,7 +805,7 @@ function mouseUp() {
       console.log("Health:", agent1.health, "Name:", agent1.id);
       console.log("Health:", agent2.health, "Name:", agent2.id);
       healthtext.innerHTML = health;
-      console.log(health);
+      console.log(health);*/
     }
   } else if (
     isLocked === 0 &&
@@ -902,7 +1038,7 @@ cardSymb = [
   'url("images/guns/outlaw.png")',
   'url("images/guns/operator.png")',
   'url("images/guns/ares.png")',
-  'url("images/guns/odin.png")'
+  'url("images/guns/odin.png")',
 ];
 
 abilitySymb = [
@@ -921,7 +1057,7 @@ abilitySymb = [
   'url("images/abilitycards/razorvine.png")', //12
   'url("images/abilitycards/recon bolt.png")', //13
   'url("images/abilitycards/regrowth.png")', //14
-  'url("images/abilitycards/ruse.png")',  //15
+  'url("images/abilitycards/ruse.png")', //15
   'url("images/abilitycards/shear.png")', //16
   'url("images/abilitycards/shock bolt.png")', //17
   'url("images/abilitycards/slow orb.png")', //18
@@ -929,22 +1065,19 @@ abilitySymb = [
   'url("images/abilitycards/tailwind.png")', //20
   'url("images/abilitycards/trailblazer.png")', //21
   'url("images/abilitycards/undercut.png")', //22
-  'url("images/abilitycards/updraft.png")' //23
+  'url("images/abilitycards/updraft.png")', //23
 ];
 
 let agentBtn = document.getElementById("agentBtn");
 
 const priceList = [
-  300, 450, 500, 800, 1100, 1600, 850,
-  1850, 2050, 2250, 2900, 2900, 950,
-  2400, 4700, 1600, 3200
+  300, 450, 500, 800, 1100, 1600, 850, 1850, 2050, 2250, 2900, 2900, 950, 2400,
+  4700, 1600, 3200,
 ];
 
 updateSpawnerButtons();
 abNames();
 credsText.innerHTML = creds;
-
-
 
 let ab1 = document.getElementById("ab1");
 let ab2 = document.getElementById("ab2");
@@ -966,56 +1099,47 @@ function createCard(id, initialX, initialY, buttonId) {
   let imgSelect;
   if (buttonId === "randBtn") {
     imgSelect = abilitySymb[rndNum];
-  }
-  else if(buttonId === "ab1" || buttonId === "ab2" || buttonId === "ab3"){
-    if(bg.includes("skye.png")){
-      if(buttonId === "ab1"){
+  } else if (buttonId === "ab1" || buttonId === "ab2" || buttonId === "ab3") {
+    if (bg.includes("skye.png")) {
+      if (buttonId === "ab1") {
         imgSelect = abilitySymb[21];
-      } else if (buttonId === "ab2"){
+      } else if (buttonId === "ab2") {
         imgSelect = abilitySymb[6];
-      } else if (buttonId === "ab3"){
+      } else if (buttonId === "ab3") {
         imgSelect = abilitySymb[14];
       }
-
     } else if (bg.includes("sage.png")) {
-        if (buttonId === "ab1") imgSelect = abilitySymb[18];
-        else if (buttonId === "ab2") imgSelect = abilitySymb[7];
-        else if (buttonId === "ab3") imgSelect = abilitySymb[1];
+      if (buttonId === "ab1") imgSelect = abilitySymb[18];
+      else if (buttonId === "ab2") imgSelect = abilitySymb[7];
+      else if (buttonId === "ab3") imgSelect = abilitySymb[1];
     } else if (bg.includes("jett.png")) {
-        if (buttonId === "ab1") imgSelect = abilitySymb[23];
-        else if (buttonId === "ab2") imgSelect = abilitySymb[20];
-        else if (buttonId === "ab3") imgSelect = abilitySymb[2];
-
+      if (buttonId === "ab1") imgSelect = abilitySymb[23];
+      else if (buttonId === "ab2") imgSelect = abilitySymb[20];
+      else if (buttonId === "ab3") imgSelect = abilitySymb[2];
     } else if (bg.includes("vyse.png")) {
-        if (buttonId === "ab1") imgSelect = abilitySymb[16];
-        else if (buttonId === "ab2") imgSelect = abilitySymb[0];
-        else if (buttonId === "ab3") imgSelect = abilitySymb[12];
-
+      if (buttonId === "ab1") imgSelect = abilitySymb[16];
+      else if (buttonId === "ab2") imgSelect = abilitySymb[0];
+      else if (buttonId === "ab3") imgSelect = abilitySymb[12];
     } else if (bg.includes("omen.png")) {
-        if (buttonId === "ab1") imgSelect = abilitySymb[10];
-        else if (buttonId === "ab2") imgSelect = abilitySymb[4];
-        else if (buttonId === "ab3") imgSelect = abilitySymb[19];
-
+      if (buttonId === "ab1") imgSelect = abilitySymb[10];
+      else if (buttonId === "ab2") imgSelect = abilitySymb[4];
+      else if (buttonId === "ab3") imgSelect = abilitySymb[19];
     } else if (bg.includes("clove.png")) {
-        if (buttonId === "ab1") imgSelect = abilitySymb[8];
-        else if (buttonId === "ab2") imgSelect = abilitySymb[15];
-        else if (buttonId === "ab3") imgSelect = abilitySymb[11];
-
+      if (buttonId === "ab1") imgSelect = abilitySymb[8];
+      else if (buttonId === "ab2") imgSelect = abilitySymb[15];
+      else if (buttonId === "ab3") imgSelect = abilitySymb[11];
     } else if (bg.includes("iso.png")) {
-        if (buttonId === "ab1") imgSelect = abilitySymb[22];
-        else if (buttonId === "ab2") imgSelect = abilitySymb[5];
-        else if (buttonId === "ab3") imgSelect = abilitySymb[3];
-
+      if (buttonId === "ab1") imgSelect = abilitySymb[22];
+      else if (buttonId === "ab2") imgSelect = abilitySymb[5];
+      else if (buttonId === "ab3") imgSelect = abilitySymb[3];
     } else if (bg.includes("sova.png")) {
-        if (buttonId === "ab1") imgSelect = abilitySymb[17];
-        else if (buttonId === "ab2") imgSelect = abilitySymb[13];
-        else if (buttonId === "ab3") imgSelect = abilitySymb[9];
+      if (buttonId === "ab1") imgSelect = abilitySymb[17];
+      else if (buttonId === "ab2") imgSelect = abilitySymb[13];
+      else if (buttonId === "ab3") imgSelect = abilitySymb[9];
     }
+  } else {
+    imgSelect = cardSymb[buttonMap[buttonId]];
   }
-  else {
-    imgSelect = cardSymb[ buttonMap[buttonId] ];
-  }
-
 
   cardElement.style.backgroundImage = imgSelect;
 
@@ -1028,7 +1152,7 @@ function createCard(id, initialX, initialY, buttonId) {
     cardElement.price = 0;
   }
 
-  if (buttonId === "ab1" || buttonId === "ab2" || buttonId === "ab3"){
+  if (buttonId === "ab1" || buttonId === "ab2" || buttonId === "ab3") {
     cardElement.price = 0;
   }
 
@@ -1193,15 +1317,15 @@ socket.on("enemySpawnedCard", (data) => {
   const enemycard = document.createElement("div");
   enemycard.className = "card";
   enemycard.id = "opponent_" + data;
-  enemycard.style.left = window.innerWidth/2 + "px";
-  enemycard.style.top = window.innerHeight/2 + "px";
+  enemycard.style.left = window.innerWidth / 2 + "px";
+  enemycard.style.top = window.innerHeight / 2 + "px";
 
   enemycard.style.backgroundImage = "url(images/abilitycards/back.png)";
   enemycard.deckOponent = true;
   deckCardsOponent.push(enemycard);
   cardsGame.push(enemycard);
   document.querySelector(".container").appendChild(enemycard);
-    updateDeckPositionsOponent(0.5);
+  updateDeckPositionsOponent(0.5);
 });
 
 // TODO [yell]: // PRICE KEEPERS
@@ -1229,7 +1353,7 @@ function handOpening() {
     handhitbox.style.height = "15.5vw";
     handhitbox.style.zIndex = "1";
     //cardSpacing = 270;
-      cardSpacing = window.innerWidth * 0.11;
+    cardSpacing = window.innerWidth * 0.11;
 
     updateDeckPositions(0.5);
     handDown = false;
@@ -1258,7 +1382,7 @@ function handOpening() {
     handhitbox.style.height = "5.5vw";
     handhitbox.style.zIndex = "99";
     //cardSpacing = 180;
-      cardSpacing = window.innerWidth * 0.06;
+    cardSpacing = window.innerWidth * 0.06;
     updateDeckPositions(0.5);
     handDown = true;
   }
@@ -1297,7 +1421,8 @@ function updateDeckPositionsOponent(speed) {
   activeOppDeck.forEach((card, i) => {
     const targetX =
       centerX - totalWidth / 2 + i * cardSpacing - card.offsetWidth / 2;
-    const targetY = window.innerHeight - hand.offsetTop - 0.15 * window.innerWidth;
+    const targetY =
+      window.innerHeight - hand.offsetTop - 0.15 * window.innerWidth;
     gsap.to(card, {
       left: targetX + "px",
       top: targetY + "px",
@@ -1351,7 +1476,7 @@ agentBtn.addEventListener("click", () => {
   abNames();
 });
 
-function updateAgent(){
+function updateAgent() {
   agentBtn.classList.add("fade-img");
 
   setTimeout(() => {
@@ -1360,7 +1485,7 @@ function updateAgent(){
     agentBtn.classList.remove("fade-img");
   }, 200); // same as CSS
 
-  for(let i = 0; i < circles.length; i++) {
+  for (let i = 0; i < circles.length; i++) {
     circles[i].style.backgroundColor = "white";
   }
   circles[currentCircle].style.backgroundColor = "red";
@@ -1422,7 +1547,7 @@ function updateZIndex(cardId) {
 }; */
 
 function roundOver() {
-  creds = creds + 200;
-  credsText.innerHTML = creds;
-  updateSpawnerButtons();
+    creds = creds + 200;
+    credsText.innerHTML = creds;
+    updateSpawnerButtons();
 }

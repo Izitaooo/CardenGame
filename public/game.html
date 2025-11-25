@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="https://use.typekit.net/vkl5kng.css">
   </head>
   <body>
+  <div id="enemyPlaying"></div>
+  <div id="youPlaying"></div>
     <div id="agentSelectMenuBackground">
       <h2 id="agentSelectH2">Choose your agents</h2>
       <div id="agentContainer">
@@ -46,6 +48,7 @@
         </div>
       </div>
         <button id="lockIn" onclick="lockIn()">Lock in</button>
+        <p id="waitForPlayerText">wait for second player to join</p>
     </div>
     <img
       id="background"
@@ -95,6 +98,8 @@
     <div id="health"> 10 </div>
     <div id="money">0</div>
     <div id="endRound" onclick="roundOver()" >Agartha</div>
+    <div id="switchPlayer" onclick="switchPlayer()" >switchPlayer</div>
+
     <div id="bottomholder">
       <div id="bottomhitbox">
         <div id="hand"></div>
