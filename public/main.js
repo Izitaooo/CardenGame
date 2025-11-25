@@ -60,23 +60,23 @@ const randBtn = document.getElementById("randBtn");
 const spawnButtons = document.querySelectorAll(".spawnButtons");
 
 const buttonMap = {
-  shortyBtn: 0,
-  frenzyBtn: 1,
-  ghostBtn: 2,
-  sheriffBtn: 3,
-  stingerBtn: 4,
-  spectreBtn: 5,
-  buckyBtn: 6,
-  judgeBtn: 7,
-  bulldogBtn: 8,
-  guardianBtn: 9,
-  phantomBtn: 10,
-  vandalBtn: 11,
-  marshalBtn: 12,
-  outlawBtn: 13,
-  operatorBtn: 14,
-  aresBtn: 15,
-  odinBtn: 16,
+  shortyBtn:     0,
+  frenzyBtn:     1,
+  ghostBtn:      2,
+  sheriffBtn:    3,
+  stingerBtn:    4,
+  spectreBtn:    5,
+  buckyBtn:      6,
+  judgeBtn:      7,
+  bulldogBtn:    8,
+  guardianBtn:   9,
+  phantomBtn:    10,
+  vandalBtn:     11,
+  marshalBtn:    12,
+  outlawBtn:     13,
+  operatorBtn:   14,
+  aresBtn:       15,
+  odinBtn:       16,
 };
 
 let playersInRoom = 0;
@@ -1038,7 +1038,13 @@ cardSymb = [
   'url("images/guns/outlaw.png")',
   'url("images/guns/operator.png")',
   'url("images/guns/ares.png")',
-  'url("images/guns/odin.png")',
+  'url("images/guns/odin.png")'
+];
+
+const priceList = [
+  300, 450, 500, 800, 1100, 1600, 850,
+  1850, 2050, 2250, 2900, 2900, 950,
+  2400, 4700, 1600, 3200
 ];
 
 abilitySymb = [
@@ -1057,7 +1063,7 @@ abilitySymb = [
   'url("images/abilitycards/razorvine.png")', //12
   'url("images/abilitycards/recon bolt.png")', //13
   'url("images/abilitycards/regrowth.png")', //14
-  'url("images/abilitycards/ruse.png")', //15
+  'url("images/abilitycards/ruse.png")',  //15
   'url("images/abilitycards/shear.png")', //16
   'url("images/abilitycards/shock bolt.png")', //17
   'url("images/abilitycards/slow orb.png")', //18
@@ -1065,18 +1071,19 @@ abilitySymb = [
   'url("images/abilitycards/tailwind.png")', //20
   'url("images/abilitycards/trailblazer.png")', //21
   'url("images/abilitycards/undercut.png")', //22
-  'url("images/abilitycards/updraft.png")', //23
+  'url("images/abilitycards/updraft.png")' //23
 ];
+
+const abilityPrice = [
+  150,300,200,200,150,200,250,250
+  ,250,400,250,200,150,250,150,150
+  ,200,150,200,100,200,300,300,150
+]
 
 let agentBtn = document.getElementById("agentBtn");
 
-const priceList = [
-  300, 450, 500, 800, 1100, 1600, 850, 1850, 2050, 2250, 2900, 2900, 950, 2400,
-  4700, 1600, 3200,
-];
 
 updateSpawnerButtons();
-abNames();
 credsText.innerHTML = creds;
 
 let ab1 = document.getElementById("ab1");
@@ -1108,52 +1115,84 @@ function createCard(id, initialX, initialY, buttonId) {
       } else if (buttonId === "ab3") {
         imgSelect = abilitySymb[14];
       }
+      ab1.dataset.price = String(abilityPrice[21]);
+      ab2.dataset.price = String(abilityPrice[6]);
+      ab3.dataset.price = String(abilityPrice[14]);
+
     } else if (bg.includes("sage.png")) {
-      if (buttonId === "ab1") imgSelect = abilitySymb[18];
-      else if (buttonId === "ab2") imgSelect = abilitySymb[7];
-      else if (buttonId === "ab3") imgSelect = abilitySymb[1];
+        if (buttonId === "ab1") imgSelect = abilitySymb[18];
+        else if (buttonId === "ab2") imgSelect = abilitySymb[7];
+        else if (buttonId === "ab3") imgSelect = abilitySymb[1];
+      ab1.dataset.price = String(abilityPrice[18]);
+      ab2.dataset.price = String(abilityPrice[7]);
+      ab3.dataset.price = String(abilityPrice[1]);
+
     } else if (bg.includes("jett.png")) {
-      if (buttonId === "ab1") imgSelect = abilitySymb[23];
-      else if (buttonId === "ab2") imgSelect = abilitySymb[20];
-      else if (buttonId === "ab3") imgSelect = abilitySymb[2];
+        if (buttonId === "ab1") imgSelect = abilitySymb[23];
+        else if (buttonId === "ab2") imgSelect = abilitySymb[20];
+        else if (buttonId === "ab3") imgSelect = abilitySymb[2];
+      ab1.dataset.price = String(abilityPrice[23]);
+      ab2.dataset.price = String(abilityPrice[20]);
+      ab3.dataset.price = String(abilityPrice[2]);
+
     } else if (bg.includes("vyse.png")) {
-      if (buttonId === "ab1") imgSelect = abilitySymb[16];
-      else if (buttonId === "ab2") imgSelect = abilitySymb[0];
-      else if (buttonId === "ab3") imgSelect = abilitySymb[12];
+        if (buttonId === "ab1") imgSelect = abilitySymb[16];
+        else if (buttonId === "ab2") imgSelect = abilitySymb[0];
+        else if (buttonId === "ab3") imgSelect = abilitySymb[12];
+      ab1.dataset.price = String(abilityPrice[16]);
+      ab2.dataset.price = String(abilityPrice[0]);
+      ab3.dataset.price = String(abilityPrice[12]);
+
     } else if (bg.includes("omen.png")) {
-      if (buttonId === "ab1") imgSelect = abilitySymb[10];
-      else if (buttonId === "ab2") imgSelect = abilitySymb[4];
-      else if (buttonId === "ab3") imgSelect = abilitySymb[19];
+        if (buttonId === "ab1") imgSelect = abilitySymb[10];
+        else if (buttonId === "ab2") imgSelect = abilitySymb[4];
+        else if (buttonId === "ab3") imgSelect = abilitySymb[19];
+      ab1.dataset.price = String(abilityPrice[10]);
+      ab2.dataset.price = String(abilityPrice[4]);
+      ab3.dataset.price = String(abilityPrice[19]);
+
     } else if (bg.includes("clove.png")) {
-      if (buttonId === "ab1") imgSelect = abilitySymb[8];
-      else if (buttonId === "ab2") imgSelect = abilitySymb[15];
-      else if (buttonId === "ab3") imgSelect = abilitySymb[11];
+        if (buttonId === "ab1") imgSelect = abilitySymb[8];
+        else if (buttonId === "ab2") imgSelect = abilitySymb[15];
+        else if (buttonId === "ab3") imgSelect = abilitySymb[11];
+      ab1.dataset.price = String(abilityPrice[8]);
+      ab2.dataset.price = String(abilityPrice[15]);
+      ab3.dataset.price = String(abilityPrice[11]);
+
     } else if (bg.includes("iso.png")) {
-      if (buttonId === "ab1") imgSelect = abilitySymb[22];
-      else if (buttonId === "ab2") imgSelect = abilitySymb[5];
-      else if (buttonId === "ab3") imgSelect = abilitySymb[3];
+        if (buttonId === "ab1") imgSelect = abilitySymb[22];
+        else if (buttonId === "ab2") imgSelect = abilitySymb[5];
+        else if (buttonId === "ab3") imgSelect = abilitySymb[3];
+      ab1.dataset.price = String(abilityPrice[22]);
+      ab2.dataset.price = String(abilityPrice[5]);
+      ab3.dataset.price = String(abilityPrice[3]);
+
     } else if (bg.includes("sova.png")) {
-      if (buttonId === "ab1") imgSelect = abilitySymb[17];
-      else if (buttonId === "ab2") imgSelect = abilitySymb[13];
-      else if (buttonId === "ab3") imgSelect = abilitySymb[9];
+        if (buttonId === "ab1") imgSelect = abilitySymb[17];
+        else if (buttonId === "ab2") imgSelect = abilitySymb[13];
+        else if (buttonId === "ab3") imgSelect = abilitySymb[9];
+      ab1.dataset.price = String(abilityPrice[17]);
+      ab2.dataset.price = String(abilityPrice[13]);
+      ab3.dataset.price = String(abilityPrice[9]);
     }
-  } else {
-    imgSelect = cardSymb[buttonMap[buttonId]];
   }
+  else {
+    imgSelect = cardSymb[ buttonMap[buttonId] ];
+  }
+
 
   cardElement.style.backgroundImage = imgSelect;
 
   // TODO [yell]: // PRICES
 
-  if (buttonId !== "randBtn") {
+  if (buttonId !== "randBtn" && buttonId !== "ab1" && buttonId !== "ab2" && buttonId !== "ab3") {
     const index = cardSymb.indexOf(imgSelect);
     cardElement.price = priceList[index];
+  } else if (buttonId === "randBtn"){
+    cardElement.price = 0;
   } else {
-    cardElement.price = 0;
-  }
-
-  if (buttonId === "ab1" || buttonId === "ab2" || buttonId === "ab3") {
-    cardElement.price = 0;
+    const abIndex = abilitySymb.indexOf(imgSelect);
+    cardElement.price = abilityPrice[abIndex];
   }
 
   /* cardElement.infoAble = false
@@ -1317,15 +1356,15 @@ socket.on("enemySpawnedCard", (data) => {
   const enemycard = document.createElement("div");
   enemycard.className = "card";
   enemycard.id = "opponent_" + data;
-  enemycard.style.left = window.innerWidth / 2 + "px";
-  enemycard.style.top = window.innerHeight / 2 + "px";
+  enemycard.style.left = window.innerWidth/2 + "px";
+  enemycard.style.top = window.innerHeight/2 + "px";
 
   enemycard.style.backgroundImage = "url(images/abilitycards/back.png)";
   enemycard.deckOponent = true;
   deckCardsOponent.push(enemycard);
   cardsGame.push(enemycard);
   document.querySelector(".container").appendChild(enemycard);
-  updateDeckPositionsOponent(0.5);
+    updateDeckPositionsOponent(0.5);
 });
 
 // TODO [yell]: // PRICE KEEPERS
@@ -1353,7 +1392,7 @@ function handOpening() {
     handhitbox.style.height = "15.5vw";
     handhitbox.style.zIndex = "1";
     //cardSpacing = 270;
-    cardSpacing = window.innerWidth * 0.11;
+      cardSpacing = window.innerWidth * 0.11;
 
     updateDeckPositions(0.5);
     handDown = false;
@@ -1382,7 +1421,7 @@ function handOpening() {
     handhitbox.style.height = "5.5vw";
     handhitbox.style.zIndex = "99";
     //cardSpacing = 180;
-    cardSpacing = window.innerWidth * 0.06;
+      cardSpacing = window.innerWidth * 0.06;
     updateDeckPositions(0.5);
     handDown = true;
   }
@@ -1421,8 +1460,7 @@ function updateDeckPositionsOponent(speed) {
   activeOppDeck.forEach((card, i) => {
     const targetX =
       centerX - totalWidth / 2 + i * cardSpacing - card.offsetWidth / 2;
-    const targetY =
-      window.innerHeight - hand.offsetTop - 0.15 * window.innerWidth;
+    const targetY = window.innerHeight - hand.offsetTop - 0.15 * window.innerWidth;
     gsap.to(card, {
       left: targetX + "px",
       top: targetY + "px",
@@ -1477,53 +1515,57 @@ agentBtn.addEventListener("click", () => {
 });
 
 function updateAgent() {
+  const agentName = agentsChosen[currentAgentIndex]; // reliable source
+
+  // Fade out image
   agentBtn.classList.add("fade-img");
 
+  // Set ability texts immediately (no waiting for fade)
+  abNames(agentName);
+
+  // After the fade duration, switch the image and fade back in
   setTimeout(() => {
-    agentBtn.style.backgroundImage = `url(images/agents/${agentsChosen[currentAgentIndex]}.png)`;
-
+    agentBtn.style.backgroundImage = `url(images/agents/${agentName}.png)`;
     agentBtn.classList.remove("fade-img");
-  }, 200); // same as CSS
+  }, 200); // matches your CSS transition
 
-  for (let i = 0; i < circles.length; i++) {
+  for(let i = 0; i < circles.length; i++) {
     circles[i].style.backgroundColor = "white";
   }
   circles[currentCircle].style.backgroundColor = "red";
-  abNames();
 }
 
-function abNames() {
-  const bg = getComputedStyle(agentBtn).backgroundImage;
-
-  if (bg.includes("skye.png")) {
+// Update abNames to take agentName as parameter
+function abNames(agent) {
+  if (agent === "skye") {
     ab1.innerText = "TRAILBLAZER";
     ab2.innerText = "GUIDING LIGHT";
     ab3.innerText = "REGROWTH";
-  } else if (bg.includes("sage.png")) {
+  } else if (agent === "sage") {
     ab1.innerText = "SLOW ORB";
     ab2.innerText = "HEALING ORB";
     ab3.innerText = "BARRIER ORB";
-  } else if (bg.includes("jett.png")) {
+  } else if (agent === "jett") {
     ab1.innerText = "UPDRAFT";
     ab2.innerText = "TAILWIND";
     ab3.innerText = "CLOUDBURST";
-  } else if (bg.includes("vyse.png")) {
+  } else if (agent === "vyse") {
     ab1.innerText = "SHEAR";
     ab2.innerText = "ARC ROSE";
     ab3.innerText = "RAZORVINE";
-  } else if (bg.includes("omen.png")) {
+  } else if (agent === "omen") {
     ab1.innerText = "PARANOIA";
     ab2.innerText = "DARK COVER";
     ab3.innerText = "SHROUDED STEP";
-  } else if (bg.includes("clove.png")) {
+  } else if (agent === "clove") {
     ab1.innerText = "MEDDLE";
     ab2.innerText = "RUSE";
     ab3.innerText = "PICK-ME-UP";
-  } else if (bg.includes("iso.png")) {
+  } else if (agent === "iso") {
     ab1.innerText = "UNDERCUT";
     ab2.innerText = "DOUBLE TAP";
     ab3.innerText = "CONTINGENCY";
-  } else if (bg.includes("sova.png")) {
+  } else if (agent === "sova") {
     ab1.innerText = "SHOCK BOLT";
     ab2.innerText = "RECON BOLT";
     ab3.innerText = "OWL DRONE";
@@ -1547,7 +1589,7 @@ function updateZIndex(cardId) {
 }; */
 
 function roundOver() {
-    creds = creds + 200;
-    credsText.innerHTML = creds;
-    updateSpawnerButtons();
+  creds = creds + 200;
+  credsText.innerHTML = creds;
+  updateSpawnerButtons();
 }
