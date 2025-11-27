@@ -97,6 +97,12 @@ io.on("connection", (socket) => {
         socket.to(playerRoom).emit("playerMoved", cards[data.id]);
     });
 
+    socket.on("damageAgent", (agentId, damage) => {
+        const playerRoom = players[socket.id].room; // w rooms
+        socket.to(playerRoom).emit("damageAgent", agentId, damage);
+
+    })
+
   //io.emit("updatePlayers", players);
 
   socket.on("disconnect", (reason) => {

@@ -144,7 +144,7 @@ function lockIn() {
     for (let agent of agents) {
       if (agentsChosen.includes(agent)) {
         const el = document.getElementById(agent);
-        //el.health = 10; // Add custom property here
+        el.health = 10; // Add custom property here
 
         console.log("is there");
         document.getElementById(agent).classList.remove("selected");
@@ -393,6 +393,22 @@ function switchPlayer() {
         agentsChosen.includes(el.id)
     );
 
+    document.querySelectorAll(".agentSelect").forEach((el) => {
+        el.classList.remove("selected");
+    });
+
+    // Remove damageable from ALL enemy agents and clean up their listeners
+    document.querySelectorAll(".agentSelect.enemy").forEach((el) => {
+        el.classList.remove("damageable");
+        el.style.pointerEvents = "none";
+
+        // Remove old listener if it exists
+        if (enemyClickHandlers[el.id]) {
+            el.removeEventListener("click", enemyClickHandlers[el.id]);
+            delete enemyClickHandlers[el.id];
+        }
+    });
+
     // Don't recreate handlers - just use the existing ones
     updateTurnState(myAgents);
 
@@ -400,6 +416,8 @@ function switchPlayer() {
 
     socket.emit("switchRoles");
 }
+// Store enemy click handlers globally
+const enemyClickHandlers = {};
 
 function SelectToAttack(agent) {
     const agentEl = document.getElementById(agent);
@@ -410,10 +428,65 @@ function SelectToAttack(agent) {
         el.classList.remove("selected");
     });
 
-    // If it wasn't selected, select it now
+    // Remove damageable from ALL enemy agents and clean up their listeners
+    document.querySelectorAll(".agentSelect.enemy").forEach((el) => {
+        el.classList.remove("damageable");
+        el.style.pointerEvents = "none";
+
+        // Remove old listener if it exists
+        if (enemyClickHandlers[el.id]) {
+            el.removeEventListener("click", enemyClickHandlers[el.id]);
+            delete enemyClickHandlers[el.id];
+        }
+    });
+
+    // If it wasn't selected, select it now and make enemies damageable
     if (!wasSelected) {
         agentEl.classList.add("selected");
+        console.log("selected to attack:", agent);
+
+        document.querySelectorAll(".agentSelect.enemy").forEach((el) => {
+            console.log("making damageable:", el.id);
+            el.classList.add("damageable");
+            el.style.pointerEvents = "auto";
+
+            // Create and store the handler
+            enemyClickHandlers[el.id] = () => damageAgent(el.id);
+            el.addEventListener("click", enemyClickHandlers[el.id]);
+        });
     }
+}
+
+function damageAgent(agentId) {
+    let agent = document.getElementById(agentId);
+    console.log("damaging agent:", agent.id);
+    agent.health -= 2;
+    console.log("New health:", agent.health);
+
+    // Update the health display
+    const healthDisplay = agent.querySelector(".agentHealth");
+    if (healthDisplay) {
+        healthDisplay.textContent = agent.health;
+    }
+    socket.emit("damageAgent", agentId, 2);//2 is only for now, later replace with varriabnle!
+    damageOutput(agentId, 2);
+    setTimeout(() => {
+        switchPlayer();
+    }, 1000);
+
+}
+socket.on("damageAgent", (agentId, damage) => {
+    let agent = document.getElementById(agentId.replace("enemy_", ""));
+    console.log("Enemy damaging your agent:", agent.id);
+    console.log("old health:", agent.health);
+    agent.health -= damage;
+    console.log("New health:", agent.health);
+    agent.querySelector(".agentHealth").innerHTML = agent.health;
+
+});
+function damageOutput(agentId, damage) {
+    let agent = document.getElementById(agentId);
+
 }
 
 function UpdatePermisions() {
@@ -499,7 +572,7 @@ function mouseDown(e, cardElement) {
 
   if (handDown === true) {
     return;
-  } else {
+  }/* else {
     for (let i = 0; i < deckCards.length; i++) {
       deckCards[i].addEventListener("click", () => {
         if (handDown === false) {
@@ -507,11 +580,12 @@ function mouseDown(e, cardElement) {
         }
       });
     }
-  }
+  }*/
 
   console.log("MouseDown:", cardElement.id, activeCard.id);
 
   updateZIndex(activeCard.id);
+  whereCanPlace(cardElement);
 
   startX = e.clientX;
   startY = e.clientY;
@@ -523,6 +597,11 @@ function mouseDown(e, cardElement) {
 
   dragged = false;
 }
+
+function whereCanPlace(cardElement) {
+
+}
+
 
 let agent0, agent1, agent2;
 
