@@ -79,7 +79,7 @@ const buttonMap = {
   odinBtn:       16,
 };
 
-let playersInRoom = 0;
+let playersInRoom = 2;
 
 socket.on("roomPlayerCount", (data) => {
   playersInRoom = data.count;
@@ -555,10 +555,8 @@ let deckCards = [];
 
 let deckCardsOponent = [];
 
-//let health = 10;
-//let healthtext = document.getElementById("health");
 let credsText = document.getElementById("money");
-let creds = 100000;
+let creds = 50000;
 
 const handhitbox = document.getElementById("bottomhitbox");
 let cardSpacing = window.innerWidth * 0.06;
@@ -796,7 +794,7 @@ function mouseUp() {
       }, 300);
     } else {
       creds = creds - activeCard.price;
-      credsText.innerHTML = creds;
+      credsText.innerHTML = creds + "c";
       updateSpawnerButtons();
     }
   }
@@ -1126,7 +1124,7 @@ const priceList = [
   2400, 4700, 1600, 3200
 ];
 
-abilitySymb = [
+const abilitySymb = [
   'url("images/abilitycards/arc rose.png")', //0
   'url("images/abilitycards/barrier orb.png")', //1
   'url("images/abilitycards/cloudburst.png")', //2
@@ -1153,6 +1151,33 @@ abilitySymb = [
   'url("images/abilitycards/updraft.png")' //23
 ];
 
+const abilityIcon = [
+    'url("images/abilityIcon/arc rose.webp")', //0
+    'url("images/abilityIcon/barrier orb.webp")', //1
+    'url("images/abilityIcon/cloudburst.webp")', //2
+    'url("images/abilityIcon/contigency.webp")', //3
+    'url("images/abilityIcon/dark cover.webp")', //4
+    'url("images/abilityIcon/double tap.webp")', //5
+    'url("images/abilityIcon/guiding light.webp")', //6
+    'url("images/abilityIcon/healing orb.webp")', //7
+    'url("images/abilityIcon/meddle.webp")', //8
+    'url("images/abilityIcon/owl drone.webp")', //9
+    'url("images/abilityIcon/paranoia.webp")', //10
+    'url("images/abilityIcon/pick me up.webp")', //11
+    'url("images/abilityIcon/razorvine.webp")', //12
+    'url("images/abilityIcon/recon bolt.webp")', //13
+    'url("images/abilityIcon/regrowth.webp")', //14
+    'url("images/abilityIcon/ruse.webp")',  //15
+    'url("images/abilityIcon/shear.webp")', //16
+    'url("images/abilityIcon/shock bolt.webp")', //17
+    'url("images/abilityIcon/slow orb.webp")', //18
+    'url("images/abilityIcon/shrouded step.webp")', //19
+    'url("images/abilityIcon/tailwind.webp")', //20
+    'url("images/abilityIcon/trailblazer.webp")', //21
+    'url("images/abilityIcon/undercut.webp")', //22
+    'url("images/abilityIcon/updraft.webp")' //23
+]
+
 const abilityPrice = [
   150,300,200,200,150,200,250,250
   ,250,400,250,200,150,250,150,150
@@ -1163,7 +1188,7 @@ let agentBtn = document.getElementById("agentBtn");
 
 
 updateSpawnerButtons();
-credsText.innerHTML = creds;
+credsText.innerHTML = creds + "c";
 
 let ab1 = document.getElementById("ab1");
 let ab2 = document.getElementById("ab2");
@@ -1183,81 +1208,49 @@ function createCard(id, initialX, initialY, buttonId) {
 
   let rndNum = selectAbility(0, 23);
   let imgSelect;
-  if (buttonId === "randBtn") {
-    imgSelect = abilitySymb[rndNum];
-  } else if (buttonId === "ab1" || buttonId === "ab2" || buttonId === "ab3") {
+
+    // --- inside the function where you handle ability buttons (createCard block) ---
+    let qIndex, eIndex, cIndex;
+
+// choose indices per agent (use the same indices you've been using)
     if (bg.includes("skye.png")) {
-      if (buttonId === "ab1") {
-        imgSelect = abilitySymb[21];
-      } else if (buttonId === "ab2") {
-        imgSelect = abilitySymb[6];
-      } else if (buttonId === "ab3") {
-        imgSelect = abilitySymb[14];
-      }
-      ab1.dataset.price = String(abilityPrice[21]);
-      ab2.dataset.price = String(abilityPrice[6]);
-      ab3.dataset.price = String(abilityPrice[14]);
-
+        qIndex = 21; eIndex = 6;  cIndex = 14;
     } else if (bg.includes("sage.png")) {
-        if (buttonId === "ab1") imgSelect = abilitySymb[18];
-        else if (buttonId === "ab2") imgSelect = abilitySymb[7];
-        else if (buttonId === "ab3") imgSelect = abilitySymb[1];
-      ab1.dataset.price = String(abilityPrice[18]);
-      ab2.dataset.price = String(abilityPrice[7]);
-      ab3.dataset.price = String(abilityPrice[1]);
-
+        qIndex = 18; eIndex = 7;  cIndex = 1;
     } else if (bg.includes("jett.png")) {
-        if (buttonId === "ab1") imgSelect = abilitySymb[23];
-        else if (buttonId === "ab2") imgSelect = abilitySymb[20];
-        else if (buttonId === "ab3") imgSelect = abilitySymb[2];
-      ab1.dataset.price = String(abilityPrice[23]);
-      ab2.dataset.price = String(abilityPrice[20]);
-      ab3.dataset.price = String(abilityPrice[2]);
-
+        qIndex = 23; eIndex = 20; cIndex = 2;
     } else if (bg.includes("vyse.png")) {
-        if (buttonId === "ab1") imgSelect = abilitySymb[16];
-        else if (buttonId === "ab2") imgSelect = abilitySymb[0];
-        else if (buttonId === "ab3") imgSelect = abilitySymb[12];
-      ab1.dataset.price = String(abilityPrice[16]);
-      ab2.dataset.price = String(abilityPrice[0]);
-      ab3.dataset.price = String(abilityPrice[12]);
-
+        qIndex = 16; eIndex = 0;  cIndex = 12;
     } else if (bg.includes("omen.png")) {
-        if (buttonId === "ab1") imgSelect = abilitySymb[10];
-        else if (buttonId === "ab2") imgSelect = abilitySymb[4];
-        else if (buttonId === "ab3") imgSelect = abilitySymb[19];
-      ab1.dataset.price = String(abilityPrice[10]);
-      ab2.dataset.price = String(abilityPrice[4]);
-      ab3.dataset.price = String(abilityPrice[19]);
-
+        qIndex = 10; eIndex = 4;  cIndex = 19;
     } else if (bg.includes("clove.png")) {
-        if (buttonId === "ab1") imgSelect = abilitySymb[8];
-        else if (buttonId === "ab2") imgSelect = abilitySymb[15];
-        else if (buttonId === "ab3") imgSelect = abilitySymb[11];
-      ab1.dataset.price = String(abilityPrice[8]);
-      ab2.dataset.price = String(abilityPrice[15]);
-      ab3.dataset.price = String(abilityPrice[11]);
-
+        qIndex = 8;  eIndex = 15; cIndex = 11;
     } else if (bg.includes("iso.png")) {
-        if (buttonId === "ab1") imgSelect = abilitySymb[22];
-        else if (buttonId === "ab2") imgSelect = abilitySymb[5];
-        else if (buttonId === "ab3") imgSelect = abilitySymb[3];
-      ab1.dataset.price = String(abilityPrice[22]);
-      ab2.dataset.price = String(abilityPrice[5]);
-      ab3.dataset.price = String(abilityPrice[3]);
-
+        qIndex = 22; eIndex = 5;  cIndex = 3;
     } else if (bg.includes("sova.png")) {
-        if (buttonId === "ab1") imgSelect = abilitySymb[17];
-        else if (buttonId === "ab2") imgSelect = abilitySymb[13];
-        else if (buttonId === "ab3") imgSelect = abilitySymb[9];
-      ab1.dataset.price = String(abilityPrice[17]);
-      ab2.dataset.price = String(abilityPrice[13]);
-      ab3.dataset.price = String(abilityPrice[9]);
+        qIndex = 17; eIndex = 13; cIndex = 9;
     }
-  }
-  else {
-    imgSelect = cardSymb[ buttonMap[buttonId] ];
-  }
+
+// assign the selected image like before
+    if (buttonId === "randBtn") {
+        imgSelect = abilitySymb[rndNum];
+    } else if (buttonId === "ab1" || buttonId === "ab2" || buttonId === "ab3") {
+        if (buttonId === "ab1") imgSelect = abilitySymb[qIndex];
+        else if (buttonId === "ab2") imgSelect = abilitySymb[eIndex];
+        else if (buttonId === "ab3") imgSelect = abilitySymb[cIndex];
+
+        // set prices (dataset must be string)
+        ab1.dataset.price = String(abilityPrice[qIndex] );
+        ab2.dataset.price = String(abilityPrice[eIndex]);
+        ab3.dataset.price = String(abilityPrice[cIndex]);
+
+        // set button icons (use abilityIcon array)
+        ab1.style.backgroundImage = abilityIcon[qIndex];
+        ab2.style.backgroundImage = abilityIcon[eIndex];
+        ab3.style.backgroundImage = abilityIcon[cIndex];
+    } else {
+        imgSelect = cardSymb[buttonMap[buttonId]];
+    }
 
 
   cardElement.style.backgroundImage = imgSelect;
@@ -1267,35 +1260,26 @@ function createCard(id, initialX, initialY, buttonId) {
   if (buttonId !== "randBtn" && buttonId !== "ab1" && buttonId !== "ab2" && buttonId !== "ab3") {
     const index = cardSymb.indexOf(imgSelect);
     cardElement.price = priceList[index];
+    cardElement.type = "ab"
   } else if (buttonId === "randBtn"){
     cardElement.price = 0;
   } else {
+      cardElement.type = "gun"
     const abIndex = abilitySymb.indexOf(imgSelect);
     cardElement.price = abilityPrice[abIndex];
   }
-
-  /* cardElement.infoAble = false
-
-    const ib = document.createElement("div");
-    ib.className = "cardInfo"; // hidden by default
-    ib.innerHTML = `I love cock`;
-    cardElement.appendChild(ib);
-    cardElement.infoBox = ib;
-
-    cardElement.addEventListener("click", (e) => {
-      if (handDown) return; // ignore if hand is down
-      e.stopPropagation(); // prevent bubbling if needed
-      cardElement.infoBox.classList.toggle("visible");
-
-      cardElement.infoAble = cardElement.infoAble !== true;
-
-      console.log("make it happen" + cardElement.infoAble);
-    }); */
 
   const front = document.createElement("div");
   front.className = "face front";
   const back = document.createElement("div");
   back.className = "face back";
+  if (buttonId !== "randBtn" && buttonId !== "ab1" && buttonId !== "ab2" && buttonId !== "ab3"){
+      back.style.backgroundImage = "url(images/guns/back.png)";
+  } else {
+      back.style.backgroundImage = imgSelect.replace('images/abilitycards', 'images/backs')
+          .replace('.png', '.webp')
+  }
+
 
   // TODO [yell]: // BACK INFO
 
@@ -1379,16 +1363,21 @@ function createCard(id, initialX, initialY, buttonId) {
   //cardElement.addEventListener("mouseup", mouseUp);
 
   //Add to the DOM
-  document.querySelector(".container").appendChild(cardElement);
+    document.querySelector(".container").appendChild(cardElement);
 
-  allCards[id] = cardElement;
-  //Initial GSAP
-  /*    gsap.to(cardElement, {
-      transform: "scale(1)",
-      duration: "0.2",
-  });*/
-  //activeCard = cardElement;
-  return cardElement;
+    cardElement.style.opacity = "0";
+    cardElement.style.transform = "scale(0.7)";
+
+    gsap.to(cardElement, {
+        opacity: 1,
+        scale: 1,
+        duration: 0.25,
+        ease: "power2.out"
+    });
+
+// store and return
+    allCards[id] = cardElement;
+    return cardElement;
 }
 
 let nOfCards = 0;
@@ -1571,7 +1560,7 @@ function onMoveOutside(element1, element2, callback) {
 }
 
 const menu = document.getElementById("shopMenu");
-const menuExit = document.getElementById("exit");
+const menuExit = document.querySelector(".close");
 
 let currentAgentIndex = 0;
 let currentCircle = 0;
@@ -1611,44 +1600,112 @@ function updateAgent() {
   for(let i = 0; i < circles.length; i++) {
     circles[i].style.backgroundColor = "white";
   }
-  circles[currentCircle].style.backgroundColor = "red";
+  circles[currentCircle].style.backgroundColor = "pink";
+
+    ab1.style.backgroundSize = "2.5vw"
+    ab2.style.backgroundSize = "3.5vw"
+    ab3.style.backgroundSize = "3.5vw"
 }
 
 // Update abNames to take agentName as parameter
 function abNames(agent) {
-  if (agent === "skye") {
-    ab1.innerText = "TRAILBLAZER";
-    ab2.innerText = "GUIDING LIGHT";
-    ab3.innerText = "REGROWTH";
-  } else if (agent === "sage") {
-    ab1.innerText = "SLOW ORB";
-    ab2.innerText = "HEALING ORB";
-    ab3.innerText = "BARRIER ORB";
-  } else if (agent === "jett") {
-    ab1.innerText = "UPDRAFT";
-    ab2.innerText = "TAILWIND";
-    ab3.innerText = "CLOUDBURST";
-  } else if (agent === "vyse") {
-    ab1.innerText = "SHEAR";
-    ab2.innerText = "ARC ROSE";
-    ab3.innerText = "RAZORVINE";
-  } else if (agent === "omen") {
-    ab1.innerText = "PARANOIA";
-    ab2.innerText = "DARK COVER";
-    ab3.innerText = "SHROUDED STEP";
-  } else if (agent === "clove") {
-    ab1.innerText = "MEDDLE";
-    ab2.innerText = "RUSE";
-    ab3.innerText = "PICK-ME-UP";
-  } else if (agent === "iso") {
-    ab1.innerText = "UNDERCUT";
-    ab2.innerText = "DOUBLE TAP";
-    ab3.innerText = "CONTINGENCY";
-  } else if (agent === "sova") {
-    ab1.innerText = "SHOCK BOLT";
-    ab2.innerText = "RECON BOLT";
-    ab3.innerText = "OWL DRONE";
-  }
+    let qIndex, eIndex, cIndex;
+
+    if (agent === "skye") {
+        qIndex = 21; eIndex = 6;  cIndex = 14;
+        ab1.querySelector(".nameWpn").innerText = "TRAILBLAZER";
+        ab2.querySelector(".nameWpn").innerText = "GUIDING LIGHT";
+        ab3.querySelector(".nameWpn").innerText = "REGROWTH";
+        ab1.querySelector(".priceWpn").innerText = abilityPrice[qIndex] + "c";
+        ab2.querySelector(".priceWpn").innerText = abilityPrice[eIndex] + "c";
+        ab3.querySelector(".priceWpn").innerText = abilityPrice[cIndex] + "c";
+        ab1.style.backgroundSize = "2.5vw"
+        ab2.style.backgroundSize = "3.5vw"
+        ab3.style.backgroundSize = "4.5vw"
+
+    } else if (agent === "sage") {
+        qIndex = 18; eIndex = 7;  cIndex = 1;
+        ab1.querySelector(".nameWpn").innerText = "SLOW ORB";
+        ab2.querySelector(".nameWpn").innerText = "HEALING ORB";
+        ab3.querySelector(".nameWpn").innerText = "BARRIER ORB";
+        ab1.querySelector(".priceWpn").innerText = abilityPrice[qIndex] + "c";
+        ab2.querySelector(".priceWpn").innerText = abilityPrice[eIndex] + "c";
+        ab3.querySelector(".priceWpn").innerText = abilityPrice[cIndex] + "c";
+        ab1.style.backgroundSize = "2.5vw"
+        ab2.style.backgroundSize = "3.5vw"
+        ab3.style.backgroundSize = "1.5vw"
+    } else if (agent === "jett") {
+        qIndex = 23; eIndex = 20; cIndex = 2;
+        ab1.querySelector(".nameWpn").innerText = "UPDRAFT";
+        ab2.querySelector(".nameWpn").innerText = "TAILWIND";
+        ab3.querySelector(".nameWpn").innerText = "CLOUDBURST";
+        ab1.querySelector(".priceWpn").innerText = abilityPrice[qIndex] + "c";
+        ab2.querySelector(".priceWpn").innerText = abilityPrice[eIndex] + "c";
+        ab3.querySelector(".priceWpn").innerText = abilityPrice[cIndex] + "c";
+        ab1.style.backgroundSize = "2.2vw"
+        ab2.style.backgroundSize = "3.2vw"
+        ab3.style.backgroundSize = "2.7vw"
+    } else if (agent === "vyse") {
+        qIndex = 16; eIndex = 0;  cIndex = 12;
+        ab1.querySelector(".nameWpn").innerText = "SHEAR";
+        ab2.querySelector(".nameWpn").innerText = "ARC ROSE";
+        ab3.querySelector(".nameWpn").innerText = "RAZORVINE";
+        ab1.querySelector(".priceWpn").innerText = abilityPrice[qIndex] + "c";
+        ab2.querySelector(".priceWpn").innerText = abilityPrice[eIndex] + "c";
+        ab3.querySelector(".priceWpn").innerText = abilityPrice[cIndex] + "c";
+        ab1.style.backgroundSize = "2.5vw"
+        ab2.style.backgroundSize = "2.5vw"
+        ab3.style.backgroundSize = "3.5vw"
+    } else if (agent === "omen") {
+        qIndex = 10; eIndex = 4;  cIndex = 19;
+        ab1.querySelector(".nameWpn").innerText = "PARANOIA";
+        ab2.querySelector(".nameWpn").innerText = "DARK COVER";
+        ab3.querySelector(".nameWpn").innerText = "SHROUDED STEP";
+        ab1.querySelector(".priceWpn").innerText = abilityPrice[qIndex] + "c";
+        ab2.querySelector(".priceWpn").innerText = abilityPrice[eIndex] + "c";
+        ab3.querySelector(".priceWpn").innerText = abilityPrice[cIndex] + "c";
+        ab1.style.backgroundSize = "3.5vw"
+        ab2.style.backgroundSize = "3.5vw"
+        ab3.style.backgroundSize = "3.5vw"
+    } else if (agent === "clove") {
+        qIndex = 8;  eIndex = 15; cIndex = 11;
+        ab1.querySelector(".nameWpn").innerText = "MEDDLE";
+        ab2.querySelector(".nameWpn").innerText = "RUSE";
+        ab3.querySelector(".nameWpn").innerText = "PICK-ME-UP";
+        ab1.querySelector(".priceWpn").innerText = abilityPrice[qIndex] + "c";
+        ab2.querySelector(".priceWpn").innerText = abilityPrice[eIndex] + "c";
+        ab3.querySelector(".priceWpn").innerText = abilityPrice[cIndex] + "c";
+        ab1.style.backgroundSize = "2.5vw"
+        ab2.style.backgroundSize = "2.5vw"
+        ab3.style.backgroundSize = "3.5vw"
+    } else if (agent === "iso") {
+        qIndex = 22; eIndex = 5;  cIndex = 3;
+        ab1.querySelector(".nameWpn").innerText = "UNDERCUT";
+        ab2.querySelector(".nameWpn").innerText = "DOUBLE TAP";
+        ab3.querySelector(".nameWpn").innerText = "CONTINGENCY";
+        ab1.querySelector(".priceWpn").innerText = abilityPrice[qIndex] + "c";
+        ab2.querySelector(".priceWpn").innerText = abilityPrice[eIndex] + "c";
+        ab3.querySelector(".priceWpn").innerText = abilityPrice[cIndex] + "c";
+        ab1.style.backgroundSize = "2.5vw"
+        ab2.style.backgroundSize = "1.5vw"
+        ab3.style.backgroundSize = "4.5vw"
+    } else if (agent === "sova") {
+        qIndex = 17; eIndex = 13; cIndex = 9;
+        ab1.querySelector(".nameWpn").innerText = "SHOCK BOLT";
+        ab2.querySelector(".nameWpn").innerText = "RECON BOLT";
+        ab3.querySelector(".nameWpn").innerText = "OWL DRONE";
+        ab1.querySelector(".priceWpn").innerText = abilityPrice[qIndex] + "c";
+        ab2.querySelector(".priceWpn").innerText = abilityPrice[eIndex] + "c";
+        ab3.querySelector(".priceWpn").innerText = abilityPrice[cIndex] + "c";
+        ab1.style.backgroundSize = "1.5vw"
+        ab2.style.backgroundSize = "3.5vw"
+        ab3.style.backgroundSize = "3.5vw"
+    }
+
+
+    ab1.style.backgroundImage = abilityIcon[qIndex];
+    ab2.style.backgroundImage = abilityIcon[eIndex];
+    ab3.style.backgroundImage = abilityIcon[cIndex];
 }
 
 menuExit.addEventListener("click", () => {

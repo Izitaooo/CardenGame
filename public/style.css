@@ -388,7 +388,9 @@ body {
 }
 
 #waitForPlayerText{
-    font-family: "futura-100", sans-serifsans-serif;
+    font-family: "fabiola-capitals", sans-serif;
+    font-weight: 400;
+    font-style: normal;
     color: gray;
     font-size: 1.5vw;
     margin-top: 3vh;
@@ -424,7 +426,7 @@ body {
   display: flex;
   justify-content: center;
   align-content: center;
-  background-color: #38334a;
+    background-color: #38334a;
   opacity: 0.67;
   z-index: 99;
   user-select: none;
@@ -448,15 +450,12 @@ body {
   aspect-ratio: 2/3;
   cursor: pointer;
   position: fixed;
-  background-image: url("images/luant-s-artworks-comm-avocadocat-megu.jpg");
   background-size: cover;
   z-index: 2;
   user-select: none;
   -webkit-user-drag: none;
   pointer-events: auto;
 }
-
-
 
 @keyframes pulseBorder {
   0%, 100% {
@@ -489,28 +488,34 @@ body {
 }
 
 #drop1 {
-  left: 32.5vw;
+  left: 30vw;
   top: calc(50vh - 16vw);
+    filter: drop-shadow(5px 9px 10px #000000);
 }
 #drop2 {
   left: 45vw;
   top: calc(50vh - 16vw);
+    filter: drop-shadow(5px 9px 10px #000000);
 }
 #drop3 {
-  left: 57.5vw;
+  left: 60vw;
   top: calc(50vh - 16vw);
+    filter: drop-shadow(5px 9px 10px #000000);
 }
 #drop4 {
-  left: 32.5vw;
+  left: 30vw;
   top: calc(50vh + 1vw);
+    filter: drop-shadow(5px 9px 10px #000000);
 }
 #drop5 {
   left: 45vw;
   top: calc(50vh + 1vw);
+    filter: drop-shadow(5px 9px 10px #000000);
 }
 #drop6 {
-  left: 57.5vw;
+  left: 60vw;
   top: calc(50vh + 1vw);
+    filter: drop-shadow(5px 9px 10px #000000);
 }
 
 .slidecontainer {
@@ -612,26 +617,47 @@ body {
     z-index: 100;
     border-radius: 0.2vw;
     border: none;
-    font-family: "futura-100", sans-serif;
+    font-family: "corsario-variable", sans-serif;
     font-weight: 400;
     font-style: normal;
-    font-size: 0.8vw;
+    font-size: 0.7vw;
     text-align: center;
     color: pink;
     background-position: center;
     background-color: #38334a;
     background-repeat: no-repeat;
     display: flex;
-    align-items: flex-end;
-    justify-content: flex-start;
+    align-items: flex-start;
+    justify-content: flex-end;
+    flex-direction: column;
+    transition-duration: 0.3s;
+}
+.spawnButtons:hover {
+    box-shadow: inset 0 0 0.15vw pink;
+    transition-duration: 0.3s;
 }
 
 #sidearms button:not(#frenzyBtn, #sheriffBtn) {
     background-size: 7vw;
 }
 
-.spawnButtons:disabled{
+.spawnButtons .priceWpn {
+    font-size: 1vw;
+    font-weight: bold;
+    margin-bottom: -0.3vw;
+    color: white;
+}
 
+.spawnButtons .nameWpn {
+    font-size: 1vw;
+}
+
+#marshalBtn .nameWpn, #outlawBtn .nameWpn, #operatorBtn .nameWpn {
+    font-size: 0.7vw;
+}
+
+#marshalBtn .priceWpn, #outlawBtn .priceWpn, #operatorBtn .priceWpn {
+    font-size: 0.6vw;
 }
 
 #shopContainer{
@@ -639,18 +665,18 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  position: fixed;
+  flex-direction: column;
+    gap: 2vw;
+  position: relative;
+    top: -1vw;
+    right: -8vw;
   width: 100%;
   height: 100%;
 }
 
 #buttonHolder{
     display: flex;
-    position: relative;
-    left: 12.5%;
-    top: -4vw;
     width: 65%;
-    height: 70%;
     border-radius: 0.8vw;
     justify-content: center;
     align-items: center;
@@ -733,16 +759,14 @@ body {
     line-height: 1.5vw;
     user-select: none;
     pointer-events: auto;
-    font-family: "futura-100", sans-serif;
+    font-family: "fabiola-capitals", sans-serif;
     font-weight: 400;
     font-style: normal;
+    font-size: 1.5vw;
 }
 
 #abilityHolder{
     display: flex;
-    position: fixed;
-    top: 36vw;
-    left: 24vw;
     width: 65%;
     height: 10%;
     border-radius: 0.8vw;
@@ -913,6 +937,14 @@ body {
     opacity: 0;
 }
 
+#ab1, #ab2, #ab3 {
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 3.5vw;
+    font-size: 0.9vw;
+    align-items: flex-start;
+}
+
 #arrows{
     display: flex;
     gap: 0.5vw;
@@ -921,7 +953,7 @@ body {
 }
 
 #agentTxt{
-    font-family: "futura-100", sans-serif;
+    font-family: "fabiola-capitals", sans-serif;
     font-weight: 400;
     font-style: normal;
     font-size: 1vw;
@@ -941,7 +973,7 @@ body {
   width: 20vw;
   left: 0;
   position: fixed;
-  height: 99.5%;
+  height: 100%;
   border-radius: 0.8vw;
   border-color: #dca61e;
   transition-duration: 0.5s;
@@ -949,6 +981,10 @@ body {
   z-index: 99;
   transition: 0.5s;
   border-style: double;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: column;
 }
 
 #luh:hover{
@@ -956,32 +992,20 @@ body {
   transition-timing-function: ease;
 }
 
-#exit {
-  font-family: "Open Sans", sans-serif;
-  font-size: 2vw;
-  letter-spacing: 2px;
-  text-decoration: none;
-  text-transform: uppercase;
-  top: 1vw;
-  right: 2vw;
-  position: fixed;
-  width: 10vw;
-  height: 8vh;
- color: var(--pinkie);
- cursor: pointer;
- border: var(--pinkie) 3px solid;
- padding: 0.25em 0.5em;
- box-shadow: var(--pinkie) 1px 1px 0px 0px, var(--pinkie)  2px 2px 0px 0px, var(--pinkie) 3px 3px 0px 0px, var(--pinkie) 4px 4px 0px 0px, var(--pinkie) 5px 5px 0px 0px;
- user-select: none;
- -webkit-user-select: none;
- touch-action: manipulation;
-  z-index: 102;
+#luhText{
+    color: pink;
+    font-size: 4.5vw;
+    font-family: "fabiola-capitals", sans-serif;
+    font-weight: 400;
+    font-style: normal;
 }
 
-#exit:active {
-  box-shadow: 0px 0px 0px 0px;
-  top: 1vw;
-  right: 2vw;
+#money {
+    font-family: "fabiola-capitals", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    color: white;
+    font-size: 4.5vw;
 }
 
 #health {
@@ -991,15 +1015,6 @@ body {
   font-family: 'VALORANT', sans-serif;
   color: white;
   font-size: 3vw;
-}
-
-#money {
-    position: fixed;
-    top: 3vw;
-    left: 5vw;
-    font-family: 'VALORANT', sans-serif;
-    color: white;
-    font-size: 3vw;
 }
 
 /* HTML: <div class="parallelogram"></div> */
@@ -1103,15 +1118,68 @@ body {
 .card {
     transform-style: preserve-3d;
     perspective: 1000px;
+
 }
 .face {
-    position:absolute; inset:0; backface-visibility: hidden;
+    position:absolute;
+    inset:0;
+    backface-visibility: hidden;
 }
 .back {
     transform: rotateY(180deg);
-    background-image: url("images/guns/back.png");
     background-size: cover;
     text-align: center;
     line-height: 14vw;
     color: #F2C3F7;
+
+}
+
+.close {
+    position: fixed;
+    width: 3.5vw;
+    height: 3.5vw;
+    top: 2vw;
+    left: 73vw;
+    overflow: hidden;
+    z-index: 100;
+    cursor: pointer;
+}
+
+.close::before,
+.close::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    top: 50%;
+    background: pink;
+    transition: background 0.3s;
+}
+
+
+/* When hovering the .close element */
+.close:hover::before,
+.close:hover::after {
+    background: white;
+}
+
+.close::before {
+    transform: rotate(45deg);
+}
+
+.close::after {
+    transform: rotate(-45deg);
+}
+
+/* Heavy version */
+.close.heavy::before,
+.close.heavy::after {
+    height: 12px;
+    margin-top: -6px;
+}
+
+/* Pointy version */
+.close.pointy::before,
+.close.pointy::after {
+    width: 200%;
+    left: -50%;
 }
