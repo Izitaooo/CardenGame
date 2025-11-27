@@ -75,6 +75,7 @@
         height: 100%;
         z-index: 0;
         pointer-events: none;
+        box-shadow: 0 0 200px rgba(0,0,0,0.9) inset;
       "
     />
     <p id="roomNameText" style="text-align: end; position: fixed; right: 2vw">
@@ -95,8 +96,6 @@
     <div class="slidecontainer">
       <input type="range" min="0.0" max="1" value="0.15" step="0.01" class="slider" id="volume">
     </div>
-    <div id="health"> 10 </div>
-    <div id="money">0</div>
     <div id="endRound" onclick="roundOver()" >Agartha</div>
     <div id="switchPlayer" onclick="switchPlayer()" >switchPlayer</div>
 
@@ -114,92 +113,121 @@
               <span>spawnRand</span>
             </button>
             <button draggable="true" ondragstart="spawnCard(event)" data-price="300" id="shortyBtn" class="spawnButtons">
-              <span>SHORTY</span>
+              <span class="priceWpn">300c</span>
+              <span class="nameWpn">SHORTY</span>
             </button>
             <button draggable="true" ondragstart="spawnCard(event)" data-price="450" id="frenzyBtn" class="spawnButtons">
-              <span>FRENZY</span>
+              <span class="priceWpn">450c</span>
+              <span class="nameWpn">FRENZY</span>
             </button>
             <button draggable="true" ondragstart="spawnCard(event)" data-price="500" id="ghostBtn" class="spawnButtons">
-              <span>GHOST</span>
+              <span class="priceWpn">500c</span>
+              <span class="nameWpn">GHOST</span>
             </button>
             <button draggable="true" ondragstart="spawnCard(event)" data-price="800" id="sheriffBtn" class="spawnButtons">
-              <span>SHERIFF</span>
+              <span class="priceWpn">800c</span>
+              <span class="nameWpn">SHERIFF</span>
             </button>
           </div>
 
           <div id="sNs">
             <div class="category">SMGS</div>
             <button draggable="true" ondragstart="spawnCard(event)" data-price="1100" id="stingerBtn" class="spawnButtons">
-              <span>STINGER</span>
+              <span class="priceWpn">1100c</span>
+              <span class="nameWpn">STINGER</span>
             </button>
             <button draggable="true" ondragstart="spawnCard(event)" data-price="1600" id="spectreBtn" class="spawnButtons">
-              <span>SPECTRE</span>
+              <span class="priceWpn">1600c</span>
+              <span class="nameWpn">SPECTRE</span>
             </button>
 
             <div class="category">SHOTGUNS</div>
             <button draggable="true" ondragstart="spawnCard(event)" data-price="850" id="buckyBtn" class="spawnButtons">
-              <span>BUCKY</span>
+              <span class="priceWpn">850c</span>
+              <span class="nameWpn">BUCKY</span>
             </button>
             <button draggable="true" ondragstart="spawnCard(event)" data-price="1850" id="judgeBtn" class="spawnButtons">
-              <span>JUDGE</span>
+              <span class="priceWpn">1850c</span>
+              <span class="nameWpn">JUDGE</span>
             </button>
           </div>
 
           <div id="rifles">
             <div class="category">RIFLES</div>
             <button draggable="true" ondragstart="spawnCard(event)" data-price="2050" id="bulldogBtn" class="spawnButtons">
-              <span>BULLDOG</span>
+              <span class="priceWpn">2050c</span>
+              <span class="nameWpn">BULLDOG</span>
             </button>
             <button draggable="true" ondragstart="spawnCard(event)" data-price="2250" id="guardianBtn" class="spawnButtons">
-              <span>GUARDIAN</span>
+              <span class="priceWpn">2250c</span>
+              <span class="nameWpn">GUARDIAN</span>
             </button>
             <button draggable="true" ondragstart="spawnCard(event)" data-price="2900" id="phantomBtn" class="spawnButtons">
-              <span>PHANTOM</span>
+              <span class="priceWpn">2900c</span>
+              <span class="nameWpn">PHANTOM</span>
             </button>
             <button draggable="true" ondragstart="spawnCard(event)" data-price="2900" id="vandalBtn" class="spawnButtons">
-              <span>VANDAL</span>
+              <span class="priceWpn">2900c</span>
+              <span class="nameWpn">VANDAL</span>
             </button>
           </div>
 
           <div id="heavies">
             <div class="category">SNIPER RIFLES</div>
             <button draggable="true" ondragstart="spawnCard(event)" data-price="950" id="marshalBtn" class="spawnButtons">
-              <span>MARSHAL</span>
+              <span class="priceWpn">950c</span>
+              <span class="nameWpn">MARSHAL</span>
             </button>
             <button draggable="true" ondragstart="spawnCard(event)" data-price="2400" id="outlawBtn" class="spawnButtons">
-              <span>OUTLAW</span>
+              <span class="priceWpn">2400c</span>
+              <span class="nameWpn">OUTLAW</span>
             </button>
             <button draggable="true" ondragstart="spawnCard(event)" data-price="4700" id="operatorBtn" class="spawnButtons">
-              <span>OPERATOR</span>
+              <span class="priceWpn">4070c</span>
+              <span class="nameWpn">OPERATOR</span>
             </button>
 
             <div class="category">MACHINE GUNS</div>
             <button draggable="true" ondragstart="spawnCard(event)" data-price="1600" id="aresBtn" class="spawnButtons">
-              <span>ARES</span>
+              <span class="priceWpn">1600c</span>
+              <span class="nameWpn">ARES</span>
             </button>
             <button draggable="true" ondragstart="spawnCard(event)" data-price="3200" id="odinBtn" class="spawnButtons">
-              <span>ODIN</span>
+              <span class="priceWpn">3200c</span>
+              <span class="nameWpn">ODIN</span>
+            </button>
+          </div>
+        </div>
+        <div id="abilityHolder">
+          <div class="category">ABILITIES</div>
+          <div id="abilities">
+            <div id="agentBtn">
+              <div id="arrows">
+                <div id="left" class="arrow"></div>
+                <div id="middle" class="arrow"></div>
+                <div id="right" class="arrow"></div>
+              </div>
+            </div>
+            <button draggable="true" ondragstart="spawnCard(event)" id="ab1" class="spawnButtons">
+              <span class="priceWpn">1600c</span>
+              <span class="nameWpn"></span>
+            </button>
+            <button draggable="true" ondragstart="spawnCard(event)" id="ab2" class="spawnButtons">
+              <span class="priceWpn">1600c</span>
+              <span class="nameWpn"></span>
+            </button>
+            <button draggable="true" ondragstart="spawnCard(event)" id="ab3" class="spawnButtons">
+              <span class="priceWpn">1600c</span>
+              <span class="nameWpn"></span>
             </button>
           </div>
         </div>
       </div>
-      <div id="abilityHolder">
-        <div class="category">ABILITIES</div>
-        <div id="abilities">
-          <div id="agentBtn">
-            <div id="arrows">
-              <div id="left" class="arrow"></div>
-              <div id="middle" class="arrow"></div>
-              <div id="right" class="arrow"></div>
-            </div>
-          </div>
-          <button draggable="true" ondragstart="spawnCard(event)" id="ab1" class="spawnButtons">COCK</button>
-          <button draggable="true" ondragstart="spawnCard(event)" id="ab2" class="spawnButtons">COCK2</button>
-          <button draggable="true" ondragstart="spawnCard(event)" id="ab3" class="spawnButtons">COCK3</button>
-        </div>
+      <div id="luh">
+        <div id="luhText">DRAG HERE!</div>
+        <div id="money">C</div>
       </div>
-      <div id="luh"></div>
-      <button id="exit" role="button">exit</button>
+      <div class="close heavy pointy"></div>
     </div>
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/howler@2.2.4/dist/howler.min.js"></script>
