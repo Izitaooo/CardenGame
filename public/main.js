@@ -146,7 +146,7 @@ function lockIn() {
         const el = document.getElementById(agent);
         el.health = 10; // Add custom property here
 
-        console.log("is there");
+        //console.log("is there");
         document.getElementById(agent).classList.remove("selected");
         document.getElementById(agent).classList.add("inGame");
         document.getElementById(agent).style.zIndex = "1000"; // start high
@@ -160,7 +160,7 @@ function lockIn() {
       } else {
         document.getElementById(agent).classList.add("agentsLocked");
 
-        console.log("not there");
+        //console.log("not there");
       }
     }
 
@@ -257,7 +257,7 @@ function lockIn() {
 let enemyAgents = [];
 socket.on("enemyChose", (data) => {
   enemyAgents = data.agentsChosen;
-  console.log("Enemy chose agents:", data.agentsChosen);
+  //console.log("Enemy chose agents:", data.agentsChosen);
   enemyAgents.forEach((agent, index) => {
     const dropperNum = 1 + index;
     const dropper = document.getElementById("drop" + dropperNum);
@@ -597,7 +597,45 @@ function mouseDown(e, cardElement) {
 }
 
 function whereCanPlace(cardElement) {
+    const agentElements = document.querySelectorAll(".agentSelect");
+    const myAgents = Array.from(agentElements).filter(el =>
+        agentsChosen.includes(el.id)
+    );
+    const enemyAgentElements = enemyAgents.map(agentName =>
+        document.getElementById("enemy_" + agentName)
+    ).filter(el => el !== null);
+console.log("card type: " + cardElement.type);
+    if(cardElement.type === "gun"
+        || cardElement.type === "barrier orb"
+        || cardElement.type === "contigency"
+        || cardElement.type === "double tap"
+        || cardElement.type === "healing orb"
+        || cardElement.type === "pick me up"
+        || cardElement.type === "regrowth"
+        || cardElement.type === "shrouded step"
+        || cardElement.type === "tailwind"
+        || cardElement.type === "updraft"
+    ){
+        myAgents.forEach(agentEl => {
+            agentEl.classList.add("isPlaceable");
+        });
+        enemyAgentElements.forEach(enemyEl => {
+            enemyEl.classList.remove("isPlaceable");
+        });
+        console.log("friendly");
 
+    } else{
+        enemyAgentElements.forEach(enemyEl => {
+            enemyEl.classList.add("isPlaceable");
+        });
+        console.log("enemy");
+
+        myAgents.forEach(agentEl => {
+            agentEl.classList.remove("isPlaceable");
+        });
+        console.log("enemy");
+
+    }
 }
 
 
@@ -617,7 +655,7 @@ function mouseMove(e) {
   dropPlay = 1;
   dragged = true;
 
-  console.log(agentsChosen);
+  //console.log(agentsChosen);
 
   let purple = document.getElementById("luh");
   let purpleRect = purple.getBoundingClientRect();
@@ -628,7 +666,7 @@ function mouseMove(e) {
   } */
 
   if (activeCard.deck === true) {
-    console.log("zoul  be mine");
+    //console.log("zoul  be mine");
     const index = deckCards.indexOf(activeCard); // find where it is in the array
     if (index !== -1) {
       deckCards.splice(index, 1); // remove that one item
@@ -643,10 +681,38 @@ function mouseMove(e) {
 
   activeCard.draggedAO = true;
 
-  console.log(isLocked);
+  //console.log(isLocked);
 
   //box1
   const domRect1 = activeCard.getBoundingClientRect();
+
+    /*    const abilityIcon = [
+          'url("images/abilityIcon/arc rose.webp")', //0
+          'url("images/abilityIcon/barrier orb.webp")', //1
+          'url("images/abilityIcon/cloudburst.webp")', //2
+          'url("images/abilityIcon/contigency.webp")', //3
+          'url("images/abilityIcon/dark cover.webp")', //4
+          'url("images/abilityIcon/double tap.webp")', //5
+          'url("images/abilityIcon/guiding light.webp")', //6
+          'url("images/abilityIcon/healing orb.webp")', //7
+          'url("images/abilityIcon/meddle.webp")', //8
+          'url("images/abilityIcon/owl drone.webp")', //9
+          'url("images/abilityIcon/paranoia.webp")', //10
+          'url("images/abilityIcon/pick me up.webp")', //11
+          'url("images/abilityIcon/razorvine.webp")', //12
+          'url("images/abilityIcon/recon bolt.webp")', //13
+          'url("images/abilityIcon/regrowth.webp")', //14
+          'url("images/abilityIcon/ruse.webp")',  //15
+          'url("images/abilityIcon/shear.webp")', //16
+          'url("images/abilityIcon/shock bolt.webp")', //17
+          'url("images/abilityIcon/slow orb.webp")', //18
+          'url("images/abilityIcon/shrouded step.webp")', //19
+          'url("images/abilityIcon/tailwind.webp")', //20
+          'url("images/abilityIcon/trailblazer.webp")', //21
+          'url("images/abilityIcon/undercut.webp")', //22
+          'url("images/abilityIcon/updraft.webp")' //23
+      ]*/
+
 
   if (activeCard.spawning === true) {
     if (
@@ -668,13 +734,24 @@ function mouseMove(e) {
   }
 
   if (activeCard.spawning === false) {
+/*      if (activeCard.type === "gun") {
+
+      }*/
     if (
-      !(
-        domRect1.top > domRect2.bottom ||
-        domRect1.right < domRect2.left ||
-        domRect1.bottom < domRect2.top ||
-        domRect1.left > domRect2.right
-      )
+      !(domRect1.top > domRect2.bottom ||
+          domRect1.right < domRect2.left ||
+          domRect1.bottom < domRect2.top ||
+          domRect1.left > domRect2.right
+          ) && activeCard.type !== "gun"
+        && activeCard.type !== "barrier orb"
+        && activeCard.type !== "contigency"
+        && activeCard.type !== "double tap"
+        && activeCard.type !== "healing orb"
+        && activeCard.type !== "pick me up"
+        && activeCard.type !== "regrowth"
+        && activeCard.type !== "shrouded step"
+        && activeCard.type !== "tailwind"
+        && activeCard.type !== "updraft"
     ) {
       isLocked = 1;
       container = 1;
@@ -688,8 +765,18 @@ function mouseMove(e) {
         domRect1.right < domRect3.left ||
         domRect1.bottom < domRect3.top ||
         domRect1.left > domRect3.right
-      )
-    ) {
+      ) && activeCard.type !== "gun"
+        && activeCard.type !== "barrier orb"
+        && activeCard.type !== "contigency"
+        && activeCard.type !== "double tap"
+        && activeCard.type !== "healing orb"
+        && activeCard.type !== "pick me up"
+        && activeCard.type !== "regrowth"
+        && activeCard.type !== "shrouded step"
+        && activeCard.type !== "tailwind"
+        && activeCard.type !== "updraft"
+    )
+    {
       isLocked = 1;
       container = 2;
       scale();
@@ -702,7 +789,16 @@ function mouseMove(e) {
         domRect1.right < domRect4.left ||
         domRect1.bottom < domRect4.top ||
         domRect1.left > domRect4.right
-      )
+      ) && activeCard.type !== "gun"
+        && activeCard.type !== "barrier orb"
+        && activeCard.type !== "contigency"
+        && activeCard.type !== "double tap"
+        && activeCard.type !== "healing orb"
+        && activeCard.type !== "pick me up"
+        && activeCard.type !== "regrowth"
+        && activeCard.type !== "shrouded step"
+        && activeCard.type !== "tailwind"
+        && activeCard.type !== "updraft"
     ) {
       isLocked = 1;
       container = 3;
@@ -713,7 +809,21 @@ function mouseMove(e) {
         domRect1.right < domRect5.left ||
         domRect1.bottom < domRect5.top ||
         domRect1.left > domRect5.right
-      )
+      ) && activeCard.type !== "arc rose"
+        && activeCard.type !== "cloudburst"
+        && activeCard.type !== "dark cover"
+        && activeCard.type !== "guiding light"
+        && activeCard.type !== "meddle"
+        && activeCard.type !== "owl drone"
+        && activeCard.type !== "paranoia"
+        && activeCard.type !== "razorvine"
+        && activeCard.type !== "recon bolt"
+        && activeCard.type !== "ruse"
+        && activeCard.type !== "shear"
+        && activeCard.type !== "shock bolt"
+        && activeCard.type !== "slow orb"
+        && activeCard.type !== "trailblazer"
+        && activeCard.type !== "undercut"
     ) {
       isLocked = 1;
       container = 4;
@@ -724,7 +834,21 @@ function mouseMove(e) {
         domRect1.right < domRect6.left ||
         domRect1.bottom < domRect6.top ||
         domRect1.left > domRect6.right
-      )
+      ) && activeCard.type !== "arc rose"
+        && activeCard.type !== "cloudburst"
+        && activeCard.type !== "dark cover"
+        && activeCard.type !== "guiding light"
+        && activeCard.type !== "meddle"
+        && activeCard.type !== "owl drone"
+        && activeCard.type !== "paranoia"
+        && activeCard.type !== "razorvine"
+        && activeCard.type !== "recon bolt"
+        && activeCard.type !== "ruse"
+        && activeCard.type !== "shear"
+        && activeCard.type !== "shock bolt"
+        && activeCard.type !== "slow orb"
+        && activeCard.type !== "trailblazer"
+        && activeCard.type !== "undercut"
     ) {
       isLocked = 1;
       container = 5;
@@ -735,7 +859,21 @@ function mouseMove(e) {
         domRect1.right < domRect7.left ||
         domRect1.bottom < domRect7.top ||
         domRect1.left > domRect7.right
-      )
+      ) && activeCard.type !== "arc rose"
+        && activeCard.type !== "cloudburst"
+        && activeCard.type !== "dark cover"
+        && activeCard.type !== "guiding light"
+        && activeCard.type !== "meddle"
+        && activeCard.type !== "owl drone"
+        && activeCard.type !== "paranoia"
+        && activeCard.type !== "razorvine"
+        && activeCard.type !== "recon bolt"
+        && activeCard.type !== "ruse"
+        && activeCard.type !== "shear"
+        && activeCard.type !== "shock bolt"
+        && activeCard.type !== "slow orb"
+        && activeCard.type !== "trailblazer"
+        && activeCard.type !== "undercut"
     ) {
       isLocked = 1;
       container = 6;
@@ -777,6 +915,179 @@ function mouseUp() {
     id: activeCard.id,
   });
 
+
+    const agentElements = document.querySelectorAll(".agentSelect");
+    const myAgents = Array.from(agentElements).filter(el =>
+        agentsChosen.includes(el.id)
+    );
+    const enemyAgentElements = enemyAgents.map(agentName =>
+        document.getElementById("enemy_" + agentName)
+    ).filter(el => el !== null);
+
+
+    myAgents.forEach(agentEl => {
+        agentEl.classList.remove("isPlaceable");
+    });
+    enemyAgentElements.forEach(enemyEl => {
+        enemyEl.classList.remove("isPlaceable");
+    });
+
+/*    const abilityIcon = [
+        'url("images/abilityIcon/arc rose.webp")', //0
+        'url("images/abilityIcon/barrier orb.webp")', //1
+        'url("images/abilityIcon/cloudburst.webp")', //2
+        'url("images/abilityIcon/contigency.webp")', //3
+        'url("images/abilityIcon/dark cover.webp")', //4
+        'url("images/abilityIcon/double tap.webp")', //5
+        'url("images/abilityIcon/guiding light.webp")', //6
+        'url("images/abilityIcon/healing orb.webp")', //7
+        'url("images/abilityIcon/meddle.webp")', //8
+        'url("images/abilityIcon/owl drone.webp")', //9
+        'url("images/abilityIcon/paranoia.webp")', //10
+        'url("images/abilityIcon/pick me up.webp")', //11
+        'url("images/abilityIcon/razorvine.webp")', //12
+        'url("images/abilityIcon/recon bolt.webp")', //13
+        'url("images/abilityIcon/regrowth.webp")', //14
+        'url("images/abilityIcon/ruse.webp")',  //15
+        'url("images/abilityIcon/shear.webp")', //16
+        'url("images/abilityIcon/shock bolt.webp")', //17
+        'url("images/abilityIcon/slow orb.webp")', //18
+        'url("images/abilityIcon/shrouded step.webp")', //19
+        'url("images/abilityIcon/tailwind.webp")', //20
+        'url("images/abilityIcon/trailblazer.webp")', //21
+        'url("images/abilityIcon/undercut.webp")', //22
+        'url("images/abilityIcon/updraft.webp")' //23
+    ]*/
+
+/*    0- enemy (singular)
+    1- friendly (group)
+    2- enemy (singular)
+    3- friendly (only iso)
+    4- enemy (singular)
+    5- friendly (only iso)
+    6- enemy (singular)
+    7-friendly (singular)
+    8-enemy (singular)
+    9-enemy (singular)
+    10-enemy (singular but could be group but fuck it)
+    11-friendly (only clove)
+    12- enemy (singular)
+    13- enemy (singular)
+    14-friendly (singular but could be group)
+    15-enemy (singular)
+    16-enemy COULD BE FRIENDLY ACTUALLY (singular)
+    17-enemy (singular)
+    18-enemy (singular)
+    19-friendly (only omen)
+    20- friendly (only jett)
+    21- enemy (singular)
+    22- enemy (singular)
+    23- updraft (only jett)*/
+
+
+//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    if (activeCard.type === "gun" && (container === 1 || container === 2 || container === 3)) {
+        console.log("gun card on invalid container - forcing return to deck");
+        container = null;
+        isLocked = 0;
+    }else  if(activeCard.type === "arc rose" && (container === 4 || container === 5 || container === 6)){
+        console.log("arc rose on invalid container - forcing return to deck");
+        container = null;
+        isLocked = 0;
+    } else if (activeCard.type === "barrier orb" && (container === 1 || container === 2 || container === 3)){
+        console.log("barrier orb on invalid container - forcing return to deck");
+        container = null;
+        isLocked = 0;
+    } else if (activeCard.type === "cloudburst" && (container === 4 || container === 5 || container === 6)) {
+        console.log("cloudburst on invalid container - forcing return to deck");
+        container = null;
+        isLocked = 0;
+    } else if (activeCard.type === "contigency" && (container === 1 || container === 2 || container === 3)){
+        console.log("contigency on invalid container - forcing return to deck");
+        container = null;
+        isLocked = 0;
+    } else if (activeCard.type === "dark cover" && (container === 4 || container === 5 || container === 6)) {
+        console.log("dark cover on invalid container - forcing return to deck");
+        container = null;
+        isLocked = 0;
+    } else if (activeCard.type === "double tap" && (container === 1 || container === 2 || container === 3)){
+        console.log("double tap on invalid container - forcing return to deck");
+        container = null;
+        isLocked = 0;
+    } else if (activeCard.type === "guiding light" && (container === 4 || container === 5 || container === 6)) {
+        console.log("guiding light on invalid container - forcing return to deck");
+        container = null;
+        isLocked = 0;
+    } else if (activeCard.type === "healing orb" && (container === 1 || container === 2 || container === 3)){
+        console.log("healing orb on invalid container - forcing return to deck");
+        container = null;
+        isLocked = 0;
+    } else if (activeCard.type === "meddle" && (container === 4 || container === 5 || container === 6)) {
+        console.log("meddle on invalid container - forcing return to deck");
+        container = null;
+        isLocked = 0;
+    } else if (activeCard.type === "owl drone" && (container === 4 || container === 5 || container === 6)) {
+        console.log("owl drone on invalid container - forcing return to deck");
+        container = null;
+        isLocked = 0;
+    } else if (activeCard.type === "paranoia" && (container === 4 || container === 5 || container === 6)) {
+        console.log("paranoia on invalid container - forcing return to deck");
+        container = null;
+        isLocked = 0;
+    } else if (activeCard.type === "pick me up" && (container === 1 || container === 2 || container === 3)){
+        console.log("pick me up on invalid container - forcing return to deck");
+        container = null;
+        isLocked = 0;
+    } else if (activeCard.type === "razorvine" && (container === 4 || container === 5 || container === 6)) {
+        console.log("razorvine on invalid container - forcing return to deck");
+        container = null;
+        isLocked = 0;
+    } else if (activeCard.type === "recon bolt" && (container === 4 || container === 5 || container === 6)) {
+        console.log("recon bolt on invalid container - forcing return to deck");
+        container = null;
+        isLocked = 0;
+    } else if (activeCard.type === "regrowth" && (container === 1 || container === 2 || container === 3)){
+        console.log("regrowth on invalid container - forcing return to deck");
+        container = null;
+        isLocked = 0;
+    } else if (activeCard.type === "ruse" && (container === 4 || container === 5 || container === 6)) {
+        console.log("ruse on invalid container - forcing return to deck");
+        container = null;
+        isLocked = 0;
+    } else if (activeCard.type === "shear" && (container === 4 || container === 5 || container === 6)) {
+        console.log("shear on invalid container - forcing return to deck");
+        container = null;
+        isLocked = 0;
+    } else if (activeCard.type === "shock bolt" && (container === 4 || container === 5 || container === 6)) {
+        console.log("shock bolt on invalid container - forcing return to deck");
+        container = null;
+        isLocked = 0;
+    } else if (activeCard.type === "shrouded step" && (container === 1 || container === 2 || container === 3)){
+        console.log("shrouded step on invalid container - forcing return to deck");
+        container = null;
+        isLocked = 0;
+    } else if (activeCard.type === "slow orb" && (container === 4 || container === 5 || container === 6)) {
+        console.log("slow orb on invalid container - forcing return to deck");
+        container = null;
+        isLocked = 0;
+    } else if (activeCard.type === "tailwind" && (container === 1 || container === 2 || container === 3)){
+        console.log("tailwind on invalid container - forcing return to deck");
+        container = null;
+        isLocked = 0;
+    } else if (activeCard.type === "trailblazer" && (container === 4 || container === 5 || container === 6)) {
+        console.log("trailblazer on invalid container - forcing return to deck");
+        container = null;
+        isLocked = 0;
+    } else if (activeCard.type === "undercut" && (container === 4 || container === 5 || container === 6)) {
+        console.log("undercut on invalid container - forcing return to deck");
+        container = null;
+        isLocked = 0;
+    } else if (activeCard.type === "updraft" && (container === 1 || container === 2 || container === 3)){
+        console.log("updraft on invalid container - forcing return to deck");
+        container = null;
+        isLocked = 0;
+    }
+
   if (activeCard.spawning === true) {
     let purple = document.getElementById("luh");
 
@@ -805,27 +1116,44 @@ function mouseUp() {
     let dropper;
     let agent;
 
-    if (container === 1) {
-      dropper = dropper1;
-      agent = null;
-    } else if (container === 2) {
-      dropper = dropper2;
-      agent = null;
-    } else if (container === 3) {
-      dropper = dropper3;
-      agent = null;
-    } else if (container === 4) {
-      dropper = dropper4;
-      agent = agent0;
-    } else if (container === 5) {
-      dropper = dropper5;
-      agent = agent1;
-    } else if (container === 6) {
-      dropper = dropper6;
-      agent = agent2;
-    } else if (container === 0) {
-      dropper = randBtn;
-    }
+/*    if (activeCard.type === "gun") {
+        console.log("gun card dropped");
+        if (container === 4) {
+            dropper = dropper4;
+            agent = agent0;
+        } else if (container === 5) {
+            dropper = dropper5;
+            agent = agent1;
+        } else if (container === 6) {
+            dropper = dropper6;
+            agent = agent2;
+        } else {
+            container = 0;
+        }
+    }else{*/
+        if (container === 1) {
+            dropper = dropper1;
+            agent = null;
+        } else if (container === 2) {
+            dropper = dropper2;
+            agent = null;
+        } else if (container === 3) {
+            dropper = dropper3;
+            agent = null;
+        } else if (container === 4) {
+            dropper = dropper4;
+            agent = agent0;
+        } else if (container === 5) {
+            dropper = dropper5;
+            agent = agent1;
+        } else if (container === 6) {
+            dropper = dropper6;
+            agent = agent2;
+        } else if (container === 0) {
+            dropper = randBtn;
+        }
+    //}
+
 
     activeCard.style.setProperty("--border-animation", "none");
 
@@ -937,7 +1265,7 @@ function mouseUp() {
           btn.draggable = true;
           btn.style.cursor = "pointer";
         });
-        console.log(deckCards);
+        //console.log(deckCards);
         // console.log(card.deck);
         // console.log(card2.deck);
       },
@@ -1088,10 +1416,24 @@ socket.on("playerMoved", (data) => {
 });
 
 function scale() {
-  gsap.to(activeCard, {
-    transform: "scale(1.2)",
-    duration: "0.2",
-  });
+/*    if(activeCard.type === "gun"){
+        if(container === 4 || container === 5 || container === 6){
+            gsap.to(activeCard, {
+                transform: "scale(1.2)",
+                duration: "0.2",
+            });
+        }
+    }else{
+        gsap.to(activeCard, {
+            transform: "scale(1.2)",
+            duration: "0.2",
+        });
+    }*/
+    gsap.to(activeCard, {
+        transform: "scale(1.2)",
+        duration: "0.2",
+    });
+
 }
 
 function selectAbility(min, max) {
@@ -1240,7 +1582,7 @@ function createCard(id, initialX, initialY, buttonId) {
         else if (buttonId === "ab3") imgSelect = abilitySymb[cIndex];
 
         // set prices (dataset must be string)
-        ab1.dataset.price = String(abilityPrice[qIndex] );
+        ab1.dataset.price = String(abilityPrice[qIndex]);
         ab2.dataset.price = String(abilityPrice[eIndex]);
         ab3.dataset.price = String(abilityPrice[cIndex]);
 
@@ -1248,7 +1590,23 @@ function createCard(id, initialX, initialY, buttonId) {
         ab1.style.backgroundImage = abilityIcon[qIndex];
         ab2.style.backgroundImage = abilityIcon[eIndex];
         ab3.style.backgroundImage = abilityIcon[cIndex];
-    } else {
+
+/*
+        ab1.type = abilitySymb[qIndex]
+            .replace('url("images/abilitycards/', "")
+            .replace('.png")', "");
+
+        ab2.type = abilitySymb[eIndex]
+            .replace('url("images/abilitycards/', "")
+            .replace('.png")', "");
+
+        ab3.type = abilitySymb[cIndex]
+            .replace('url("images/abilitycards/', "")
+            .replace('.png")', "");
+*/
+
+    } else
+    {
         imgSelect = cardSymb[buttonMap[buttonId]];
     }
 
@@ -1260,13 +1618,31 @@ function createCard(id, initialX, initialY, buttonId) {
   if (buttonId !== "randBtn" && buttonId !== "ab1" && buttonId !== "ab2" && buttonId !== "ab3") {
     const index = cardSymb.indexOf(imgSelect);
     cardElement.price = priceList[index];
-    cardElement.type = "ab"
+    cardElement.type = "gun"
   } else if (buttonId === "randBtn"){
     cardElement.price = 0;
   } else {
-      cardElement.type = "gun"
-    const abIndex = abilitySymb.indexOf(imgSelect);
-    cardElement.price = abilityPrice[abIndex];
+      // Calculate the type directly from the index you already have
+      if(buttonId === "ab1"){
+          cardElement.type = abilitySymb[qIndex]
+              .replace('url("images/abilitycards/', "")
+              .replace('.png")', "");
+          console.log(cardElement.type);
+      }
+      else if(buttonId === "ab2"){
+          cardElement.type = abilitySymb[eIndex]
+              .replace('url("images/abilitycards/', "")
+              .replace('.png")', "");
+          console.log(cardElement.type);
+      }
+      else if(buttonId === "ab3"){
+          cardElement.type = abilitySymb[cIndex]
+              .replace('url("images/abilitycards/', "")
+              .replace('.png")', "");
+          console.log(cardElement.type);
+      }
+      const abIndex = abilitySymb.indexOf(imgSelect);
+      cardElement.price = abilityPrice[abIndex];
   }
 
   const front = document.createElement("div");
@@ -1294,6 +1670,7 @@ function createCard(id, initialX, initialY, buttonId) {
   // style faces with CSS backface-visibility like earlier
   cardElement.appendChild(front);
   cardElement.appendChild(back);
+  console.log(cardElement.type);
 
   // keep flip state
   cardElement.flipped = false;
@@ -1375,6 +1752,8 @@ function createCard(id, initialX, initialY, buttonId) {
         ease: "power2.out"
     });
 
+
+
 // store and return
     allCards[id] = cardElement;
     return cardElement;
@@ -1419,7 +1798,7 @@ function spawnCard(e) {
   //console.log("spawned and dragging card: " + cardId);
 }
 socket.on("enemySpawnedCard", (data) => {
-  console.log("enemy spawned card: " + data);
+  //console.log("enemy spawned card: " + data);
 
   const enemycard = document.createElement("div");
   enemycard.className = "card";
@@ -1456,7 +1835,7 @@ let handDown = true;
 
 function handOpening() {
   if (handDown === true && deckCards.length !== 0) {
-    console.log(deckCards);
+    //console.log(deckCards);
     handhitbox.style.height = "15.5vw";
     handhitbox.style.zIndex = "1";
     //cardSpacing = 270;
@@ -1464,7 +1843,7 @@ function handOpening() {
 
     updateDeckPositions(0.5);
     handDown = false;
-    console.log("handown:" + handDown);
+    //console.log("handown:" + handDown);
 
     canDrag = false;
     for (let i = 0; i < deckCards.length; i++) {
@@ -1485,7 +1864,7 @@ function handOpening() {
       cardOpenEnabled = true;
     }, 500);
   } else if (handDown === false && deckCards.length !== 0) {
-    console.log(deckCards);
+    //console.log(deckCards);
     handhitbox.style.height = "5.5vw";
     handhitbox.style.zIndex = "99";
     //cardSpacing = 180;
@@ -1496,7 +1875,7 @@ function handOpening() {
 }
 
 if (cardOpenEnabled === true) {
-  console.log("diameters");
+  //console.log("diameters");
   onMoveOutside(handhitbox, deckCards, () => handOpening());
 }
 
@@ -1605,6 +1984,8 @@ function updateAgent() {
     ab1.style.backgroundSize = "2.5vw"
     ab2.style.backgroundSize = "3.5vw"
     ab3.style.backgroundSize = "3.5vw"
+
+
 }
 
 // Update abNames to take agentName as parameter
@@ -1706,6 +2087,18 @@ function abNames(agent) {
     ab1.style.backgroundImage = abilityIcon[qIndex];
     ab2.style.backgroundImage = abilityIcon[eIndex];
     ab3.style.backgroundImage = abilityIcon[cIndex];
+
+/*    ab1.type = abilitySymb[qIndex]
+        .replace('url("images/abilitycards/', "")
+        .replace('.png")', "");
+
+    ab2.type = abilitySymb[eIndex]
+        .replace('url("images/abilitycards/', "")
+        .replace('.png")', "");
+
+    ab3.type = abilitySymb[cIndex]
+        .replace('url("images/abilitycards/', "")
+        .replace('.png")', "");*/
 }
 
 menuExit.addEventListener("click", () => {
