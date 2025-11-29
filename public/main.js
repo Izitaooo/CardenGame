@@ -407,6 +407,15 @@ function switchPlayer() {
             el.removeEventListener("click", enemyClickHandlers[el.id]);
             delete enemyClickHandlers[el.id];
         }
+        if (enemyHoverHandlers[el.id]){
+            el.removeEventListener("mouseover", enemyHoverHandlers[el.id]);
+            delete enemyHoverHandlers[el.id]
+        }
+        if (enemyMouseLeaveHandlers[el.id]){
+            el.removeEventListener("mouseleave", enemyMouseLeaveHandlers[el.id])
+            delete enemyMouseLeaveHandlers[el.id]
+        }
+        damageDisplayHide(el.id);
     });
 
     // Don't recreate handlers - just use the existing ones
@@ -418,8 +427,13 @@ function switchPlayer() {
 }
 // Store enemy click handlers globally
 const enemyClickHandlers = {};
+const enemyHoverHandlers = {}
+const enemyMouseLeaveHandlers = {}
 
+
+let agentSelectedToAttack;
 function SelectToAttack(agent) {
+    agentSelectedToAttack = document.getElementById(agent);
     const agentEl = document.getElementById(agent);
     const wasSelected = agentEl.classList.contains("selected");
 
@@ -438,6 +452,14 @@ function SelectToAttack(agent) {
             el.removeEventListener("click", enemyClickHandlers[el.id]);
             delete enemyClickHandlers[el.id];
         }
+        if (enemyHoverHandlers[el.id]){
+            el.removeEventListener("mouseover", enemyHoverHandlers[el.id]);
+            delete enemyHoverHandlers[el.id]
+        }
+        if (enemyMouseLeaveHandlers[el.id]){
+            el.removeEventListener("mouseleave", enemyMouseLeaveHandlers[el.id])
+            delete enemyMouseLeaveHandlers[el.id]
+        }
     });
 
     // If it wasn't selected, select it now and make enemies damageable
@@ -450,17 +472,63 @@ function SelectToAttack(agent) {
             el.classList.add("damageable");
             el.style.pointerEvents = "auto";
 
+
+            enemyHoverHandlers[el.id] = () => damageDisplay(el.id);
+            el.addEventListener("mouseover", enemyHoverHandlers[el.id]);
+
+            enemyMouseLeaveHandlers[el.id] = () => damageDisplayHide(el.id);
+            el.addEventListener("mouseleave", enemyMouseLeaveHandlers[el.id])
+
             // Create and store the handler
             enemyClickHandlers[el.id] = () => damageAgent(el.id);
             el.addEventListener("click", enemyClickHandlers[el.id]);
         });
     }
 }
+function damageDisplay(agentId){
+    let agent = document.getElementById(agentId);
+
+    weaponDamageLUT(agentSelectedToAttack.weapon);
+
+
+    let damageCalc =agent.health - damage * ammo;
+    agent.querySelector(".heart").textContent = damageCalc.toString();
+    agent.querySelector(".heart").style.color = "red";
+}
+function damageDisplayHide(agentId) {
+    let agent = document.getElementById(agentId);
+    let damageCalc =agent.health;
+    agent.querySelector(".heart").textContent = damageCalc.toString();
+    agent.querySelector(".heart").style.color = "white";
+}
 
 function damageAgent(agentId) {
     let agent = document.getElementById(agentId);
     console.log("damaging agent:", agent.id);
-    agent.health -= 2;
+    weaponDamageLUT(agentSelectedToAttack.weapon)
+    console.log(`Firing ${ammo} shots with ${agent.weapon}. Damage: ${damage}, Hit Chance: ${chanceToHit}%`);
+
+
+    for (let i = 0; i < ammo; i++) {
+        const randomChance = Math.floor(Math.random() * 100);
+
+        if (randomChance < chanceToHit) {
+            // HIT confirmed!
+            agent.health -= damage;
+            console.log(`Shot ${i + 1}: HIT! Health remaining: ${agent.health}`);
+
+            // OPTIONAL: Add a check here if the agent is defeated
+            if (agent.health <= 0) {
+                console.log("Agent defeated!");
+                agent.health = 0;
+                break; // Stop firing if the target is defeated
+            }
+        } else {
+            // MISS confirmed!
+            console.log(`Shot ${i + 1}: MISS. Health remaining: ${agent.health}`);
+        }
+    }
+
     console.log("New health:", agent.health);
 
     // Update the health display
@@ -469,12 +537,96 @@ function damageAgent(agentId) {
         healthDisplay.textContent = agent.health;
     }
     socket.emit("damageAgent", agentId, 2);//2 is only for now, later replace with varriabnle!
-    damageOutput(agentId, 2);
     setTimeout(() => {
         switchPlayer();
     }, 1000);
-
 }
+
+let damage = 0;
+let ammo = 0;
+let chanceToHit = 0;
+function weaponDamageLUT(weapon){
+    if(weapon === "classic"){
+        damage = 2;
+        ammo = 3;
+        chanceToHit = 75;
+    }else if(weapon === "shorty"){
+        damage = 4;
+        ammo = 1;
+        chanceToHit = 45;
+    }else if(weapon === "frenzy"){
+        damage = 3;
+        ammo = 3;
+        chanceToHit = 60;
+    }else if(weapon === "ghost"){
+        damage = 4;
+        ammo = 4;
+        chanceToHit = 70;
+    }else if(weapon === "sheriff"){
+        damage = 6;
+        ammo = 2;
+        chanceToHit = 85;
+    }else if(weapon === "bucky"){
+        damage = 7;
+        ammo = 2;
+        chanceToHit = 50;
+    }else if(weapon === "judge"){
+        damage = 6;
+        ammo = 3;
+        chanceToHit = 55;
+    }else if(weapon === "stinger"){
+        damage = 4;
+        ammo = 4;
+        chanceToHit = 65;
+    }else if(weapon === "spectre"){
+        damage = 5;
+        ammo = 5;
+        chanceToHit = 70;
+    }else if(weapon === "bulldog"){
+        damage = 6;
+        ammo = 5;
+        chanceToHit = 75;
+    }else if(weapon === "guardian"){
+        damage = 7;
+        ammo = 3;
+        chanceToHit = 85;
+    }else if(weapon === "phantom"){
+        damage = 8;
+        ammo = 6;
+        chanceToHit = 80;
+    }else if(weapon === "vandal"){
+        damage = 8;
+        ammo = 5;
+        chanceToHit = 80;
+    }else if(weapon === "ares"){
+        damage = 6;
+        ammo = 8;
+        chanceToHit = 60;
+    }else if(weapon === "odin"){
+        damage = 7;
+        ammo = 10;
+        chanceToHit = 55;
+    }else if(weapon === "marshal"){
+        damage = 8;
+        ammo = 1;
+        chanceToHit = 90;
+    }else if(weapon === "outlaw"){
+        damage = 9;
+        ammo = 2;
+        chanceToHit = 92;
+    }else if(weapon === "operator"){
+        damage = 10;
+        ammo = 1;
+        chanceToHit = 95;
+    }else {
+        // Default values
+        damage = 1;
+        ammo = 1;
+        chanceToHit = 100;
+    }
+}
+
+
 socket.on("damageAgent", (agentId, damage) => {
     let agent = document.getElementById(agentId.replace("enemy_", ""));
     console.log("Enemy damaging your agent:", agent.id);
@@ -484,10 +636,6 @@ socket.on("damageAgent", (agentId, damage) => {
     agent.querySelector(".heart").innerHTML = agent.health;
 
 });
-function damageOutput(agentId, damage) {
-    let agent = document.getElementById(agentId);
-
-}
 
 function UpdatePermisions() {
   if (ImPlaying) {
@@ -563,6 +711,11 @@ let cardSpacing = window.innerWidth * 0.06;
 
 let cardOpenEnabled = true;
 let canDrag = true;
+
+let pressTimer = null;
+let hasUpdatedZIndex = false;
+
+
 function mouseDown(e, cardElement) {
   activeCard = cardElement;
 
@@ -582,8 +735,17 @@ function mouseDown(e, cardElement) {
 
   console.log("MouseDown:", cardElement.id, activeCard.id);
 
-  updateZIndex(activeCard.id);
-  whereCanPlace(cardElement);
+      //updateZIndex(activeCard.id);
+
+    // Start a timer - update z-index after 150ms
+    hasUpdatedZIndex = false;
+    pressTimer = setTimeout(() => {
+        updateZIndex(activeCard.id);
+        hasUpdatedZIndex = true;
+    }, 300); // Adjust this duration as needed (in milliseconds)
+
+
+    whereCanPlace(cardElement);
 
   startX = e.clientX;
   startY = e.clientY;
@@ -642,12 +804,21 @@ console.log("card type: " + cardElement.type);
 let agent0, agent1, agent2;
 
 
+
+
 function mouseMove(e) {
   newX = startX - e.clientX;
   newY = startY - e.clientY;
 
-  startX = e.clientX;
-  startY = e.clientY;
+
+    startX = e.clientX;
+    startY = e.clientY;
+
+
+    const deltaX = Math.abs(e.clientX - startX);
+    const deltaY = Math.abs(e.clientY - startY);
+
+
 
   activeCard.style.top = activeCard.offsetTop - newY + "px";
   activeCard.style.left = activeCard.offsetLeft - newX + "px";
@@ -893,6 +1064,17 @@ let endScreen = document.getElementById("endScreen");
 
 function mouseUp() {
   console.log("MouseUp:", activeCard?.id);
+
+    // Clear the timer in case mouseUp happens before the timeout
+    clearTimeout(pressTimer);
+    pressTimer = null;
+    hasUpdatedZIndex = false;
+
+    if (!dragged) {
+        isLocked = null;
+    }
+
+
   if (!dragged) {
     isLocked = null;
   }
@@ -924,6 +1106,9 @@ function mouseUp() {
         console.log("gun card on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
+        if (container === 1){
+
+        }
     }else  if(activeCard.type === "arc rose" && (container === 4 || container === 5 || container === 6)){
         console.log("arc rose on invalid container - forcing return to deck");
         container = null;
@@ -1022,6 +1207,24 @@ function mouseUp() {
         isLocked = 0;
     }
 
+    if (activeCard.type === "gun"){
+        let agent = null;
+        if (container === 4){
+            agent = agent0;
+        } else if (container === 5){
+            agent = agent1;
+        } else if (container === 6){
+            agent = agent2;
+        }
+
+        // Only apply weapon if we have a valid agent
+        if (agent) {
+            agent.weapon = activeCard.weaponName; // Use the stored name!
+            console.log("weapon applied: " + agent.weapon + " to " + agent.id);
+        }
+    }
+
+
   if (activeCard.spawning === true) {
     let purple = document.getElementById("luh");
 
@@ -1117,7 +1320,7 @@ function mouseUp() {
         dmg = 2;
       } else {
         dmg = 3;
-      }
+      }*/
 
 
       if (agent) {
@@ -1143,7 +1346,7 @@ function mouseUp() {
       console.log("Health:", agent0.health, "Name:", agent0.id);
       console.log("Health:", agent1.health, "Name:", agent1.id);
       console.log("Health:", agent2.health, "Name:", agent2.id);
-    */
+
     }
   } else if (
     isLocked === 0 &&
@@ -1529,6 +1732,15 @@ function createCard(id, initialX, initialY, buttonId) {
     const index = cardSymb.indexOf(imgSelect);
     cardElement.price = priceList[index];
     cardElement.type = "gun"
+
+      cardElement.weaponName = imgSelect
+          .replace('url("images/guns/', '')
+          .replace('.png")', '');
+
+      console.log("Created gun card:", cardElement.weaponName);
+
+
+
   } else if (buttonId === "randBtn"){
     cardElement.price = 0;
   } else {
