@@ -82,7 +82,7 @@ body {
 }
 
 #agentSelectMenuBackground h2 {
-  font-family: "VALORANT", sans-serif;
+    font-family: "fabiola-capitals", sans-serif;
   color: white;
   font-size: 3vw;
   margin-bottom: 4vh;
@@ -118,6 +118,7 @@ body {
 }
 #sage:before {
   background-image: url("images/agents/sage.png");
+
 }
 #skye:before {
   background-image: url("images/agents/skye.png");
@@ -208,6 +209,7 @@ body {
       hue-rotate(342deg) brightness(89%) contrast(92%)
   );
 }
+
 .agentSelect:hover {
 
     box-shadow: 0px 0px 7vw 1vw rgba(250,201,53,0.46);
@@ -343,8 +345,8 @@ body {
     top: -14.3vw;
     left: 8vw;
     color: white;
-    font-size: 1.3vw;
-    font-family: "VALORANT", sans-serif;
+    font-size: 2vw;
+    font-family: "fabiola-capitals", sans-serif;
     z-index: 1001;
 }
 
@@ -574,12 +576,13 @@ body {
   border-radius: 50%;
   cursor: pointer;
   transition-duration: 0.5s;
+
 }
 
 #shopText {
-  font-family: "VALORANT", sans-serif;
-  color: #38334a;
-  font-size: 1vw;
+    font-family: "fabiola-capitals", sans-serif;
+  color: #dca61e;
+  font-size: 2vw;
   transition-duration: 0.5s;
   text-overflow: ellipsis;
 }
@@ -609,6 +612,27 @@ body {
   justify-content: center;
 }
 
+#endScreen {
+    top: -100vh;
+    position: fixed;
+    height: 100%;
+    width: 100vw;
+    transition-duration: 0.5s;
+    transition-timing-function: ease-in-out;
+    z-index: 99;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #38334a;
+}
+
+#endText {
+    font-family: "fabiola-capitals", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 6.7vw;
+}
+
 
 .spawnButtons{
   cursor: pointer;
@@ -617,14 +641,14 @@ body {
     z-index: 100;
     border-radius: 0.2vw;
     border: none;
-    font-family: "corsario-variable", sans-serif;
+    font-family: "fabiola-capitals", sans-serif;
     font-weight: 400;
     font-style: normal;
     font-size: 0.7vw;
     text-align: center;
-    color: pink;
+    color: #dca61e;
     background-position: center;
-    background-color: #38334a;
+    background-color: #112250;
     background-repeat: no-repeat;
     display: flex;
     align-items: flex-start;
@@ -642,22 +666,24 @@ body {
 }
 
 .spawnButtons .priceWpn {
-    font-size: 1vw;
+    font-size: 1.25vw;
     font-weight: bold;
     margin-bottom: -0.3vw;
     color: white;
+    letter-spacing: 0.05vw;
 }
 
 .spawnButtons .nameWpn {
-    font-size: 1vw;
+    font-size: 1.4vw;
+    letter-spacing: 0.06vw;
 }
 
 #marshalBtn .nameWpn, #outlawBtn .nameWpn, #operatorBtn .nameWpn {
-    font-size: 0.7vw;
+    font-size: 1vw;
 }
 
 #marshalBtn .priceWpn, #outlawBtn .priceWpn, #operatorBtn .priceWpn {
-    font-size: 0.6vw;
+    font-size: 1vw;
 }
 
 #shopContainer{
@@ -753,16 +779,17 @@ body {
 .category {
     width: 100%;
     height: 1.5vw;
-    background-color: rgba(141, 133, 171);
+    background-color: #48172d;
     text-align: center;
     border-radius: 0.2vw;
     line-height: 1.5vw;
     user-select: none;
     pointer-events: auto;
-    font-family: "fabiola-capitals", sans-serif;
+    font-family: "corsario-variable", sans-serif;
     font-weight: 400;
     font-style: normal;
-    font-size: 1.5vw;
+    font-size: 1vw;
+    color: #dca61e;
 }
 
 #abilityHolder{
@@ -919,16 +946,19 @@ body {
     height: 6.5vw;
     position: relative;
     left: -1vw;
-    background-color: darkseagreen;
+    background-color: #48172d;
     border-radius: 0.2vw;
     justify-content: flex-end;
     align-items: center;
     display: flex;
     flex-direction: column;
-    background-size: cover;
+    background-position: center;
+    background-size: 100%;
+    background-repeat: no-repeat;
     cursor: pointer !important;
     z-index: 10000;
     user-select: none;
+    transition-duration: 0.3s;
     transition: background-image 0.2s ease, opacity 0.2s ease;
     opacity: 1;
 }
@@ -993,11 +1023,14 @@ body {
 }
 
 #luhText{
-    color: pink;
-    font-size: 4.5vw;
+    color: #dca61e;
+    font-size: 5.5vw;
     font-family: "fabiola-capitals", sans-serif;
     font-weight: 400;
     font-style: normal;
+    text-align: center;
+    line-height: 3vw;
+    padding-top: 1.7vw;
 }
 
 #money {
@@ -1006,15 +1039,7 @@ body {
     font-style: normal;
     color: white;
     font-size: 4.5vw;
-}
-
-#health {
-  position: fixed;
-  top: 3vw;
-  left: 50vw;
-  font-family: 'VALORANT', sans-serif;
-  color: white;
-  font-size: 3vw;
+    letter-spacing: 0.05vw;
 }
 
 /* HTML: <div class="parallelogram"></div> */
@@ -1033,7 +1058,7 @@ body {
 
     text-align: center;
     line-height: 2.5vw;
-    font-family: 'VALORANT', sans-serif;
+    font-family: "fabiola-capitals", sans-serif;
     color: white;
     font-size: 1vw;
     -webkit-user-select: none; /* Safari */
@@ -1063,7 +1088,7 @@ body {
 
     text-align: center;
     line-height: 2.5vw;
-    font-family: 'VALORANT', sans-serif;
+    font-family: "fabiola-capitals", sans-serif;
     color: white;
     font-size: 1vw;
     -webkit-user-select: none; /* Safari */
@@ -1124,6 +1149,7 @@ body {
     position:absolute;
     inset:0;
     backface-visibility: hidden;
+    filter: saturate(150%);
 }
 .back {
     transform: rotateY(180deg);
@@ -1131,7 +1157,7 @@ body {
     text-align: center;
     line-height: 14vw;
     color: #F2C3F7;
-
+    filter: saturate(150%);
 }
 
 .close {
@@ -1151,7 +1177,7 @@ body {
     position: absolute;
     width: 100%;
     top: 50%;
-    background: pink;
+    background: #ab8117;;
     transition: background 0.3s;
 }
 
@@ -1182,4 +1208,24 @@ body {
 .close.pointy::after {
     width: 200%;
     left: -50%;
+}
+
+.heart {
+    height: 3vw; /* adjust to control the size */
+    aspect-ratio: 1;
+    --_m: radial-gradient(#000 69%,#0000 70%) 84.5%/50%;
+    -webkit-mask-box-image: var(--_m);
+    mask-border: var(--_m);
+    clip-path: polygon(-41% 0,50% 91%, 141% 0);
+    background: #ab8117;
+    z-index: 10000;
+    position: relative;
+    top: -16vw;
+    left: 8.48vw;
+    font-size: 1.6vw;
+    text-align: center;
+    padding-left: 0.1vw;
+    line-height: 2.3vw;
+    color: white;
+    font-family: "corsario-variable", sans-serif;
 }

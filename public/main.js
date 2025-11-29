@@ -42,19 +42,19 @@ gsap.to(card2, {
   duration: "0.2",
 }); */
 
-const dropper1 = document.getElementById("drop1");
-const dropper2 = document.getElementById("drop2");
-const dropper3 = document.getElementById("drop3");
-const dropper4 = document.getElementById("drop4");
-const dropper5 = document.getElementById("drop5");
-const dropper6 = document.getElementById("drop6");
+let dropper1 = document.getElementById("drop1");
+let dropper2 = document.getElementById("drop2");
+let dropper3 = document.getElementById("drop3");
+let dropper4 = document.getElementById("drop4");
+let dropper5 = document.getElementById("drop5");
+let dropper6 = document.getElementById("drop6");
 
-const domRect2 = dropper1.getBoundingClientRect();
-const domRect3 = dropper2.getBoundingClientRect();
-const domRect4 = dropper3.getBoundingClientRect();
-const domRect5 = dropper4.getBoundingClientRect();
-const domRect6 = dropper5.getBoundingClientRect();
-const domRect7 = dropper6.getBoundingClientRect();
+let domRect2 = dropper1.getBoundingClientRect();
+let domRect3 = dropper2.getBoundingClientRect();
+let domRect4 = dropper3.getBoundingClientRect();
+let domRect5 = dropper4.getBoundingClientRect();
+let domRect6 = dropper5.getBoundingClientRect();
+let domRect7 = dropper6.getBoundingClientRect();
 
 const randBtn = document.getElementById("randBtn");
 const spawnButtons = document.querySelectorAll(".spawnButtons");
@@ -309,7 +309,7 @@ function spawnEnemyAgent(agentName, dropper) {
 
     // Add health display element
     const healthDisplay = document.createElement("div");
-    healthDisplay.className = "agentHealth";
+    healthDisplay.className = "heart";
     healthDisplay.textContent = "10";
     enemyAgent.appendChild(healthDisplay);
 
@@ -464,7 +464,7 @@ function damageAgent(agentId) {
     console.log("New health:", agent.health);
 
     // Update the health display
-    const healthDisplay = agent.querySelector(".agentHealth");
+    const healthDisplay = agent.querySelector(".heart");
     if (healthDisplay) {
         healthDisplay.textContent = agent.health;
     }
@@ -481,7 +481,7 @@ socket.on("damageAgent", (agentId, damage) => {
     console.log("old health:", agent.health);
     agent.health -= damage;
     console.log("New health:", agent.health);
-    agent.querySelector(".agentHealth").innerHTML = agent.health;
+    agent.querySelector(".heart").innerHTML = agent.health;
 
 });
 function damageOutput(agentId, damage) {
@@ -603,6 +603,7 @@ function whereCanPlace(cardElement) {
 
 let agent0, agent1, agent2;
 
+
 function mouseMove(e) {
   newX = startX - e.clientX;
   newY = startY - e.clientY;
@@ -617,7 +618,6 @@ function mouseMove(e) {
   dropPlay = 1;
   dragged = true;
 
-  console.log(agentsChosen);
 
   let purple = document.getElementById("luh");
   let purpleRect = purple.getBoundingClientRect();
@@ -643,7 +643,15 @@ function mouseMove(e) {
 
   activeCard.draggedAO = true;
 
-  console.log(isLocked);
+
+  agent0.querySelector(".heart").textContent = agent0.health;
+  agent1.querySelector(".heart").textContent = agent1.health;
+  agent2.querySelector(".heart").textContent = agent2.health;
+
+  agent0.querySelector(".heart").style.color = "white";
+  agent1.querySelector(".heart").style.color = "white";
+  agent2.querySelector(".heart").style.color = "white";
+
 
   //box1
   const domRect1 = activeCard.getBoundingClientRect();
@@ -707,6 +715,7 @@ function mouseMove(e) {
       isLocked = 1;
       container = 3;
       scale();
+
     } else if (
       !(
         domRect1.top > domRect5.bottom ||
@@ -718,6 +727,8 @@ function mouseMove(e) {
       isLocked = 1;
       container = 4;
       scale();
+      agent0.querySelector(".heart").textContent = agent0.health - activeCard.dmg;
+        agent0.querySelector(".heart").style.color = "red";
     } else if (
       !(
         domRect1.top > domRect6.bottom ||
@@ -729,6 +740,8 @@ function mouseMove(e) {
       isLocked = 1;
       container = 5;
       scale();
+      agent1.querySelector(".heart").textContent = agent1.health - activeCard.dmg;
+        agent1.querySelector(".heart").style.color = "red";
     } else if (
       !(
         domRect1.top > domRect7.bottom ||
@@ -740,6 +753,8 @@ function mouseMove(e) {
       isLocked = 1;
       container = 6;
       scale();
+      agent2.querySelector(".heart").textContent = agent2.health - activeCard.dmg;
+        agent2.querySelector(".heart").style.color = "red";
     } else {
       isLocked = 0;
       container = null;
@@ -765,6 +780,8 @@ function mouseMove(e) {
 
   distanceFind();
 }
+
+let endScreen = document.getElementById("endScreen");
 
 function mouseUp() {
   console.log("MouseUp:", activeCard?.id);
@@ -857,7 +874,7 @@ function mouseUp() {
     }
 
     if (dragged && container !== 0) {
-/*      let dmg;
+      let dmg;
 
       if (
         getComputedStyle(activeCard).backgroundImage.includes("Artual.jpeg")
@@ -871,18 +888,30 @@ function mouseUp() {
         dmg = 3;
       }
 
-      health -= dmg;
 
       if (agent) {
         agent.health -= dmg;
-        agent.querySelector(".agentHealth").textContent = agent.health;
+
+        if (agent.health <= 0){
+            agent.querySelector(".heart").textContent = 0;
+            console.log(agent.id)
+            gsap.to(agent, {
+                filter: "grayscale(1)",
+                duration:  0.5,
+            });
+            if(agent0.health <= 0 && agent1.health <= 0 && agent2.health <= 0){
+                console.log("i love cock so fucking mch")
+                endScreen.style.top = "0vh";
+            }
+        }
+        else {
+            agent.querySelector(".heart").textContent = agent.health;
+        }
       }
 
       console.log("Health:", agent0.health, "Name:", agent0.id);
       console.log("Health:", agent1.health, "Name:", agent1.id);
       console.log("Health:", agent2.health, "Name:", agent2.id);
-      healthtext.innerHTML = health;
-      console.log(health);*/
     }
   } else if (
     isLocked === 0 &&
@@ -1213,21 +1242,21 @@ function createCard(id, initialX, initialY, buttonId) {
     let qIndex, eIndex, cIndex;
 
 // choose indices per agent (use the same indices you've been using)
-    if (bg.includes("skye.png")) {
+    if (bg.includes("skye_icon.webp")) {
         qIndex = 21; eIndex = 6;  cIndex = 14;
-    } else if (bg.includes("sage.png")) {
+    } else if (bg.includes("sage_icon.webp")) {
         qIndex = 18; eIndex = 7;  cIndex = 1;
-    } else if (bg.includes("jett.png")) {
+    } else if (bg.includes("jett_icon.webp")) {
         qIndex = 23; eIndex = 20; cIndex = 2;
-    } else if (bg.includes("vyse.png")) {
+    } else if (bg.includes("vyse_icon.webp")) {
         qIndex = 16; eIndex = 0;  cIndex = 12;
-    } else if (bg.includes("omen.png")) {
+    } else if (bg.includes("omen_icon.webp")) {
         qIndex = 10; eIndex = 4;  cIndex = 19;
-    } else if (bg.includes("clove.png")) {
+    } else if (bg.includes("clove_icon.webp")) {
         qIndex = 8;  eIndex = 15; cIndex = 11;
-    } else if (bg.includes("iso.png")) {
+    } else if (bg.includes("iso_icon.webp")) {
         qIndex = 22; eIndex = 5;  cIndex = 3;
-    } else if (bg.includes("sova.png")) {
+    } else if (bg.includes("sova_icon.webp")) {
         qIndex = 17; eIndex = 13; cIndex = 9;
     }
 
@@ -1252,8 +1281,15 @@ function createCard(id, initialX, initialY, buttonId) {
         imgSelect = cardSymb[buttonMap[buttonId]];
     }
 
+    const front = document.createElement("div");
+    front.className = "face front";
+    const back = document.createElement("div");
+    back.className = "face back";
 
-  cardElement.style.backgroundImage = imgSelect;
+
+    front.style.backgroundImage = imgSelect;
+    front.style.backgroundSize = "cover";
+    front.style.backgroundPosition = "center";
 
   // TODO [yell]: // PRICES
 
@@ -1269,10 +1305,7 @@ function createCard(id, initialX, initialY, buttonId) {
     cardElement.price = abilityPrice[abIndex];
   }
 
-  const front = document.createElement("div");
-  front.className = "face front";
-  const back = document.createElement("div");
-  back.className = "face back";
+
   if (buttonId !== "randBtn" && buttonId !== "ab1" && buttonId !== "ab2" && buttonId !== "ab3"){
       back.style.backgroundImage = "url(images/guns/back.png)";
   } else {
@@ -1355,6 +1388,7 @@ function createCard(id, initialX, initialY, buttonId) {
   cardElement.deleteTrigger = false;
   cardElement.draggedAO = false; //maybe useless
   cardElement.spawning = true;
+  cardElement.dmg = 3;
 
   cardElement.addEventListener("mousedown", (e) => mouseDown(e, cardElement));
 
@@ -1593,18 +1627,17 @@ function updateAgent() {
 
   // After the fade duration, switch the image and fade back in
   setTimeout(() => {
-    agentBtn.style.backgroundImage = `url(images/agents/${agentName}.png)`;
+    agentBtn.style.backgroundImage = `url(images/agentIcon/${agentName}_icon.webp)`;
+    console.log(`url(images/agentIcon/${agentName}_icon.webp)`);
     agentBtn.classList.remove("fade-img");
   }, 200); // matches your CSS transition
 
   for(let i = 0; i < circles.length; i++) {
     circles[i].style.backgroundColor = "white";
   }
-  circles[currentCircle].style.backgroundColor = "pink";
+  circles[currentCircle].style.backgroundColor = "#dca61e";
 
-    ab1.style.backgroundSize = "2.5vw"
-    ab2.style.backgroundSize = "3.5vw"
-    ab3.style.backgroundSize = "3.5vw"
+
 }
 
 // Update abNames to take agentName as parameter
@@ -1619,9 +1652,9 @@ function abNames(agent) {
         ab1.querySelector(".priceWpn").innerText = abilityPrice[qIndex] + "c";
         ab2.querySelector(".priceWpn").innerText = abilityPrice[eIndex] + "c";
         ab3.querySelector(".priceWpn").innerText = abilityPrice[cIndex] + "c";
-        ab1.style.backgroundSize = "2.5vw"
-        ab2.style.backgroundSize = "3.5vw"
-        ab3.style.backgroundSize = "4.5vw"
+        ab1.style.backgroundSize = "2.3vw"
+        ab2.style.backgroundSize = "2.9vw"
+        ab3.style.backgroundSize = "2.8vw"
 
     } else if (agent === "sage") {
         qIndex = 18; eIndex = 7;  cIndex = 1;
@@ -1631,9 +1664,9 @@ function abNames(agent) {
         ab1.querySelector(".priceWpn").innerText = abilityPrice[qIndex] + "c";
         ab2.querySelector(".priceWpn").innerText = abilityPrice[eIndex] + "c";
         ab3.querySelector(".priceWpn").innerText = abilityPrice[cIndex] + "c";
-        ab1.style.backgroundSize = "2.5vw"
-        ab2.style.backgroundSize = "3.5vw"
-        ab3.style.backgroundSize = "1.5vw"
+        ab1.style.backgroundSize = "2.75vw"
+        ab2.style.backgroundSize = "2.75vw"
+        ab3.style.backgroundSize = "3.2vw"
     } else if (agent === "jett") {
         qIndex = 23; eIndex = 20; cIndex = 2;
         ab1.querySelector(".nameWpn").innerText = "UPDRAFT";
@@ -1653,9 +1686,9 @@ function abNames(agent) {
         ab1.querySelector(".priceWpn").innerText = abilityPrice[qIndex] + "c";
         ab2.querySelector(".priceWpn").innerText = abilityPrice[eIndex] + "c";
         ab3.querySelector(".priceWpn").innerText = abilityPrice[cIndex] + "c";
-        ab1.style.backgroundSize = "2.5vw"
-        ab2.style.backgroundSize = "2.5vw"
-        ab3.style.backgroundSize = "3.5vw"
+        ab1.style.backgroundSize = "3.2vw"
+        ab2.style.backgroundSize = "3vw"
+        ab3.style.backgroundSize = "3.2vw"
     } else if (agent === "omen") {
         qIndex = 10; eIndex = 4;  cIndex = 19;
         ab1.querySelector(".nameWpn").innerText = "PARANOIA";
@@ -1664,9 +1697,9 @@ function abNames(agent) {
         ab1.querySelector(".priceWpn").innerText = abilityPrice[qIndex] + "c";
         ab2.querySelector(".priceWpn").innerText = abilityPrice[eIndex] + "c";
         ab3.querySelector(".priceWpn").innerText = abilityPrice[cIndex] + "c";
-        ab1.style.backgroundSize = "3.5vw"
-        ab2.style.backgroundSize = "3.5vw"
-        ab3.style.backgroundSize = "3.5vw"
+        ab1.style.backgroundSize = "3vw"
+        ab2.style.backgroundSize = "2.5vw"
+        ab3.style.backgroundSize = "2.75vw"
     } else if (agent === "clove") {
         qIndex = 8;  eIndex = 15; cIndex = 11;
         ab1.querySelector(".nameWpn").innerText = "MEDDLE";
@@ -1675,9 +1708,9 @@ function abNames(agent) {
         ab1.querySelector(".priceWpn").innerText = abilityPrice[qIndex] + "c";
         ab2.querySelector(".priceWpn").innerText = abilityPrice[eIndex] + "c";
         ab3.querySelector(".priceWpn").innerText = abilityPrice[cIndex] + "c";
-        ab1.style.backgroundSize = "2.5vw"
-        ab2.style.backgroundSize = "2.5vw"
-        ab3.style.backgroundSize = "3.5vw"
+        ab1.style.backgroundSize = "3.2vw"
+        ab2.style.backgroundSize = "2.7vw"
+        ab3.style.backgroundSize = "3vw"
     } else if (agent === "iso") {
         qIndex = 22; eIndex = 5;  cIndex = 3;
         ab1.querySelector(".nameWpn").innerText = "UNDERCUT";
@@ -1686,9 +1719,9 @@ function abNames(agent) {
         ab1.querySelector(".priceWpn").innerText = abilityPrice[qIndex] + "c";
         ab2.querySelector(".priceWpn").innerText = abilityPrice[eIndex] + "c";
         ab3.querySelector(".priceWpn").innerText = abilityPrice[cIndex] + "c";
-        ab1.style.backgroundSize = "2.5vw"
-        ab2.style.backgroundSize = "1.5vw"
-        ab3.style.backgroundSize = "4.5vw"
+        ab1.style.backgroundSize = "2.8vw"
+        ab2.style.backgroundSize = "2vw"
+        ab3.style.backgroundSize = "3vw"
     } else if (agent === "sova") {
         qIndex = 17; eIndex = 13; cIndex = 9;
         ab1.querySelector(".nameWpn").innerText = "SHOCK BOLT";
@@ -1697,8 +1730,8 @@ function abNames(agent) {
         ab1.querySelector(".priceWpn").innerText = abilityPrice[qIndex] + "c";
         ab2.querySelector(".priceWpn").innerText = abilityPrice[eIndex] + "c";
         ab3.querySelector(".priceWpn").innerText = abilityPrice[cIndex] + "c";
-        ab1.style.backgroundSize = "1.5vw"
-        ab2.style.backgroundSize = "3.5vw"
+        ab1.style.backgroundSize = "2.7vw"
+        ab2.style.backgroundSize = "2.9vw"
         ab3.style.backgroundSize = "3.5vw"
     }
 
@@ -1720,9 +1753,56 @@ function updateZIndex(cardId) {
   }
 }
 
-/* window.onresize = function () {
-  location.replace(location.href);
-}; */
+ window.onresize = function () {
+     dropper1 = document.getElementById("drop1");
+     dropper2 = document.getElementById("drop2");
+     dropper3 = document.getElementById("drop3");
+     dropper4 = document.getElementById("drop4");
+     dropper5 = document.getElementById("drop5");
+     dropper6 = document.getElementById("drop6");
+
+     domRect2 = dropper1.getBoundingClientRect();
+     domRect3 = dropper2.getBoundingClientRect();
+     domRect4 = dropper3.getBoundingClientRect();
+     domRect5 = dropper4.getBoundingClientRect();
+     domRect6 = dropper5.getBoundingClientRect();
+     domRect7 = dropper6.getBoundingClientRect();
+
+     updateAgentPositionsOnResize();
+     updateDeckPositionsOponent(0);
+     updateDeckPositions(0);
+};
+
+function updateAgentPositionsOnResize() {
+    // Make sure droppers exist
+    const d4 = document.getElementById("drop4");
+    const d5 = document.getElementById("drop5");
+    const d6 = document.getElementById("drop6");
+    const d1 = document.getElementById("drop1");
+    const d2 = document.getElementById("drop2");
+    const d3 = document.getElementById("drop3");
+    if (!d4 || !d5 || !d6) return;
+
+    // Helper to animate element to a dropper's current left/top
+    function moveToDrop(el, dropper ) {
+        if (el.classList.contains("animating")) return; // don't interfere
+        const rect = dropper.getBoundingClientRect();
+        gsap.to(el, {
+            left: rect.left + "px",
+            top: rect.top + "px",
+            duration: 0,
+            overwrite: true
+        });
+    }
+    // Move player's locked-in agents (agentsChosen order -> drop4,drop5,drop6)
+
+    const drops = [d4, d5, d6];
+    for (let i = 0; i < 3; i++) {
+        const nameOrEl = agentsChosen[i];
+        let el = document.getElementById(nameOrEl);
+        moveToDrop(el, drops[i]);
+    }
+}
 
 function roundOver() {
   creds = creds + 200;
