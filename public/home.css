@@ -9,15 +9,57 @@ body {
     user-select: none;
 }
 
+    #container {
+        position: relative;
+        height: 100vh;
+        width: 100%;
+    //border: solid 1px red;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+
 #cont {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     position: absolute;
-    right: 5vw;
+    right: 10vw;
+    top: -2vw;
     justify-content: center;
     height: 100vh;
-    gap: 2vw;
+    gap: 1.5vw;
+    pointer-events: none;
+}
+
+#info {
+    width: 100vw;
+    height: 3vw;
+    font-family: "fabiola-capitals", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    background-color: #292a33;
+    color: white;
+    text-align: center;
+    font-size: 4vw;
+    border: none;
+    pointer-events: all;
+    z-index: 3;
+    display: flex;
+    bottom: 0;
+    position: fixed;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+#info p {
+    font-family: "fabiola-capitals", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 1.2vw;
+    color: white;
+    padding-left: 1vw;
 }
 
 #playerInput {
@@ -31,24 +73,32 @@ body {
     text-align: center;
     font-size: 4vw;
     outline: 13px ridge #DCA61E;
-    outline-offset: 0px;
-    border: none;
+    border: 1px solid #DCA61E;
+    pointer-events: all;
+    z-index: 2;
 }
 
 #create {
     width: 25vw;
-    height: 10vw;
+    height: 7vw;
+    background-color: #292a33;
+    text-align: center;
+    outline: 13px ridge #DCA61E;
+    cursor: pointer;
+    border: 1px solid #DCA61E;
+    pointer-events: all;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#create p {
     font-family: "fabiola-capitals", sans-serif;
     font-weight: 400;
     font-style: normal;
-    background-color: #292a33;
+    font-size: 3vw;
     color: white;
-    text-align: center;
-    font-size: 4vw;
-    outline: 13px ridge #DCA61E;
-    outline-offset: 0px;
-    cursor: pointer;
-    border: none;
 }
 
 .glint {

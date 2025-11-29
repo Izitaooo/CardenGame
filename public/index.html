@@ -8,29 +8,50 @@
 </head>
 <body>
 <div id="cont">
+
     <input type="text" id="playerInput" placeholder="room name..." autocomplete="off" maxlength="20">
-    <div>
-        <div onclick="createRoom()"  id="create">
-            <p>create or join room</p>
-            <div class="glint"></div>
-        </div>
+    <div onclick="createRoom()"  id="create">
+        <p>create or join room</p>
     </div>
 </div>
-
-<img
-        id="backgroundIndex"
-        src="images/background2.webp"
-        style="
+<div id="info">
+    <p>This is a valorant fan project! not at all associated with Riot Games!</p>
+</div>
+<div id="container">
+    <img
+            id="backgroundIndex"
+            src="images/background-background.webp"
+            style="
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        z-index: -1;
+        z-index: -2;
         object-fit: cover;
         pointer-events: none;
+        display: block;
+        scale: 102%;
       "
-/>
+    />
+
+    <img
+            id="backgroundIndex2"
+            src="images/background-foreground.webp"
+            style="
+        position: fixed;
+        top: -2vw;
+        left: -4vw;
+        width: 110%;
+        height: 110%;
+        z-index: 1;
+        object-fit: cover;
+        pointer-events: none;
+        display: block;
+
+      "
+    />
+</div>
 
 
 <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
@@ -60,4 +81,7 @@
 
 </script>
 </body>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="plugins/gsap.min.js"></script>
+<script src="index.js"></script>
 </html>
