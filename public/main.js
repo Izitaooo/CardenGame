@@ -144,26 +144,15 @@ function lockIn() {
     agent0 = document.getElementById(agentsChosen[0]);
     agent1 = document.getElementById(agentsChosen[1]);
     agent2 = document.getElementById(agentsChosen[2]);
-/*     enemyAgent0 = enemyAgentElements[0];
-     enemyAgent1 = enemyAgentElements[1];
-     enemyAgent2 = enemyAgentElements[2];*/
 
       agent0.effects = [];
       agent1.effects = [];
       agent2.effects = [];
-/*      enemyAgent0.effects = [];
-      enemyAgent1.effects = [];
-      enemyAgent2.effects = [];*/
-
-
-
-
-
 
       for (let agent of agents) {
       if (agentsChosen.includes(agent)) {
         const el = document.getElementById(agent);
-        el.health = 10; // Add custom property here
+        el.health = 25; // Add custom property here
 
         //console.log("is there");
         document.getElementById(agent).classList.remove("selected");
@@ -274,7 +263,6 @@ function lockIn() {
   MainGameLoop();
 }
 let enemyAgents = [];
-
 socket.on("enemyChose", (data) => {
   enemyAgents = data.agentsChosen;
   //console.log("Enemy chose agents:", data.agentsChosen);
@@ -283,7 +271,6 @@ socket.on("enemyChose", (data) => {
     const dropper = document.getElementById("drop" + dropperNum);
 
     cardsGame.push(spawnEnemyAgent(agent, dropper));
-
   });
 
   // Animate all enemy agents
@@ -466,17 +453,6 @@ function switchPlayer() {
 
     socket.emit("switchRoles");
 }
-
-/*function removeEffect(agent, abilityName) {
-    const index = agent.effects.findIndex(e => e.name === abilityName);
-    if (index !== -1) {
-        agent.effects.splice(index, 1);
-        console.log(`Removed ${abilityName} from ${agent.id}`);
-        console.log("Remaining effects:", agent.effects);
-    }
-}*/
-
-
 // Store enemy click handlers globally
 const enemyClickHandlers = {};
 const enemyHoverHandlers = {}
@@ -821,15 +797,7 @@ function whereCanPlace(cardElement) {
     enemyAgent0 = enemyAgentElements[0];
     enemyAgent1 = enemyAgentElements[1];
     enemyAgent2 = enemyAgentElements[2];
-/*    enemyAgent0.effects = [];
-    enemyAgent1.effects = [];
-    enemyAgent2.effects = [];*/
-/*    enemyAgent0 = enemyAgentElements[0];
-    enemyAgent1 = enemyAgentElements[1];
-    enemyAgent2 = enemyAgentElements[2];
-    enemyAgent0.effects = [];
-    enemyAgent1.effects = [];
-    enemyAgent2.effects = [];*/
+
 console.log("card type: " + cardElement.type);
     if(cardElement.type === "gun"
         || cardElement.ability === "barrier orb"
@@ -890,6 +858,8 @@ function mouseMove(e) {
   inDeck = 0;
   dropPlay = 1;
   dragged = true;
+
+  console.log(isLocked);
 
   //console.log(agentsChosen);
 
@@ -1042,8 +1012,8 @@ function mouseMove(e) {
       isLocked = 1;
       container = 4;
       scale();
-      agent0.querySelector(".heart").textContent = agent0.health - activeCard.dmg;
-        agent0.querySelector(".heart").style.color = "red";
+      /* agent0.querySelector(".heart").textContent = agent0.health - activeCard.dmg;
+        agent0.querySelector(".heart").style.color = "red"; */
     } else if (
       !(
         domRect1.top > domRect6.bottom ||
@@ -1069,8 +1039,8 @@ function mouseMove(e) {
       isLocked = 1;
       container = 5;
       scale();
-      agent1.querySelector(".heart").textContent = agent1.health - activeCard.dmg;
-        agent1.querySelector(".heart").style.color = "red";
+      /* agent1.querySelector(".heart").textContent = agent1.health - activeCard.dmg;
+        agent1.querySelector(".heart").style.color = "red"; */
     } else if (
       !(
         domRect1.top > domRect7.bottom ||
@@ -1096,8 +1066,8 @@ function mouseMove(e) {
       isLocked = 1;
       container = 6;
       scale();
-      agent2.querySelector(".heart").textContent = agent2.health - activeCard.dmg;
-        agent2.querySelector(".heart").style.color = "red";
+      /* agent2.querySelector(".heart").textContent = agent2.health - activeCard.dmg;
+        agent2.querySelector(".heart").style.color = "red"; */
     } else {
       isLocked = 0;
       container = null;
@@ -1125,6 +1095,7 @@ function mouseMove(e) {
 }
 
 let endScreen = document.getElementById("endScreen");
+let wpn = document.querySelectorAll(".wpn")
 
 let enemyAgentElements;
 
@@ -1321,13 +1292,16 @@ function mouseUp() {
         if (agent) {
             agent.weapon = activeCard.weaponName; // Use the stored name!
             console.log("weapon applied: " + agent.weapon + " to " + agent.id);
+
+            document.querySelector(`#${agent.id} .wpn`).style.backgroundImage = `url('images/gunIcon/${agent.weapon}_killfeed.webp')`;
+            document.querySelector(`#${agent.id} .wpn`).className = "wpn";
+            document.querySelector(`#${agent.id} .wpn`).classList.add(agent.weapon);
+
+
             document.removeEventListener("mousemove", mouseMove);
             document.removeEventListener("mouseup", mouseUp);
             dropSound.play();
         }
-    }
-    if (activeCard.type === "ability"){
-
     }
 
 
@@ -1958,7 +1932,7 @@ function createCard(id, initialX, initialY, buttonId) {
   cardElement.deleteTrigger = false;
   cardElement.draggedAO = false; //maybe useless
   cardElement.spawning = true;
-  cardElement.dmg = 3;
+  cardElement.dmg = 25;
 
   cardElement.addEventListener("mousedown", (e) => mouseDown(e, cardElement));
 
