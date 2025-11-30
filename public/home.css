@@ -68,29 +68,31 @@ body {
     font-family: "fabiola-capitals", sans-serif;
     font-weight: 400;
     font-style: normal;
-    background-color: #292a33;
     color: white;
     text-align: center;
-    font-size: 4vw;
-    outline: 13px ridge #DCA61E;
-    border: 1px solid #DCA61E;
+    font-size: 3.4vw;
     pointer-events: all;
     z-index: 2;
+    background-image: url("images/buttons/button-2.svg");
+    background-repeat: no-repeat;
+    background-size: 100%;
+    border: none;
+    background-color: rgba(0, 0, 0, 0);
 }
 
 #create {
     width: 25vw;
     height: 7vw;
-    background-color: #292a33;
     text-align: center;
-    outline: 13px ridge #DCA61E;
     cursor: pointer;
-    border: 1px solid #DCA61E;
     pointer-events: all;
     z-index: 2;
     display: flex;
     align-items: center;
     justify-content: center;
+    background-image: url("images/buttons/button-2.svg");
+    background-repeat: no-repeat;
+    background-size: 100%;
 }
 
 #create p {
@@ -138,12 +140,10 @@ body {
     font-family: "fabiola-capitals", sans-serif;
     font-weight: 400;
     font-style: normal;
-    background-color: #292a33;
     color: white;
     text-align: center;
-    font-size: 4vw;
-    outline: 13px ridge #DCA61E;
-    outline-offset: 0px;
+    font-size: 3.4vw;
+    outline: none;
 }
 
 ::selection {

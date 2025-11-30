@@ -144,7 +144,7 @@ function lockIn() {
     for (let agent of agents) {
       if (agentsChosen.includes(agent)) {
         const el = document.getElementById(agent);
-        el.health = 10; // Add custom property here
+        el.health = 25; // Add custom property here
 
         //console.log("is there");
         document.getElementById(agent).classList.remove("selected");
@@ -827,6 +827,8 @@ function mouseMove(e) {
   dropPlay = 1;
   dragged = true;
 
+  console.log(isLocked);
+
   //console.log(agentsChosen);
 
   let purple = document.getElementById("luh");
@@ -978,8 +980,8 @@ function mouseMove(e) {
       isLocked = 1;
       container = 4;
       scale();
-      agent0.querySelector(".heart").textContent = agent0.health - activeCard.dmg;
-        agent0.querySelector(".heart").style.color = "red";
+      /* agent0.querySelector(".heart").textContent = agent0.health - activeCard.dmg;
+        agent0.querySelector(".heart").style.color = "red"; */
     } else if (
       !(
         domRect1.top > domRect6.bottom ||
@@ -1005,8 +1007,8 @@ function mouseMove(e) {
       isLocked = 1;
       container = 5;
       scale();
-      agent1.querySelector(".heart").textContent = agent1.health - activeCard.dmg;
-        agent1.querySelector(".heart").style.color = "red";
+      /* agent1.querySelector(".heart").textContent = agent1.health - activeCard.dmg;
+        agent1.querySelector(".heart").style.color = "red"; */
     } else if (
       !(
         domRect1.top > domRect7.bottom ||
@@ -1032,8 +1034,8 @@ function mouseMove(e) {
       isLocked = 1;
       container = 6;
       scale();
-      agent2.querySelector(".heart").textContent = agent2.health - activeCard.dmg;
-        agent2.querySelector(".heart").style.color = "red";
+      /* agent2.querySelector(".heart").textContent = agent2.health - activeCard.dmg;
+        agent2.querySelector(".heart").style.color = "red"; */
     } else {
       isLocked = 0;
       container = null;
@@ -1061,6 +1063,7 @@ function mouseMove(e) {
 }
 
 let endScreen = document.getElementById("endScreen");
+let wpn = document.querySelectorAll(".wpn")
 
 function mouseUp() {
   console.log("MouseUp:", activeCard?.id);
@@ -1205,6 +1208,10 @@ function mouseUp() {
         console.log("updraft on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
+    } else if (activeCard.spawning === false && isLocked === 1){
+        document.removeEventListener("mousemove", mouseMove);
+        document.removeEventListener("mouseup", mouseUp);
+        dropSound.play();
     }
 
     if (activeCard.type === "gun"){
@@ -1221,6 +1228,15 @@ function mouseUp() {
         if (agent) {
             agent.weapon = activeCard.weaponName; // Use the stored name!
             console.log("weapon applied: " + agent.weapon + " to " + agent.id);
+
+            document.querySelector(`#${agent.id} .wpn`).style.backgroundImage = `url('images/gunIcon/${agent.weapon}_killfeed.webp')`;
+            document.querySelector(`#${agent.id} .wpn`).className = "wpn";
+            document.querySelector(`#${agent.id} .wpn`).classList.add(agent.weapon);
+
+
+            document.removeEventListener("mousemove", mouseMove);
+            document.removeEventListener("mouseup", mouseUp);
+            dropSound.play();
         }
     }
 
@@ -1246,6 +1262,7 @@ function mouseUp() {
       updateSpawnerButtons();
     }
   }
+
 
   let totalDistance = distanceFind();
 
@@ -1308,7 +1325,7 @@ function mouseUp() {
     }
 
     if (dragged && container !== 0) {
-/*      let dmg;
+        let dmg;
 
       if (
         getComputedStyle(activeCard).backgroundImage.includes("Artual.jpeg")
@@ -1319,8 +1336,8 @@ function mouseUp() {
       ) {
         dmg = 2;
       } else {
-        dmg = 3;
-      }*/
+        dmg = 25;
+      }
 
 
       if (agent) {
@@ -1851,7 +1868,7 @@ function createCard(id, initialX, initialY, buttonId) {
   cardElement.deleteTrigger = false;
   cardElement.draggedAO = false; //maybe useless
   cardElement.spawning = true;
-  cardElement.dmg = 3;
+  cardElement.dmg = 25;
 
   cardElement.addEventListener("mousedown", (e) => mouseDown(e, cardElement));
 
