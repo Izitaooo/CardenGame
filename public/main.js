@@ -129,6 +129,10 @@ function selectAgent(agentName) {
   console.log("Selected agents:", agentsChosen);
 }
 
+let enemyAgent0;
+let enemyAgent1;
+let enemyAgent2;
+
 function lockIn() {
   console.log("lock in");
   if (agentsChosen.length === 3 && playersInRoom === 2) {
@@ -140,8 +144,23 @@ function lockIn() {
     agent0 = document.getElementById(agentsChosen[0]);
     agent1 = document.getElementById(agentsChosen[1]);
     agent2 = document.getElementById(agentsChosen[2]);
+/*     enemyAgent0 = enemyAgentElements[0];
+     enemyAgent1 = enemyAgentElements[1];
+     enemyAgent2 = enemyAgentElements[2];*/
 
-    for (let agent of agents) {
+      agent0.effects = [];
+      agent1.effects = [];
+      agent2.effects = [];
+/*      enemyAgent0.effects = [];
+      enemyAgent1.effects = [];
+      enemyAgent2.effects = [];*/
+
+
+
+
+
+
+      for (let agent of agents) {
       if (agentsChosen.includes(agent)) {
         const el = document.getElementById(agent);
         el.health = 10; // Add custom property here
@@ -255,6 +274,7 @@ function lockIn() {
   MainGameLoop();
 }
 let enemyAgents = [];
+
 socket.on("enemyChose", (data) => {
   enemyAgents = data.agentsChosen;
   //console.log("Enemy chose agents:", data.agentsChosen);
@@ -263,6 +283,7 @@ socket.on("enemyChose", (data) => {
     const dropper = document.getElementById("drop" + dropperNum);
 
     cardsGame.push(spawnEnemyAgent(agent, dropper));
+
   });
 
   // Animate all enemy agents
@@ -302,6 +323,7 @@ function spawnEnemyAgent(agentName, dropper) {
 
     // Add health property
     enemyAgent.health = 10;
+    enemyAgent.effects = []; // ✅
 
     const glint = document.createElement("div");
     glint.className = "glint";
@@ -396,6 +418,25 @@ function switchPlayer() {
     document.querySelectorAll(".agentSelect").forEach((el) => {
         el.classList.remove("selected");
     });
+    if (ImPlaying) {
+        agentElements.forEach((agent) => {
+            // Check if the agent has effects array
+            if (agent.effects && agent.effects.length > 0) {
+                // Loop through each effect
+                for (let i = agent.effects.length - 1; i >= 0; i--) {
+                    agent.effects[i].duration--;
+
+                    console.log(`${agent.id} - ${agent.effects[i].name}: ${agent.effects[i].duration} rounds left`);
+
+                    // Remove effect if duration reaches 0
+                    if (agent.effects[i].duration <= 0) {
+                        console.log(`Removing ${agent.effects[i].name} from ${agent.id}`);
+                        agent.effects.splice(i, 1);
+                    }
+                }
+            }
+        });
+    }
 
     // Remove damageable from ALL enemy agents and clean up their listeners
     document.querySelectorAll(".agentSelect.enemy").forEach((el) => {
@@ -425,6 +466,17 @@ function switchPlayer() {
 
     socket.emit("switchRoles");
 }
+
+/*function removeEffect(agent, abilityName) {
+    const index = agent.effects.findIndex(e => e.name === abilityName);
+    if (index !== -1) {
+        agent.effects.splice(index, 1);
+        console.log(`Removed ${abilityName} from ${agent.id}`);
+        console.log("Remaining effects:", agent.effects);
+    }
+}*/
+
+
 // Store enemy click handlers globally
 const enemyClickHandlers = {};
 const enemyHoverHandlers = {}
@@ -766,17 +818,29 @@ function whereCanPlace(cardElement) {
     const enemyAgentElements = enemyAgents.map(agentName =>
         document.getElementById("enemy_" + agentName)
     ).filter(el => el !== null);
+    enemyAgent0 = enemyAgentElements[0];
+    enemyAgent1 = enemyAgentElements[1];
+    enemyAgent2 = enemyAgentElements[2];
+/*    enemyAgent0.effects = [];
+    enemyAgent1.effects = [];
+    enemyAgent2.effects = [];*/
+/*    enemyAgent0 = enemyAgentElements[0];
+    enemyAgent1 = enemyAgentElements[1];
+    enemyAgent2 = enemyAgentElements[2];
+    enemyAgent0.effects = [];
+    enemyAgent1.effects = [];
+    enemyAgent2.effects = [];*/
 console.log("card type: " + cardElement.type);
     if(cardElement.type === "gun"
-        || cardElement.type === "barrier orb"
-        || cardElement.type === "contigency"
-        || cardElement.type === "double tap"
-        || cardElement.type === "healing orb"
-        || cardElement.type === "pick me up"
-        || cardElement.type === "regrowth"
-        || cardElement.type === "shrouded step"
-        || cardElement.type === "tailwind"
-        || cardElement.type === "updraft"
+        || cardElement.ability === "barrier orb"
+        || cardElement.ability === "contigency"
+        || cardElement.ability === "double tap"
+        || cardElement.ability === "healing orb"
+        || cardElement.ability === "pick me up"
+        || cardElement.ability === "regrowth"
+        || cardElement.ability === "shrouded step"
+        || cardElement.ability === "tailwind"
+        || cardElement.ability === "updraft"
     ){
         myAgents.forEach(agentEl => {
             agentEl.classList.add("isPlaceable");
@@ -892,15 +956,15 @@ function mouseMove(e) {
           domRect1.bottom < domRect2.top ||
           domRect1.left > domRect2.right
           ) && activeCard.type !== "gun"
-        && activeCard.type !== "barrier orb"
-        && activeCard.type !== "contigency"
-        && activeCard.type !== "double tap"
-        && activeCard.type !== "healing orb"
-        && activeCard.type !== "pick me up"
-        && activeCard.type !== "regrowth"
-        && activeCard.type !== "shrouded step"
-        && activeCard.type !== "tailwind"
-        && activeCard.type !== "updraft"
+        && activeCard.ability !== "barrier orb"
+        && activeCard.ability !== "contigency"
+        && activeCard.ability !== "double tap"
+        && activeCard.ability !== "healing orb"
+        && activeCard.ability !== "pick me up"
+        && activeCard.ability !== "regrowth"
+        && activeCard.ability !== "shrouded step"
+        && activeCard.ability !== "tailwind"
+        && activeCard.ability !== "updraft"
     ) {
       isLocked = 1;
       container = 1;
@@ -915,15 +979,15 @@ function mouseMove(e) {
         domRect1.bottom < domRect3.top ||
         domRect1.left > domRect3.right
       ) && activeCard.type !== "gun"
-        && activeCard.type !== "barrier orb"
-        && activeCard.type !== "contigency"
-        && activeCard.type !== "double tap"
-        && activeCard.type !== "healing orb"
-        && activeCard.type !== "pick me up"
-        && activeCard.type !== "regrowth"
-        && activeCard.type !== "shrouded step"
-        && activeCard.type !== "tailwind"
-        && activeCard.type !== "updraft"
+        && activeCard.ability !== "barrier orb"
+        && activeCard.ability !== "contigency"
+        && activeCard.ability !== "double tap"
+        && activeCard.ability !== "healing orb"
+        && activeCard.ability !== "pick me up"
+        && activeCard.ability !== "regrowth"
+        && activeCard.ability !== "shrouded step"
+        && activeCard.ability !== "tailwind"
+        && activeCard.ability !== "updraft"
     )
     {
       isLocked = 1;
@@ -939,15 +1003,15 @@ function mouseMove(e) {
         domRect1.bottom < domRect4.top ||
         domRect1.left > domRect4.right
       ) && activeCard.type !== "gun"
-        && activeCard.type !== "barrier orb"
-        && activeCard.type !== "contigency"
-        && activeCard.type !== "double tap"
-        && activeCard.type !== "healing orb"
-        && activeCard.type !== "pick me up"
-        && activeCard.type !== "regrowth"
-        && activeCard.type !== "shrouded step"
-        && activeCard.type !== "tailwind"
-        && activeCard.type !== "updraft"
+        && activeCard.ability !== "barrier orb"
+        && activeCard.ability !== "contigency"
+        && activeCard.ability !== "double tap"
+        && activeCard.ability !== "healing orb"
+        && activeCard.ability !== "pick me up"
+        && activeCard.ability !== "regrowth"
+        && activeCard.ability !== "shrouded step"
+        && activeCard.ability !== "tailwind"
+        && activeCard.ability !== "updraft"
     ) {
       isLocked = 1;
       container = 3;
@@ -959,21 +1023,21 @@ function mouseMove(e) {
         domRect1.right < domRect5.left ||
         domRect1.bottom < domRect5.top ||
         domRect1.left > domRect5.right
-      ) && activeCard.type !== "arc rose"
-        && activeCard.type !== "cloudburst"
-        && activeCard.type !== "dark cover"
-        && activeCard.type !== "guiding light"
-        && activeCard.type !== "meddle"
-        && activeCard.type !== "owl drone"
-        && activeCard.type !== "paranoia"
-        && activeCard.type !== "razorvine"
-        && activeCard.type !== "recon bolt"
-        && activeCard.type !== "ruse"
-        && activeCard.type !== "shear"
-        && activeCard.type !== "shock bolt"
-        && activeCard.type !== "slow orb"
-        && activeCard.type !== "trailblazer"
-        && activeCard.type !== "undercut"
+      ) && activeCard.ability !== "arc rose"
+        && activeCard.ability !== "cloudburst"
+        && activeCard.ability !== "dark cover"
+        && activeCard.ability !== "guiding light"
+        && activeCard.ability !== "meddle"
+        && activeCard.ability !== "owl drone"
+        && activeCard.ability !== "paranoia"
+        && activeCard.ability !== "razorvine"
+        && activeCard.ability !== "recon bolt"
+        && activeCard.ability !== "ruse"
+        && activeCard.ability !== "shear"
+        && activeCard.ability !== "shock bolt"
+        && activeCard.ability !== "slow orb"
+        && activeCard.ability !== "trailblazer"
+        && activeCard.ability !== "undercut"
     ) {
       isLocked = 1;
       container = 4;
@@ -986,21 +1050,21 @@ function mouseMove(e) {
         domRect1.right < domRect6.left ||
         domRect1.bottom < domRect6.top ||
         domRect1.left > domRect6.right
-      ) && activeCard.type !== "arc rose"
-        && activeCard.type !== "cloudburst"
-        && activeCard.type !== "dark cover"
-        && activeCard.type !== "guiding light"
-        && activeCard.type !== "meddle"
-        && activeCard.type !== "owl drone"
-        && activeCard.type !== "paranoia"
-        && activeCard.type !== "razorvine"
-        && activeCard.type !== "recon bolt"
-        && activeCard.type !== "ruse"
-        && activeCard.type !== "shear"
-        && activeCard.type !== "shock bolt"
-        && activeCard.type !== "slow orb"
-        && activeCard.type !== "trailblazer"
-        && activeCard.type !== "undercut"
+      ) && activeCard.ability !== "arc rose"
+        && activeCard.ability !== "cloudburst"
+        && activeCard.ability !== "dark cover"
+        && activeCard.ability !== "guiding light"
+        && activeCard.ability !== "meddle"
+        && activeCard.ability !== "owl drone"
+        && activeCard.ability !== "paranoia"
+        && activeCard.ability !== "razorvine"
+        && activeCard.ability !== "recon bolt"
+        && activeCard.ability !== "ruse"
+        && activeCard.ability !== "shear"
+        && activeCard.ability !== "shock bolt"
+        && activeCard.ability !== "slow orb"
+        && activeCard.ability !== "trailblazer"
+        && activeCard.ability !== "undercut"
     ) {
       isLocked = 1;
       container = 5;
@@ -1013,21 +1077,21 @@ function mouseMove(e) {
         domRect1.right < domRect7.left ||
         domRect1.bottom < domRect7.top ||
         domRect1.left > domRect7.right
-      ) && activeCard.type !== "arc rose"
-        && activeCard.type !== "cloudburst"
-        && activeCard.type !== "dark cover"
-        && activeCard.type !== "guiding light"
-        && activeCard.type !== "meddle"
-        && activeCard.type !== "owl drone"
-        && activeCard.type !== "paranoia"
-        && activeCard.type !== "razorvine"
-        && activeCard.type !== "recon bolt"
-        && activeCard.type !== "ruse"
-        && activeCard.type !== "shear"
-        && activeCard.type !== "shock bolt"
-        && activeCard.type !== "slow orb"
-        && activeCard.type !== "trailblazer"
-        && activeCard.type !== "undercut"
+      ) && activeCard.ability !== "arc rose"
+        && activeCard.ability !== "cloudburst"
+        && activeCard.ability !== "dark cover"
+        && activeCard.ability !== "guiding light"
+        && activeCard.ability !== "meddle"
+        && activeCard.ability !== "owl drone"
+        && activeCard.ability !== "paranoia"
+        && activeCard.ability !== "razorvine"
+        && activeCard.ability !== "recon bolt"
+        && activeCard.ability !== "ruse"
+        && activeCard.ability !== "shear"
+        && activeCard.ability !== "shock bolt"
+        && activeCard.ability !== "slow orb"
+        && activeCard.ability !== "trailblazer"
+        && activeCard.ability !== "undercut"
     ) {
       isLocked = 1;
       container = 6;
@@ -1062,6 +1126,8 @@ function mouseMove(e) {
 
 let endScreen = document.getElementById("endScreen");
 
+let enemyAgentElements;
+
 function mouseUp() {
   console.log("MouseUp:", activeCard?.id);
 
@@ -1089,7 +1155,7 @@ function mouseUp() {
     const myAgents = Array.from(agentElements).filter(el =>
         agentsChosen.includes(el.id)
     );
-    const enemyAgentElements = enemyAgents.map(agentName =>
+    enemyAgentElements = enemyAgents.map(agentName =>
         document.getElementById("enemy_" + agentName)
     ).filter(el => el !== null);
 
@@ -1109,102 +1175,136 @@ function mouseUp() {
         if (container === 1){
 
         }
-    }else  if(activeCard.type === "arc rose" && (container === 4 || container === 5 || container === 6)){
+    }else  if(activeCard.ability === "arc rose" && (container === 4 || container === 5 || container === 6)){
         console.log("arc rose on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.type === "barrier orb" && (container === 1 || container === 2 || container === 3)){
+    } else if (activeCard.ability === "barrier orb" && (container === 1 || container === 2 || container === 3)){
         console.log("barrier orb on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.type === "cloudburst" && (container === 4 || container === 5 || container === 6)) {
+    } else if (activeCard.ability === "cloudburst" && (container === 4 || container === 5 || container === 6)) {
         console.log("cloudburst on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.type === "contigency" && (container === 1 || container === 2 || container === 3)){
+    } else if (activeCard.ability === "contigency" && (container === 1 || container === 2 || container === 3)){
         console.log("contigency on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.type === "dark cover" && (container === 4 || container === 5 || container === 6)) {
+    } else if (activeCard.ability === "dark cover" && (container === 4 || container === 5 || container === 6)) {
         console.log("dark cover on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.type === "double tap" && (container === 1 || container === 2 || container === 3)){
+    } else if (activeCard.ability === "double tap" && (container === 1 || container === 2 || container === 3)){
         console.log("double tap on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.type === "guiding light" && (container === 4 || container === 5 || container === 6)) {
+    } else if (activeCard.ability === "guiding light" && (container === 4 || container === 5 || container === 6)) {
         console.log("guiding light on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.type === "healing orb" && (container === 1 || container === 2 || container === 3)){
+    } else if (activeCard.ability === "healing orb" && (container === 1 || container === 2 || container === 3)){
         console.log("healing orb on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.type === "meddle" && (container === 4 || container === 5 || container === 6)) {
+    } else if (activeCard.ability === "meddle" && (container === 4 || container === 5 || container === 6)) {
         console.log("meddle on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.type === "owl drone" && (container === 4 || container === 5 || container === 6)) {
+    } else if (activeCard.ability === "owl drone" && (container === 4 || container === 5 || container === 6)) {
         console.log("owl drone on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.type === "paranoia" && (container === 4 || container === 5 || container === 6)) {
+    } else if (activeCard.ability === "paranoia" && (container === 4 || container === 5 || container === 6)) {
         console.log("paranoia on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.type === "pick me up" && (container === 1 || container === 2 || container === 3)){
+    } else if (activeCard.ability === "pick me up" && (container === 1 || container === 2 || container === 3)){
         console.log("pick me up on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.type === "razorvine" && (container === 4 || container === 5 || container === 6)) {
+    } else if (activeCard.ability === "razorvine" && (container === 4 || container === 5 || container === 6)) {
         console.log("razorvine on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.type === "recon bolt" && (container === 4 || container === 5 || container === 6)) {
+    } else if (activeCard.ability === "recon bolt" && (container === 4 || container === 5 || container === 6)) {
         console.log("recon bolt on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.type === "regrowth" && (container === 1 || container === 2 || container === 3)){
+    } else if (activeCard.ability === "regrowth" && (container === 1 || container === 2 || container === 3)){
         console.log("regrowth on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.type === "ruse" && (container === 4 || container === 5 || container === 6)) {
+    } else if (activeCard.ability === "ruse" && (container === 4 || container === 5 || container === 6)) {
         console.log("ruse on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.type === "shear" && (container === 4 || container === 5 || container === 6)) {
+    } else if (activeCard.ability === "shear" && (container === 4 || container === 5 || container === 6)) {
         console.log("shear on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.type === "shock bolt" && (container === 4 || container === 5 || container === 6)) {
+    } else if (activeCard.ability === "shock bolt" && (container === 4 || container === 5 || container === 6)) {
         console.log("shock bolt on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.type === "shrouded step" && (container === 1 || container === 2 || container === 3)){
+    } else if (activeCard.ability === "shrouded step" && (container === 1 || container === 2 || container === 3)){
         console.log("shrouded step on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.type === "slow orb" && (container === 4 || container === 5 || container === 6)) {
+    } else if (activeCard.ability === "slow orb" && (container === 4 || container === 5 || container === 6)) {
         console.log("slow orb on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.type === "tailwind" && (container === 1 || container === 2 || container === 3)){
+    } else if (activeCard.ability === "tailwind" && (container === 1 || container === 2 || container === 3)){
         console.log("tailwind on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.type === "trailblazer" && (container === 4 || container === 5 || container === 6)) {
+    } else if (activeCard.ability === "trailblazer" && (container === 4 || container === 5 || container === 6)) {
         console.log("trailblazer on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.type === "undercut" && (container === 4 || container === 5 || container === 6)) {
+    } else if (activeCard.ability === "undercut" && (container === 4 || container === 5 || container === 6)) {
         console.log("undercut on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.type === "updraft" && (container === 1 || container === 2 || container === 3)){
+    } else if (activeCard.ability === "updraft" && (container === 1 || container === 2 || container === 3)){
         console.log("updraft on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
+    } else if (activeCard.spawning === false && isLocked === 1){
+        if (activeCard.type === "ability") {
+
+            let agent = null;
+            if (container === 1) {
+                agent = enemyAgentElements[0];
+            } else if (container === 2) {
+                agent = enemyAgentElements[1];
+            } else if (container === 3) {
+                agent = enemyAgentElements[2];
+            } else if (container === 4) {
+                agent = agent0;
+            } else if (container === 5) {
+                agent = agent1;
+            } else if (container === 6) {
+                agent = agent2;
+            }
+
+            if (agent) {
+
+                const effectObj = {
+                    name: activeCard.ability,
+                    duration: 4
+                };
+
+                agent.effects.unshift(effectObj);
+
+                console.log("effect applied: " + activeCard.ability + " to " + agent.id);
+                console.log("Current effects:", agent.effects);
+                document.removeEventListener("mousemove", mouseMove);
+                document.removeEventListener("mouseup", mouseUp);
+                dropSound.play();
+            }
+        }
     }
 
     if (activeCard.type === "gun"){
@@ -1221,7 +1321,13 @@ function mouseUp() {
         if (agent) {
             agent.weapon = activeCard.weaponName; // Use the stored name!
             console.log("weapon applied: " + agent.weapon + " to " + agent.id);
+            document.removeEventListener("mousemove", mouseMove);
+            document.removeEventListener("mouseup", mouseUp);
+            dropSound.play();
         }
+    }
+    if (activeCard.type === "ability"){
+
     }
 
 
@@ -1423,7 +1529,7 @@ function mouseUp() {
   if (dropPlay === 1 && isLocked === 1 && container !== 0) {
     gsap.to(activeCard, {
       duration: totalDistance * 0.0013,
-      onComplete: () => dropSound.play(),
+      //onComplete: () => dropSound.play(),
     });
   } else if (dropPlay === 1 && isLocked === 0) {
     gsap.to(activeCard, {
@@ -1744,21 +1850,22 @@ function createCard(id, initialX, initialY, buttonId) {
   } else if (buttonId === "randBtn"){
     cardElement.price = 0;
   } else {
+      cardElement.type = "ability"
       // Calculate the type directly from the index you already have
       if(buttonId === "ab1"){
-          cardElement.type = abilitySymb[qIndex]
+          cardElement.ability = abilitySymb[qIndex]
               .replace('url("images/abilitycards/', "")
               .replace('.png")', "");
           console.log(cardElement.type);
       }
       else if(buttonId === "ab2"){
-          cardElement.type = abilitySymb[eIndex]
+          cardElement.ability = abilitySymb[eIndex]
               .replace('url("images/abilitycards/', "")
               .replace('.png")', "");
           console.log(cardElement.type);
       }
       else if(buttonId === "ab3"){
-          cardElement.type = abilitySymb[cIndex]
+          cardElement.ability = abilitySymb[cIndex]
               .replace('url("images/abilitycards/', "")
               .replace('.png")', "");
           console.log(cardElement.type);
