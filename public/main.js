@@ -309,7 +309,7 @@ function spawnEnemyAgent(agentName, dropper) {
     enemyAgent.style.pointerEvents = "none";
 
     // Add health property
-    enemyAgent.health = 10;
+    enemyAgent.health = 25;
     enemyAgent.effects = []; // ✅
 
     const glint = document.createElement("div");
@@ -319,7 +319,7 @@ function spawnEnemyAgent(agentName, dropper) {
     // Add health display element
     const healthDisplay = document.createElement("div");
     healthDisplay.className = "heart";
-    healthDisplay.textContent = "10";
+    healthDisplay.textContent = "25";
     enemyAgent.appendChild(healthDisplay);
 
     document.body.appendChild(enemyAgent);
