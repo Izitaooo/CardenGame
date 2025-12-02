@@ -171,6 +171,7 @@ function lockIn() {
       if (agentsChosen.includes(agent)) {
         const el = document.getElementById(agent);
         el.health = 25; // Add custom property here
+        el.isSelectable = true;
 
         //console.log("is there");
         document.getElementById(agent).classList.remove("selected");
@@ -388,7 +389,7 @@ function MainGameLoop() {
 
         // Create handlers ONCE and store them globally
         myAgents.forEach(agentEl => {
-            agentClickHandlers[agentEl.id] = () => SelectToAttack(agentEl.id);
+                agentClickHandlers[agentEl.id] = () => SelectToAttack(agentEl.id);
         });
 
         // Initial setup
@@ -400,7 +401,9 @@ function updateTurnState(myAgents) {
     if (ImPlaying) {
         // Enable my agents
         myAgents.forEach(agentEl => {
-            if (agentEl.health > 0){
+            //console.log("is selectable??: " + agentEl.isSelectable);
+            //if (agentEl.health > 0 && agentEl.isSelectable){
+            if (agentEl.health > 0 && agentEl.isSelectable !== false) {
                 agentEl.classList.add("selectable");
                 // Use the globally stored handler
                 if (agentClickHandlers[agentEl.id]) {
@@ -441,7 +444,10 @@ socket.on("rolesSwitched", () => {
     const myAgents = Array.from(agentElements).filter(el =>
         agentsChosen.includes(el.id)
     );
-
+/*    if (agent.effects && agent.effects.length > 0) {
+        // Loop through each effect
+        deleteEffects(agent);
+    }*/
 
     document.querySelectorAll(".agentSelect").forEach((el) => {
         el.classList.remove("selected");
@@ -451,19 +457,17 @@ socket.on("rolesSwitched", () => {
             // Check if the agent has effects array
             if (agent.effects && agent.effects.length > 0) {
                 // Loop through each effect
-                for (let i = agent.effects.length - 1; i >= 0; i--) {
-                    agent.effects[i].duration--;
-
-                    console.log(`${agent.id} - ${agent.effects[i].name}: ${agent.effects[i].duration} rounds left`);
-
-                    // Remove effect if duration reaches 0
-                    if (agent.effects[i].duration <= 0) {
-                        console.log(`Removing ${agent.effects[i].name} from ${agent.id}`);
-                        agent.effects.splice(i, 1);
-                    }
-                }
+                deleteEffects(agent);
             }
         });
+
+        agentElements.forEach((agentEl) => {
+            agentEl.hitChanceMultiplier = 1;
+            agentEl.isSelectable = true;
+            agentEl.effects.forEach((effect) => {
+                effectLUT(agentEl, effect)
+            })
+        })
     }
 
 
@@ -473,6 +477,32 @@ socket.on("rolesSwitched", () => {
     console.log("Switched to:", ImPlaying ? "You" : "Enemy");
 })
 
+
+
+function effectLUT(agent, effect){
+    if (effect.name === "arc rose" ||
+        effect.name === "guiding light" ||
+        effect.name === "paranoia"
+    ){
+        agent.hitChanceMultiplier = 0.5;
+        //lower hit percentage
+    }else if(effect.name === "barrier orb" ||
+        effect.name === "contingency" ||
+        effect.name === "shear"
+    ) {
+        agent.isSelectable = false;
+        agent.classList.remove("selectable");
+        agent.style.pointerEvents = "none";
+        //block agent from attacking
+    }else if(effect.name === "cloudburst" ||
+        effect.name === "dark cover" ||
+        effect.name === "ruse"
+    ){
+        //lowers your chance of hit
+        agent.hitChanceMultiplier = 0.5;
+
+    }
+}
 
 function switchPlayer() {
     ImPlaying = !ImPlaying;
@@ -491,7 +521,8 @@ function switchPlayer() {
             // Check if the agent has effects array
             if (agent.effects && agent.effects.length > 0) {
                 // Loop through each effect
-                for (let i = agent.effects.length - 1; i >= 0; i--) {
+                deleteEffects(agent);
+                /*for (let i = agent.effects.length - 1; i >= 0; i--) {
                     agent.effects[i].duration--;
 
                     console.log(`${agent.id} - ${agent.effects[i].name}: ${agent.effects[i].duration} rounds left`);
@@ -521,7 +552,7 @@ function switchPlayer() {
                         agent.effects.splice(i, 1);
 
                     }
-                }
+                }*/
             }
         });
     }
@@ -554,6 +585,49 @@ function switchPlayer() {
 
     socket.emit("switchRoles");
 }
+function deleteEffects(agent){
+    for (let i = agent.effects.length - 1; i >= 0; i--) {
+        agent.effects[i].duration--;
+
+        console.log(`${agent.id} - ${agent.effects[i].name}: ${agent.effects[i].duration} rounds left`);
+
+        // Remove effect if duration reaches 0
+        if (agent.effects[i].duration <= 0) {
+            console.log(`Removing ${agent.effects[i].name} from ${agent.id}`);
+
+
+            // effect you are removing
+            const effectName = agent.effects[i].name.trim().replace(/["')]/g, "");
+
+            // Check if this was a blocking effect
+            if (effectName === "barrier orb" ||
+                effectName === "contingency" ||
+                effectName === "shear") {
+
+                // Re-enable selection
+                agent.isSelectable = true;
+                agent.style.pointerEvents = "auto"; // Restore pointer events immediately
+            }
+
+    // find all slots
+            const slots = document.querySelectorAll(`#${agent.id} .effects > div`);
+
+    // loop through and clear the one that matches
+            for (const slot of slots) {
+                // backgroundImage can return full url(), so we check if it includes the file name
+                if (slot.style.backgroundImage.includes(`${effectName}.webp`)) {
+                    slot.style.backgroundImage = "";
+                    slot.style.opacity = "0";
+                    break;
+                }
+            }
+
+    // now remove effect from array
+            agent.effects.splice(i, 1);
+
+        }
+    }
+}
 // Store enemy click handlers globally
 const enemyClickHandlers = {};
 const enemyHoverHandlers = {}
@@ -565,9 +639,9 @@ function SelectToAttack(agent) {
 
     const agentEl = document.getElementById(agent);
 
-    if (agentEl.health <= 0) {
-        console.log("Cannot select dead agent");
-        return;
+    if (agentEl.health <= 0 || agentEl.isSelectable === false) {
+        console.log(`Cannot select: ${agent}`);
+        return; // Stop the function!! if blocked or dead
     }
     agentSelectedToAttack = document.getElementById(agent);
     const wasSelected = agentEl.classList.contains("selected");
@@ -629,7 +703,7 @@ function damageDisplay(agentId){
     weaponDamageLUT(agentSelectedToAttack.weapon);
 
 
-    let damageCalc =agent.health - damage * ammo;
+    let damageCalc =agent.health - damage * ammo * agentSelectedToAttack.hitChanceMultiplier;
     agent.querySelector(".heart").textContent = damageCalc.toString();
     agent.querySelector(".heart").style.color = "red";
 }
@@ -644,13 +718,13 @@ function damageAgent(agentId) {
     let agent = document.getElementById(agentId);
     console.log("damaging agent:", agent.id);
     weaponDamageLUT(agentSelectedToAttack.weapon)
-    console.log(`Firing ${ammo} shots with ${agent.weapon}. Damage: ${damage}, Hit Chance: ${chanceToHit}%`);
-
+    console.log(`Firing ${ammo} shots with ${agentSelectedToAttack.weapon}. Damage: ${damage}, Hit Chance: ${chanceToHit}%`);
+    console.log(agentSelectedToAttack.hitChanceMultiplier);
     damageDealt = 0;
     for (let i = 0; i < ammo; i++) {
         const randomChance = Math.floor(Math.random() * 100);
 
-        if (randomChance < chanceToHit) {
+        if (randomChance < chanceToHit * agentSelectedToAttack.hitChanceMultiplier) {
             // HIT confirmed!
             agent.health -= damage;
             damageDealt += damage;
@@ -939,8 +1013,8 @@ function whereCanPlace(cardElement) {
 
 console.log("card type: " + cardElement.type);
     if(cardElement.type === "gun"
-        || cardElement.ability === "barrier orb"
-        || cardElement.ability === "contigency"
+        //|| cardElement.ability === "barrier orb"
+        //|| cardElement.ability === "contigency"
         || cardElement.ability === "double tap"
         || cardElement.ability === "healing orb"
         || cardElement.ability === "pick me up"
@@ -968,6 +1042,18 @@ console.log("card type: " + cardElement.type);
         });
         console.log("enemy");
 
+    }
+    if(
+        cardElement.ability === "barrier orb"
+        || cardElement.ability === "contigency"
+        || cardElement.ability === "shear"
+    ){
+        myAgents.forEach(agentEl => {
+            agentEl.classList.add("isPlaceable");
+        });
+        enemyAgentElements.forEach(enemyEl => {
+            enemyEl.classList.add("isPlaceable");
+        });
     }
 }
 
@@ -1058,15 +1144,16 @@ function mouseMove(e) {
     }
   }
 
-  if (activeCard.spawning === false) {
+  if (activeCard.spawning === false ) {
     if (
       !(domRect1.top > domRect2.bottom ||
           domRect1.right < domRect2.left ||
           domRect1.bottom < domRect2.top ||
           domRect1.left > domRect2.right
           ) && activeCard.type !== "gun"
-        && activeCard.ability !== "barrier orb"
+/*        && activeCard.ability !== "barrier orb"
         && activeCard.ability !== "contigency"
+        && activeCard.ability !== "shear"*/
         && activeCard.ability !== "double tap"
         && activeCard.ability !== "healing orb"
         && activeCard.ability !== "pick me up"
@@ -1088,8 +1175,9 @@ function mouseMove(e) {
         domRect1.bottom < domRect3.top ||
         domRect1.left > domRect3.right
       ) && activeCard.type !== "gun"
-        && activeCard.ability !== "barrier orb"
+/*        && activeCard.ability !== "barrier orb"
         && activeCard.ability !== "contigency"
+        && activeCard.ability !== "shear"*/
         && activeCard.ability !== "double tap"
         && activeCard.ability !== "healing orb"
         && activeCard.ability !== "pick me up"
@@ -1112,8 +1200,9 @@ function mouseMove(e) {
         domRect1.bottom < domRect4.top ||
         domRect1.left > domRect4.right
       ) && activeCard.type !== "gun"
-        && activeCard.ability !== "barrier orb"
+/*        && activeCard.ability !== "barrier orb"
         && activeCard.ability !== "contigency"
+        && activeCard.ability !== "shear"*/
         && activeCard.ability !== "double tap"
         && activeCard.ability !== "healing orb"
         && activeCard.ability !== "pick me up"
@@ -1142,7 +1231,9 @@ function mouseMove(e) {
         && activeCard.ability !== "razorvine"
         && activeCard.ability !== "recon bolt"
         && activeCard.ability !== "ruse"
-        && activeCard.ability !== "shear"
+/*        && activeCard.ability !== "barrier orb"
+        && activeCard.ability !== "contigency"
+        && activeCard.ability !== "shear"*/
         && activeCard.ability !== "shock bolt"
         && activeCard.ability !== "slow orb"
         && activeCard.ability !== "trailblazer"
@@ -1169,7 +1260,9 @@ function mouseMove(e) {
         && activeCard.ability !== "razorvine"
         && activeCard.ability !== "recon bolt"
         && activeCard.ability !== "ruse"
-        && activeCard.ability !== "shear"
+/*        && activeCard.ability !== "barrier orb"
+        && activeCard.ability !== "contigency"
+        && activeCard.ability !== "shear"*/
         && activeCard.ability !== "shock bolt"
         && activeCard.ability !== "slow orb"
         && activeCard.ability !== "trailblazer"
@@ -1196,7 +1289,9 @@ function mouseMove(e) {
         && activeCard.ability !== "razorvine"
         && activeCard.ability !== "recon bolt"
         && activeCard.ability !== "ruse"
-        && activeCard.ability !== "shear"
+/*        && activeCard.ability !== "barrier orb"
+        && activeCard.ability !== "contigency"
+        && activeCard.ability !== "shear"*/
         && activeCard.ability !== "shock bolt"
         && activeCard.ability !== "slow orb"
         && activeCard.ability !== "trailblazer"
@@ -1289,19 +1384,19 @@ function mouseUp() {
         console.log("arc rose on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.ability === "barrier orb" && (container === 1 || container === 2 || container === 3)){
+    } /*else if (activeCard.ability === "barrier orb" && (container === 1 || container === 2 || container === 3)){
         console.log("barrier orb on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.ability === "cloudburst" && (container === 4 || container === 5 || container === 6)) {
+    }*/ else if (activeCard.ability === "cloudburst" && (container === 4 || container === 5 || container === 6)) {
         console.log("cloudburst on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.ability === "contigency" && (container === 1 || container === 2 || container === 3)){
+    } /*else if (activeCard.ability === "contigency" && (container === 1 || container === 2 || container === 3)){
         console.log("contigency on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.ability === "dark cover" && (container === 4 || container === 5 || container === 6)) {
+    }*/ else if (activeCard.ability === "dark cover" && (container === 4 || container === 5 || container === 6)) {
         console.log("dark cover on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
@@ -1349,11 +1444,11 @@ function mouseUp() {
         console.log("ruse on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.ability === "shear" && (container === 4 || container === 5 || container === 6)) {
+    } /*else if (activeCard.ability === "shear" && (container === 4 || container === 5 || container === 6)) {
         console.log("shear on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.ability === "shock bolt" && (container === 4 || container === 5 || container === 6)) {
+    }*/ else if (activeCard.ability === "shock bolt" && (container === 4 || container === 5 || container === 6)) {
         console.log("shock bolt on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
@@ -1415,7 +1510,13 @@ function mouseUp() {
 
                 agent.effects.unshift(effectObj);
 
-
+                agentElements.forEach((agentEl) => {
+                    agentEl.hitChanceMultiplier = 1;
+                    agentEl.isSelectable = true;
+                    agentEl.effects.forEach((effect) => {
+                        effectLUT(agentEl, effect)
+                    })
+                });
                 socket.emit("effectApplied", {
                     agentIndex: agentIndex,
                     effectName: activeCard.ability,
@@ -1428,8 +1529,8 @@ function mouseUp() {
                 console.log("Current effects:", agent.effects);
 
 
-
-                let effectName = agent.effects[0].name.trim();
+                updateEffects(agent, true);
+/*                let effectName = agent.effects[0].name.trim();
                 effectName = effectName.replace(/["')]/g, "");
                 console.log(effectName)
 
@@ -1457,7 +1558,7 @@ function mouseUp() {
                         slot.style.backgroundImage = `url('images/abilityIcon/${effectName}.webp')`;
                         break; // stop after filling the first empty one
                     }
-                }
+                }*/
             }
         }
     }
@@ -1701,6 +1802,41 @@ function mouseUp() {
   document.removeEventListener("mouseup", mouseUp); // Not mouseMove
 }
 
+function updateEffects(agent, doneWithCard){
+    let effectName = agent.effects[0].name.trim();
+    effectName = effectName.replace(/["')]/g, "");
+    console.log(effectName)
+
+    if(doneWithCard){
+        activeCard.style.transition = "opacity 0.2s";
+        activeCard.style.opacity = "0";
+
+        setTimeout(() => {
+            for (let i = 0; i < cardsGame.length; i++) {
+                cardsGame[i].style.pointerEvents = "all";
+            }
+            activeCard.style.display = "none";
+        }, 300);
+
+
+        document.removeEventListener("mousemove", mouseMove);
+        document.removeEventListener("mouseup", mouseUp);
+        dropSound.play();
+    }
+
+
+    for (let i = 1; i <= 5; i++) {
+        const slot = document.querySelector(`#${agent.id} .ef${i}`);
+
+        // check if empty
+        if (!slot.style.backgroundImage || slot.style.backgroundImage === "none") {
+            slot.style.opacity = "100%";
+            slot.style.backgroundImage = `url('images/abilityIcon/${effectName}.webp')`;
+            break; // stop after filling the first empty one
+        }
+    }
+}
+
 socket.on("enemyAppliedEffect", (data) => {
     console.log("Enemy applied effect:", data);
 
@@ -1728,7 +1864,18 @@ socket.on("enemyAppliedEffect", (data) => {
 
         agent.effects.unshift(effectObj);
         console.log(`Effect ${data.effectName} applied to ${agent.id}`);
+        updateEffects(agent, false);
     }
+    const agentElements = document.querySelectorAll(".agentSelect");
+
+    agentElements.forEach((agentEl) => {
+        agentEl.hitChanceMultiplier = 1;
+        agentEl.isSelectable = true;
+        agentEl.effects.forEach((effect) => {
+            effectLUT(agentEl, effect)
+        })
+    });
+
     console.log(agent.effects);
 });
 
