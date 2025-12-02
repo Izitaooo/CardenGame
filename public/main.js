@@ -389,7 +389,7 @@ function MainGameLoop() {
 
         // Create handlers ONCE and store them globally
         myAgents.forEach(agentEl => {
-                agentClickHandlers[agentEl.id] = () => SelectToAttack(agentEl.id);
+            agentClickHandlers[agentEl.id] = () => SelectToAttack(agentEl.id);
         });
 
         // Initial setup
@@ -444,10 +444,7 @@ socket.on("rolesSwitched", () => {
     const myAgents = Array.from(agentElements).filter(el =>
         agentsChosen.includes(el.id)
     );
-/*    if (agent.effects && agent.effects.length > 0) {
-        // Loop through each effect
-        deleteEffects(agent);
-    }*/
+
 
     document.querySelectorAll(".agentSelect").forEach((el) => {
         el.classList.remove("selected");
@@ -714,10 +711,47 @@ function damageDisplayHide(agentId) {
     agent.querySelector(".heart").style.color = "white";
 }
 let damageDealt = 0;
+let apCostW = 2
 function damageAgent(agentId) {
     let agent = document.getElementById(agentId);
     console.log("damaging agent:", agent.id);
     weaponDamageLUT(agentSelectedToAttack.weapon)
+    console.log(`Firing ${ammo} shots with ${agent.weapon}. Damage: ${damage}, Hit Chance: ${chanceToHit}%`);
+
+    if(apCostW !== 2){
+        apCostW = activeCard.ap;
+    }
+
+    if (apCostW > 0 || !apCostW) {
+        if (!canAfford(apCostW)) {
+            flashNotEnoughAP();
+            isLocked = 0;
+
+            // RETURN CARD TO DECK
+
+            document.querySelectorAll(".isPlaceable").forEach(el => {
+                el.classList.remove("isPlaceable");
+            });
+
+            gsap.to(activeCard, {
+                scale: 1,
+                duration: 0.2
+            });
+            activeCard.deck = true;
+            deckCards.push(activeCard);
+            updateDeckPositions(0.3);
+
+            document.removeEventListener("mousemove", mouseMove);
+            document.removeEventListener("mouseup", mouseUp);
+            return;
+        }
+        // else we can afford: spend AP now
+        spendAP(apCostW);
+        // optionally emit AP change / sync to server:
+        // socket.emit("updateAP", { playerId: myId, currentAP });
+        damageDealt = 0;
+        for (let i = 0; i < ammo; i++) {
+            const randomChance = Math.floor(Math.random() * 100);
     console.log(`Firing ${ammo} shots with ${agentSelectedToAttack.weapon}. Damage: ${damage}, Hit Chance: ${chanceToHit}%`);
     console.log(agentSelectedToAttack.hitChanceMultiplier);
     damageDealt = 0;
@@ -730,38 +764,39 @@ function damageAgent(agentId) {
             damageDealt += damage;
             console.log(`Shot ${i + 1}: HIT! Health remaining: ${agent.health}`);
 
-            // OPTIONAL: Add a check here if the agent is defeated
-            if (agent.health <= 0) {
-                console.log("Agent defeated!");
-                agent.health = 0;
-                gsap.to(agent, {
-                    filter: "grayscale(1)",
-                    duration:  0.5,
-                });
-                if(enemyAgent0.health <= 0 && enemyAgent1.health <= 0 && enemyAgent2.health <= 0){
-                    console.log("YESS, HELL YEAH, I WOONNNN YEYYYY 😃")
-                    endScreen.style.top = "0vh";
+                // OPTIONAL: Add a check here if the agent is defeated
+                if (agent.health <= 0) {
+                    console.log("Agent defeated!");
+                    agent.health = 0;
+                    gsap.to(agent, {
+                        filter: "grayscale(1)",
+                        duration:  0.5,
+                    });
+                    if(enemyAgent0.health <= 0 && enemyAgent1.health <= 0 && enemyAgent2.health <= 0){
+                        console.log("YESS, HELL YEAH, I WOONNNN YEYYYY 😃")
+                        endScreen.style.top = "0vh";
+                    }
+                    break; // Stop firing if the target is defeated
                 }
-                break; // Stop firing if the target is defeated
+            } else {
+                // MISS confirmed!
+                console.log(`Shot ${i + 1}: MISS. Health remaining: ${agent.health}`);
             }
-        } else {
-            // MISS confirmed!
-            console.log(`Shot ${i + 1}: MISS. Health remaining: ${agent.health}`);
         }
-    }
 
-    console.log("New health:", agent.health);
+        console.log("New health:", agent.health);
 
-    // Update the health display
-    const healthDisplay = agent.querySelector(".heart");
-    if (healthDisplay) {
-        healthDisplay.textContent = agent.health;
-    }
-    socket.emit("damageAgent", agentId, damageDealt);//2 is only for now, later replace with varriabnle!
-    switchPlayer();
-/*    setTimeout(() => {
+        // Update the health display
+        const healthDisplay = agent.querySelector(".heart");
+        if (healthDisplay) {
+            healthDisplay.textContent = agent.health;
+        }
+        socket.emit("damageAgent", agentId, damageDealt);//2 is only for now, later replace with varriabnle!
         switchPlayer();
-    }, 1000);*/
+        /*    setTimeout(() => {
+                switchPlayer();
+            }, 1000);*/
+    }
 }
 
 let damage = 0;
@@ -926,6 +961,11 @@ const dropSound = new Howl({
 const deckSound = new Howl({
   src: ["audio/Cryostasis Kill 1.mp3"],
   volume: 0.15,
+});
+const shopSound = new Howl({
+    src: ["audio/shopSound.mp3"],
+    volume: 6,
+    preload: true
 });
 
 let cardsGame = [];
@@ -1505,10 +1545,95 @@ function mouseUp() {
 
                 const effectObj = {
                     name: activeCard.ability,
-                    duration: 4
+                    duration: 4,
+                    ap: 0
                 };
 
                 agent.effects.unshift(effectObj);
+
+                let effectName = agent.effects[0].name.trim();
+                effectName = effectName.replace(/["')]/g, "");
+
+                if (effectName === "arc rose") {
+                    effectObj.ap = 2;
+                } else if (effectName === "barrier orb") {
+                    effectObj.ap = 2;
+                } else if (effectName === "cloudburst") {
+                    effectObj.ap = 1;
+                } else if (effectName === "contigency") {
+                    effectObj.ap = 2;
+                } else if (effectName === "dark cover") {
+                    effectObj.ap = 2;
+                } else if (effectName === "double tap") {
+                    effectObj.ap = 3;
+                } else if (effectName === "guiding light") {
+                    effectObj.ap = 3;
+                } else if (effectName === "healing orb") {
+                    effectObj.ap = 2;
+                } else if (effectName === "meddle") {
+                    effectObj.ap = 2;
+                } else if (effectName === "owl drone") {
+                    effectObj.ap = 2;
+                } else if (effectName === "paranoia") {
+                    effectObj.ap = 3;
+                } else if (effectName === "pick me up") {
+                    effectObj.ap = 3;
+                } else if (effectName === "razorvine") {
+                    effectObj.ap = 3;
+                } else if (effectName === "recon bolt") {
+                    effectObj.ap = 2;
+                } else if (effectName === "regrowth") {
+                    effectObj.ap = 2;
+                } else if (effectName === "ruse") {
+                    effectObj.ap = 2;
+                } else if (effectName === "shear") {
+                    effectObj.ap = 3;
+                } else if (effectName === "shock bolt") {
+                    effectObj.ap = 2;
+                } else if (effectName === "slow orb") {
+                    effectObj.ap = 3;
+                } else if (effectName === "shrouded step") {
+                    effectObj.ap = 2;
+                } else if (effectName === "tailwind") {
+                    effectObj.ap = 3;
+                } else if (effectName === "trailblazer") {
+                    effectObj.ap = 3;
+                } else if (effectName === "undercut") {
+                    effectObj.ap = 3;
+                } else if (effectName === "updraft") {
+                    effectObj.ap = 2;
+                }
+
+                const apCost = effectObj.ap;
+
+                if (apCost > 0) {
+                    if (!canAfford(apCost)) {
+                        flashNotEnoughAP();
+                        isLocked = 0;
+
+                        // RETURN CARD TO DECK
+
+                        document.querySelectorAll(".isPlaceable").forEach(el => {
+                            el.classList.remove("isPlaceable");
+                        });
+
+                        gsap.to(activeCard, {
+                            scale: 1,
+                            duration: 0.2
+                        });
+                        activeCard.deck = true;
+                        deckCards.push(activeCard);
+                        updateDeckPositions(0.3);
+
+                        document.removeEventListener("mousemove", mouseMove);
+                        document.removeEventListener("mouseup", mouseUp);
+                        return;
+                    }
+                    // else we can afford: spend AP now
+                    spendAP(apCost);
+                    // optionally emit AP change / sync to server:
+                    // socket.emit("updateAP", { playerId: myId, currentAP });
+                }
 
                 agentElements.forEach((agentEl) => {
                     agentEl.hitChanceMultiplier = 1;
@@ -1533,6 +1658,8 @@ function mouseUp() {
 /*                let effectName = agent.effects[0].name.trim();
                 effectName = effectName.replace(/["')]/g, "");
                 console.log(effectName)
+                console.log(effectObj.ap)
+                console.log(currentAP)
 
                 activeCard.style.transition = "opacity 0.2s";
                 activeCard.style.opacity = "0";
@@ -1879,6 +2006,56 @@ socket.on("enemyAppliedEffect", (data) => {
     console.log(agent.effects);
 });
 
+let maxAP = 7;
+let currentAP = maxAP;
+
+const apGems = Array.from(document.querySelectorAll("#APhold .AP"));
+
+function updateAPGems(){
+    for (let i = 0; i < apGems.length; i++) {
+        if (i < currentAP) {
+            apGems[i].classList.remove("used");
+        } else {
+            apGems[i].classList.add("used");
+        }
+    }
+}
+
+function canAfford(cost){
+    return currentAP >= cost;
+}
+
+function spendAP (cost) {
+    currentAP = Math.max(0, currentAP - cost);
+    updateAPGems();
+}
+
+function refillAP(amount = maxAP) {
+    currentAP = Math.min(maxAP, amount);
+    updateAPGems();
+}
+
+function flashNotEnoughAP() {
+    // example: add a 'shake' to APhold or briefly flash
+    const holder = document.getElementById("APhold");
+    if (!holder) return;
+    holder.classList.add("not-enough");
+    setTimeout(() => holder.classList.remove("not-enough"), 350);
+}
+
+function onCardSelected(cardElement) {
+    const apCost = activeCard.ap(cardElement); // your method to get required AP
+    if (!canAfford(apCost)) {
+        // add class to indicate disabled (and skip applying isPlaceable)
+        cardElement.classList.add("disabled-by-ap");
+        // don't mark agents as isPlaceable
+    } else {
+        cardElement.classList.remove("disabled-by-ap");
+        // continue your isPlaceable logic
+    }
+}
+
+
 function distanceFind(card = activeCard, cont = container) {
   if (!card) return 0;
   const domRect1 = card.getBoundingClientRect();
@@ -2181,7 +2358,46 @@ function createCard(id, initialX, initialY, buttonId) {
 
       console.log("Created gun card:", cardElement.weaponName);
 
+      // assign AP cost based on weapon
+      if (cardElement.weaponName === "shorty") {
+          cardElement.ap = 4;
+      } else if (cardElement.weaponName === "frenzy") {
+          cardElement.ap = 4;
+      } else if (cardElement.weaponName === "ghost") {
+          cardElement.ap = 4;
+      } else if (cardElement.weaponName === "sheriff") {
+          cardElement.ap = 4;
+      } else if (cardElement.weaponName === "stinger") {
+          cardElement.ap = 4;
+      } else if (cardElement.weaponName === "spectre") {
+          cardElement.ap = 4;
+      } else if (cardElement.weaponName === "bucky") {
+          cardElement.ap = 4;
+      } else if (cardElement.weaponName === "judge") {
+          cardElement.ap = 4;
+      } else if (cardElement.weaponName === "bulldog") {
+          cardElement.ap = 4;
+      } else if (cardElement.weaponName === "guardian") {
+          cardElement.ap = 4;
+      } else if (cardElement.weaponName === "phantom") {
+          cardElement.ap = 4;
+      } else if (cardElement.weaponName === "vandal") {
+          cardElement.ap = 4;
+      } else if (cardElement.weaponName === "marshal") {
+          cardElement.ap = 4;
+      } else if (cardElement.weaponName === "outlaw") {
+          cardElement.ap = 4;
+      } else if (cardElement.weaponName === "operator") {
+          cardElement.ap = 4;
+      } else if (cardElement.weaponName === "ares") {
+          cardElement.ap = 4;
+      } else if (cardElement.weaponName === "odin") {
+          cardElement.ap = 4;
+      } else {
+          cardElement.ap = 2;
+      }
 
+      apCostW = cardElement.ap;
 
   } else if (buttonId === "randBtn"){
     cardElement.price = 0;
