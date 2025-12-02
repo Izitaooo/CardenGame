@@ -189,7 +189,7 @@ body {
 .agentSelect:after {
   content: "";
   position: absolute;
-  background-image: url("images/Asset 5.svg");
+  background-image: url("images/Layer.svg");
   width: 110%;
   height: 105%;
   background-repeat: no-repeat;
@@ -202,16 +202,9 @@ body {
   user-select: none;
 
   /* meow tohle je on purpose ten error */
-  animation: var(--border-animation, none);
-  filter: var(
-    --border-filter,
-    brightness(0) saturate(100%) invert(91%) sepia(24%) saturate(5001%)
-      hue-rotate(342deg) brightness(89%) contrast(92%)
-  );
 }
 
 .agentSelect:hover {
-
     box-shadow: 0px 0px 7vw 1vw rgba(250,201,53,0.46);
     transition: .3s ease-in-out;
 }
@@ -248,9 +241,8 @@ body {
 
 .agentSelect.inGame.enemy.isPlaceable .glint{
     background-color: rgba(255, 38, 38, 0.29); !important;
-
-
 }
+
 
 
 .glint {
@@ -1271,6 +1263,51 @@ body {
 }
 .wpn.odin {
     background-size: 7.6vw;
+}
+
+.effects {
+    position: absolute;
+    top: -5%;        /* tweak these to place the column where you want inside the card */
+    left: -15%;
+    width: 3vw;
+    height: 16.5vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: none; /* don't block pointer to card */
+    z-index: 10000; /* lower than highlight or .glint if needed */
+}
+
+/* enemy offset variants (still absolute, not fixed) */
+.effects.enemyEF {
+    top: -5%;
+    left: -15%;     /* maybe place on the left for enemy cards */
+    right: auto;  /* unset right if needed */
+    height: 16.5vw;
+    z-index: 10;
+}
+
+/* dots */
+.ef1, .ef2, .ef3, .ef4, .ef5 {
+    width: 3vw;
+    height: 3vw;
+    border-radius: 50%;
+    background-color: #dca61e;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 2vw;
+    opacity: 0;
+}
+
+#APhold {
+    position: fixed;
+    top: 36vh;
+    left: 3vw;
+    width: 3vw;
+    height: 15vw;
+    background-color: #F2C3F7;
+    z-index: 3;
 }
 
 #endScreen {
