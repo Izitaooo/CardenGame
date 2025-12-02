@@ -732,17 +732,6 @@ function damageAgent(agentId) {
             document.querySelectorAll(".isPlaceable").forEach(el => {
                 el.classList.remove("isPlaceable");
             });
-
-            gsap.to(activeCard, {
-                scale: 1,
-                duration: 0.2
-            });
-            activeCard.deck = true;
-            deckCards.push(activeCard);
-            updateDeckPositions(0.3);
-
-            document.removeEventListener("mousemove", mouseMove);
-            document.removeEventListener("mouseup", mouseUp);
             return;
         }
         // else we can afford: spend AP now
@@ -752,47 +741,48 @@ function damageAgent(agentId) {
         damageDealt = 0;
         for (let i = 0; i < ammo; i++) {
             const randomChance = Math.floor(Math.random() * 100);
-    console.log(`Firing ${ammo} shots with ${agentSelectedToAttack.weapon}. Damage: ${damage}, Hit Chance: ${chanceToHit}%`);
-    console.log(agentSelectedToAttack.hitChanceMultiplier);
-    damageDealt = 0;
-    for (let i = 0; i < ammo; i++) {
-        const randomChance = Math.floor(Math.random() * 100);
+            console.log(`Firing ${ammo} shots with ${agentSelectedToAttack.weapon}. Damage: ${damage}, Hit Chance: ${chanceToHit}%`);
+            console.log(agentSelectedToAttack.hitChanceMultiplier);
+            damageDealt = 0;
+            for (let i = 0; i < ammo; i++) {
+                const randomChance = Math.floor(Math.random() * 100);
 
-        if (randomChance < chanceToHit * agentSelectedToAttack.hitChanceMultiplier) {
-            // HIT confirmed!
-            agent.health -= damage;
-            damageDealt += damage;
-            console.log(`Shot ${i + 1}: HIT! Health remaining: ${agent.health}`);
+                if (randomChance < chanceToHit * agentSelectedToAttack.hitChanceMultiplier) {
+                    // HIT confirmed!
+                    agent.health -= damage;
+                    damageDealt += damage;
+                    console.log(`Shot ${i + 1}: HIT! Health remaining: ${agent.health}`);
 
-                // OPTIONAL: Add a check here if the agent is defeated
-                if (agent.health <= 0) {
-                    console.log("Agent defeated!");
-                    agent.health = 0;
-                    gsap.to(agent, {
-                        filter: "grayscale(1)",
-                        duration:  0.5,
-                    });
-                    if(enemyAgent0.health <= 0 && enemyAgent1.health <= 0 && enemyAgent2.health <= 0){
-                        console.log("YESS, HELL YEAH, I WOONNNN YEYYYY 😃")
-                        endScreen.style.top = "0vh";
+                    // OPTIONAL: Add a check here if the agent is defeated
+                    if (agent.health <= 0) {
+                        console.log("Agent defeated!");
+                        agent.health = 0;
+                        gsap.to(agent, {
+                            filter: "grayscale(1)",
+                            duration: 0.5,
+                        });
+                        if (enemyAgent0.health <= 0 && enemyAgent1.health <= 0 && enemyAgent2.health <= 0) {
+                            console.log("YESS, HELL YEAH, I WOONNNN YEYYYY 😃")
+                            endScreen.style.top = "0vh";
+                        }
+                        break; // Stop firing if the target is defeated
                     }
-                    break; // Stop firing if the target is defeated
+                } else {
+                    // MISS confirmed!
+                    console.log(`Shot ${i + 1}: MISS. Health remaining: ${agent.health}`);
                 }
-            } else {
-                // MISS confirmed!
-                console.log(`Shot ${i + 1}: MISS. Health remaining: ${agent.health}`);
             }
-        }
 
-        console.log("New health:", agent.health);
+            console.log("New health:", agent.health);
 
-        // Update the health display
-        const healthDisplay = agent.querySelector(".heart");
-        if (healthDisplay) {
-            healthDisplay.textContent = agent.health;
+            // Update the health display
+            const healthDisplay = agent.querySelector(".heart");
+            if (healthDisplay) {
+                healthDisplay.textContent = agent.health;
+            }
+            socket.emit("damageAgent", agentId, damageDealt);//2 is only for now, later replace with varriabnle!
+            switchPlayer();
         }
-        socket.emit("damageAgent", agentId, damageDealt);//2 is only for now, later replace with varriabnle!
-        switchPlayer();
         /*    setTimeout(() => {
                 switchPlayer();
             }, 1000);*/
