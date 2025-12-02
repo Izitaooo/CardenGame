@@ -87,8 +87,23 @@ socket.on("roomPlayerCount", (data) => {
 
   if (playersInRoom === 2) {
     document.getElementById("waitForPlayerText").classList = "playersThere";
+  }else{
+      document.getElementById("waitForPlayerText").classList.remove("playersThere");
   }
 });
+
+
+socket.on("crash", (data) => {
+    // Disconnect the socket before redirecting
+    socket.disconnect();
+
+    alert("your diddyblud friend has disconnected!");
+
+
+
+    window.location.href = `index.html`;
+});
+
 
 const hand = document.getElementById("hand");
 
@@ -128,11 +143,14 @@ function selectAgent(agentName) {
 
   console.log("Selected agents:", agentsChosen);
 }
-
+let agent0;
+let agent1;
+let agent2;
 let enemyAgent0;
 let enemyAgent1;
 let enemyAgent2;
 
+let lockInPressed = false;
 function lockIn() {
   console.log("lock in");
   if (agentsChosen.length === 3 && playersInRoom === 2) {
@@ -256,11 +274,14 @@ function lockIn() {
           }
       }*/
   }
-  socket.emit("agentsLockedIn", {
-    agentsChosen,
-  });
-  ImPlaying = false;
-  MainGameLoop();
+  if(!lockInPressed) {
+      socket.emit("agentsLockedIn", {
+          agentsChosen,
+      });
+      ImPlaying = false;
+      MainGameLoop();
+      lockInPressed = true;
+  }
 }
 let enemyAgents = [];
 socket.on("enemyChose", (data) => {
@@ -353,12 +374,19 @@ function updateTurnState(myAgents) {
     if (ImPlaying) {
         // Enable my agents
         myAgents.forEach(agentEl => {
-            agentEl.classList.add("selectable");
-            // Use the globally stored handler
-            if (agentClickHandlers[agentEl.id]) {
-                agentEl.removeEventListener("click", agentClickHandlers[agentEl.id]);
-                agentEl.addEventListener("click", agentClickHandlers[agentEl.id]);
+            if (agentEl.health > 0){
+                agentEl.classList.add("selectable");
+                // Use the globally stored handler
+                if (agentClickHandlers[agentEl.id]) {
+                    agentEl.removeEventListener("click", agentClickHandlers[agentEl.id]);
+                    agentEl.addEventListener("click", agentClickHandlers[agentEl.id]);
+                }
+            }else {
+                // dead agents are not selectable
+                agentEl.classList.remove("selectable");
+                agentEl.style.pointerEvents = "none";
             }
+
         });
         document.getElementById("youPlaying").classList.add("active");
         document.getElementById("enemyPlaying").classList.remove("active");
@@ -381,11 +409,37 @@ function updateTurnState(myAgents) {
 
 socket.on("rolesSwitched", () => {
     ImPlaying = !ImPlaying;
+    //console.log(ImPlaying);
 
     const agentElements = document.querySelectorAll(".agentSelect");
     const myAgents = Array.from(agentElements).filter(el =>
         agentsChosen.includes(el.id)
     );
+
+
+    document.querySelectorAll(".agentSelect").forEach((el) => {
+        el.classList.remove("selected");
+    });
+    if (ImPlaying) {
+        agentElements.forEach((agent) => {
+            // Check if the agent has effects array
+            if (agent.effects && agent.effects.length > 0) {
+                // Loop through each effect
+                for (let i = agent.effects.length - 1; i >= 0; i--) {
+                    agent.effects[i].duration--;
+
+                    console.log(`${agent.id} - ${agent.effects[i].name}: ${agent.effects[i].duration} rounds left`);
+
+                    // Remove effect if duration reaches 0
+                    if (agent.effects[i].duration <= 0) {
+                        console.log(`Removing ${agent.effects[i].name} from ${agent.id}`);
+                        agent.effects.splice(i, 1);
+                    }
+                }
+            }
+        });
+    }
+
 
     // Don't recreate handlers - just use the existing ones
     updateTurnState(myAgents);
@@ -396,6 +450,7 @@ socket.on("rolesSwitched", () => {
 
 function switchPlayer() {
     ImPlaying = !ImPlaying;
+    //console.log(ImPlaying);
 
     const agentElements = document.querySelectorAll(".agentSelect");
     const myAgents = Array.from(agentElements).filter(el =>
@@ -461,8 +516,14 @@ const enemyMouseLeaveHandlers = {}
 
 let agentSelectedToAttack;
 function SelectToAttack(agent) {
-    agentSelectedToAttack = document.getElementById(agent);
+
     const agentEl = document.getElementById(agent);
+
+    if (agentEl.health <= 0) {
+        console.log("Cannot select dead agent");
+        return;
+    }
+    agentSelectedToAttack = document.getElementById(agent);
     const wasSelected = agentEl.classList.contains("selected");
 
     // Remove selected from all agents
@@ -496,20 +557,23 @@ function SelectToAttack(agent) {
         console.log("selected to attack:", agent);
 
         document.querySelectorAll(".agentSelect.enemy").forEach((el) => {
-            console.log("making damageable:", el.id);
-            el.classList.add("damageable");
-            el.style.pointerEvents = "auto";
+            // Only make them interactive if they are alive
+            if (el.health > 0) {
+                console.log("making damageable:", el.id);
+                el.classList.add("damageable");
+                el.style.pointerEvents = "auto";
 
 
-            enemyHoverHandlers[el.id] = () => damageDisplay(el.id);
-            el.addEventListener("mouseover", enemyHoverHandlers[el.id]);
+                enemyHoverHandlers[el.id] = () => damageDisplay(el.id);
+                el.addEventListener("mouseover", enemyHoverHandlers[el.id]);
 
-            enemyMouseLeaveHandlers[el.id] = () => damageDisplayHide(el.id);
-            el.addEventListener("mouseleave", enemyMouseLeaveHandlers[el.id])
+                enemyMouseLeaveHandlers[el.id] = () => damageDisplayHide(el.id);
+                el.addEventListener("mouseleave", enemyMouseLeaveHandlers[el.id])
 
-            // Create and store the handler
-            enemyClickHandlers[el.id] = () => damageAgent(el.id);
-            el.addEventListener("click", enemyClickHandlers[el.id]);
+                // Create and store the handler
+                enemyClickHandlers[el.id] = () => damageAgent(el.id);
+                el.addEventListener("click", enemyClickHandlers[el.id]);
+            }
         });
     }
 }
@@ -529,26 +593,35 @@ function damageDisplayHide(agentId) {
     agent.querySelector(".heart").textContent = damageCalc.toString();
     agent.querySelector(".heart").style.color = "white";
 }
-
+let damageDealt = 0;
 function damageAgent(agentId) {
     let agent = document.getElementById(agentId);
     console.log("damaging agent:", agent.id);
     weaponDamageLUT(agentSelectedToAttack.weapon)
     console.log(`Firing ${ammo} shots with ${agent.weapon}. Damage: ${damage}, Hit Chance: ${chanceToHit}%`);
 
-
+    damageDealt = 0;
     for (let i = 0; i < ammo; i++) {
         const randomChance = Math.floor(Math.random() * 100);
 
         if (randomChance < chanceToHit) {
             // HIT confirmed!
             agent.health -= damage;
+            damageDealt += damage;
             console.log(`Shot ${i + 1}: HIT! Health remaining: ${agent.health}`);
 
             // OPTIONAL: Add a check here if the agent is defeated
             if (agent.health <= 0) {
                 console.log("Agent defeated!");
                 agent.health = 0;
+                gsap.to(agent, {
+                    filter: "grayscale(1)",
+                    duration:  0.5,
+                });
+                if(enemyAgent0.health <= 0 && enemyAgent1.health <= 0 && enemyAgent2.health <= 0){
+                    console.log("YESS, HELL YEAH, I WOONNNN YEYYYY 😃")
+                    endScreen.style.top = "0vh";
+                }
                 break; // Stop firing if the target is defeated
             }
         } else {
@@ -564,10 +637,11 @@ function damageAgent(agentId) {
     if (healthDisplay) {
         healthDisplay.textContent = agent.health;
     }
-    socket.emit("damageAgent", agentId, 2);//2 is only for now, later replace with varriabnle!
-    setTimeout(() => {
+    socket.emit("damageAgent", agentId, damageDealt);//2 is only for now, later replace with varriabnle!
+    switchPlayer();
+/*    setTimeout(() => {
         switchPlayer();
-    }, 1000);
+    }, 1000);*/
 }
 
 let damage = 0;
@@ -660,8 +734,27 @@ socket.on("damageAgent", (agentId, damage) => {
     console.log("Enemy damaging your agent:", agent.id);
     console.log("old health:", agent.health);
     agent.health -= damage;
-    console.log("New health:", agent.health);
-    agent.querySelector(".heart").innerHTML = agent.health;
+
+
+    if (agent.health <= 0) {
+        console.log("Agent defeated!");
+        agent.health = 0;
+
+        agent.classList.remove("selectable");
+        agent.classList.remove("selected");
+        agent.style.pointerEvents = "none";
+
+        gsap.to(agent, {
+            filter: "grayscale(1)",
+            duration:  0.5,
+        });
+    }
+        console.log("New health:", agent.health);
+        agent.querySelector(".heart").innerHTML = agent.health;
+    if(agent0.health <= 0 && agent1.health <= 0 && agent2.health <= 0) {
+        console.log("I frickin lost 😭")
+        endScreen.style.top = "0vh";
+    }
 
 });
 
@@ -833,7 +926,7 @@ console.log("card type: " + cardElement.type);
 }
 
 
-let agent0, agent1, agent2;
+//let agent0, agent1, agent2;
 
 
 
@@ -1244,20 +1337,27 @@ function mouseUp() {
         isLocked = 0;
     } else if (activeCard.spawning === false && isLocked === 1){
         if (activeCard.type === "ability") {
-
             let agent = null;
+            let agentIndex = null; // Track which agent (0, 1, or 2)
+
             if (container === 1) {
                 agent = enemyAgentElements[0];
+                agentIndex = 0;
             } else if (container === 2) {
                 agent = enemyAgentElements[1];
+                agentIndex = 1;
             } else if (container === 3) {
                 agent = enemyAgentElements[2];
+                agentIndex = 2;
             } else if (container === 4) {
                 agent = agent0;
+                agentIndex = 0;
             } else if (container === 5) {
                 agent = agent1;
+                agentIndex = 1;
             } else if (container === 6) {
                 agent = agent2;
+                agentIndex = 2;
             }
 
             if (agent) {
@@ -1268,6 +1368,15 @@ function mouseUp() {
                 };
 
                 agent.effects.unshift(effectObj);
+
+
+                socket.emit("effectApplied", {
+                    agentIndex: agentIndex,
+                    effectName: activeCard.ability,
+                    duration: 4,
+                    isFriendly: container >= 4 // true if 4,5,6 (your agents), false if 1,2,3 (enemies)
+                });
+
 
                 console.log("effect applied: " + activeCard.ability + " to " + agent.id);
                 console.log("Current effects:", agent.effects);
@@ -1516,6 +1625,37 @@ function mouseUp() {
   document.removeEventListener("mousemove", mouseMove);
   document.removeEventListener("mouseup", mouseUp); // Not mouseMove
 }
+
+socket.on("enemyAppliedEffect", (data) => {
+    console.log("Enemy applied effect:", data);
+
+    let agent;
+
+    // Reverse the target! AAAAAAAAAAAAAAAA
+    if (data.isFriendly) {
+        // They applied to their agent → your enemy
+        const enemyAgentElements = enemyAgents.map(agentName =>
+            document.getElementById("enemy_" + agentName)
+        ).filter(el => el !== null);
+
+        agent = enemyAgentElements[data.agentIndex];
+    } else {
+        // They applied to their enemy → your agent
+        const myAgents = [agent0, agent1, agent2];
+        agent = myAgents[data.agentIndex];
+    }
+
+    if (agent) {
+        const effectObj = {
+            name: data.effectName,
+            duration: data.duration
+        };
+
+        agent.effects.unshift(effectObj);
+        console.log(`Effect ${data.effectName} applied to ${agent.id}`);
+    }
+    console.log(agent.effects);
+});
 
 function distanceFind(card = activeCard, cont = container) {
   if (!card) return 0;
