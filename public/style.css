@@ -1302,12 +1302,38 @@ body {
 
 #APhold {
     position: fixed;
-    top: 36vh;
+    top: 33vh;
     left: 3vw;
-    width: 3vw;
-    height: 15vw;
-    background-color: #F2C3F7;
+    width: 2vw;
+    height: 20vw;
     z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.AP {
+    width: 100%;
+    background-color: #dca61e;
+    height: 2.5vw;
+}
+
+/* make used AP dim */
+.AP.used {
+    opacity: 0.15;           /* visually "removed" */
+    transition: opacity .12s;
+    pointer-events: none;
+}
+
+#APhold.not-enough { animation: shake .3s; }
+/* add simple keyframes for a small shake */
+@keyframes shake {
+    0% { transform: translateX(0) }
+    25% { transform: translateX(-6px) }
+    50% { transform: translateX(6px) }
+    75% { transform: translateX(-3px) }
+    100% { transform: translateX(0) }
 }
 
 #endScreen {
