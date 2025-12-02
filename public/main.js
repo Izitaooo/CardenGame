@@ -316,6 +316,32 @@ function spawnEnemyAgent(agentName, dropper) {
     glint.className = "glint";
     enemyAgent.appendChild(glint);
 
+    const effects =  document.createElement("div");
+    effects.className = "effects";
+    enemyAgent.appendChild(effects);
+
+    const ef1 =  document.createElement("div");
+    ef1.className = "ef1";
+    effects.appendChild(ef1);
+
+    const ef2 =  document.createElement("div");
+    ef2.className = "ef2";
+    effects.appendChild(ef2);
+
+    const ef3 =  document.createElement("div");
+    ef3.className = "ef3";
+    effects.appendChild(ef3);
+
+    const ef4 =  document.createElement("div");
+    ef4.className = "ef4";
+    effects.appendChild(ef4);
+
+    const ef5 =  document.createElement("div");
+    ef5.className = "ef5";
+    effects.appendChild(ef5);
+
+    effects.classList.add("enemyEF");
+
     // Add health display element
     const healthDisplay = document.createElement("div");
     healthDisplay.className = "heart";
@@ -418,7 +444,27 @@ function switchPlayer() {
                     // Remove effect if duration reaches 0
                     if (agent.effects[i].duration <= 0) {
                         console.log(`Removing ${agent.effects[i].name} from ${agent.id}`);
+
+
+                        // effect you are removing
+                        const effectName = agent.effects[i].name.trim().replace(/["')]/g, "");
+
+// find all slots
+                        const slots = document.querySelectorAll(`#${agent.id} .effects > div`);
+
+// loop through and clear the one that matches
+                        for (const slot of slots) {
+                            // backgroundImage can return full url(), so we check if it includes the file name
+                            if (slot.style.backgroundImage.includes(`${effectName}.webp`)) {
+                                slot.style.backgroundImage = ""; // clear slot
+                                slot.style.opacity = "0";        // optional visual fade
+                                break; // stop after clearing the first matching slot
+                            }
+                        }
+
+// now remove effect from array
                         agent.effects.splice(i, 1);
+
                     }
                 }
             }
@@ -576,81 +622,81 @@ let chanceToHit = 0;
 function weaponDamageLUT(weapon){
     if(weapon === "classic"){
         damage = 2;
-        ammo = 3;
+        ammo = 5;
         chanceToHit = 75;
     }else if(weapon === "shorty"){
-        damage = 4;
-        ammo = 1;
+        damage = 1;
+        ammo = 5;
         chanceToHit = 45;
     }else if(weapon === "frenzy"){
-        damage = 3;
-        ammo = 3;
-        chanceToHit = 60;
-    }else if(weapon === "ghost"){
-        damage = 4;
+        damage = 1;
         ammo = 4;
-        chanceToHit = 70;
-    }else if(weapon === "sheriff"){
-        damage = 6;
+        chanceToHit = 55;
+    }else if(weapon === "ghost"){
+        damage = 2;
         ammo = 2;
-        chanceToHit = 85;
-    }else if(weapon === "bucky"){
-        damage = 7;
+        chanceToHit = 65;
+    }else if(weapon === "sheriff"){
+        damage = 4;
         ammo = 2;
         chanceToHit = 50;
+    }else if(weapon === "bucky"){
+        damage = 1;
+        ammo = 12;
+        chanceToHit = 50;
     }else if(weapon === "judge"){
-        damage = 6;
-        ammo = 3;
+        damage = 1;
+        ammo = 16;
         chanceToHit = 55;
     }else if(weapon === "stinger"){
-        damage = 4;
-        ammo = 4;
-        chanceToHit = 65;
+        damage = 1;
+        ammo = 7;
+        chanceToHit = 60;
     }else if(weapon === "spectre"){
-        damage = 5;
+        damage = 1;
         ammo = 5;
         chanceToHit = 70;
     }else if(weapon === "bulldog"){
-        damage = 6;
-        ammo = 5;
+        damage = 2;
+        ammo = 4;
         chanceToHit = 75;
     }else if(weapon === "guardian"){
-        damage = 7;
+        damage = 4;
         ammo = 3;
-        chanceToHit = 85;
+        chanceToHit = 80;
     }else if(weapon === "phantom"){
-        damage = 8;
-        ammo = 6;
-        chanceToHit = 80;
+        damage = 3;
+        ammo = 3;
+        chanceToHit = 75;
     }else if(weapon === "vandal"){
-        damage = 8;
-        ammo = 5;
-        chanceToHit = 80;
+        damage = 4;
+        ammo = 3;
+        chanceToHit = 70;
     }else if(weapon === "ares"){
-        damage = 6;
-        ammo = 8;
-        chanceToHit = 60;
-    }else if(weapon === "odin"){
-        damage = 7;
+        damage = 1;
         ammo = 10;
-        chanceToHit = 55;
+        chanceToHit = 40;
+    }else if(weapon === "odin"){
+        damage = 1;
+        ammo = 15;
+        chanceToHit = 60;
     }else if(weapon === "marshal"){
-        damage = 8;
+        damage = 3;
+        ammo = 1;
+        chanceToHit = 80;
+    }else if(weapon === "outlaw"){
+        damage = 4;
+        ammo = 2;
+        chanceToHit = 75;
+    }else if(weapon === "operator"){
+        damage = 9;
         ammo = 1;
         chanceToHit = 90;
-    }else if(weapon === "outlaw"){
-        damage = 9;
-        ammo = 2;
-        chanceToHit = 92;
-    }else if(weapon === "operator"){
-        damage = 10;
-        ammo = 1;
-        chanceToHit = 95;
     }else {
         // Default values
         damage = 1;
-        ammo = 1;
-        chanceToHit = 100;
+        ammo = 2;
+        chanceToHit = 60;
     }
 }
 
@@ -1271,9 +1317,38 @@ function mouseUp() {
 
                 console.log("effect applied: " + activeCard.ability + " to " + agent.id);
                 console.log("Current effects:", agent.effects);
+
+
+
+                let effectName = agent.effects[0].name.trim();
+                effectName = effectName.replace(/["')]/g, "");
+                console.log(effectName)
+
+                activeCard.style.transition = "opacity 0.2s";
+                activeCard.style.opacity = "0";
+
+                setTimeout(() => {
+                    for (let i = 0; i < cardsGame.length; i++) {
+                        cardsGame[i].style.pointerEvents = "all";
+                    }
+                    activeCard.style.display = "none";
+                }, 300);
+
+
                 document.removeEventListener("mousemove", mouseMove);
                 document.removeEventListener("mouseup", mouseUp);
                 dropSound.play();
+
+                for (let i = 1; i <= 5; i++) {
+                    const slot = document.querySelector(`#${agent.id} .ef${i}`);
+
+                    // check if empty
+                    if (!slot.style.backgroundImage || slot.style.backgroundImage === "none") {
+                        slot.style.opacity = "100%";
+                        slot.style.backgroundImage = `url('images/abilityIcon/${effectName}.webp')`;
+                        break; // stop after filling the first empty one
+                    }
+                }
             }
         }
     }
@@ -1643,23 +1718,23 @@ function selectAbility(min, max) {
 }
 
 cardSymb = [
-  'url("images/guns/shorty.png")',
-  'url("images/guns/frenzy.png")',
-  'url("images/guns/ghost.png")',
-  'url("images/guns/sheriff.png")',
-  'url("images/guns/stinger.png")',
-  'url("images/guns/spectre.png")',
-  'url("images/guns/bucky.png")',
-  'url("images/guns/judge.png")',
-  'url("images/guns/bulldog.png")',
-  'url("images/guns/guardian.png")',
-  'url("images/guns/phantom.png")',
-  'url("images/guns/vandal.png")',
-  'url("images/guns/marshal.png")',
-  'url("images/guns/outlaw.png")',
-  'url("images/guns/operator.png")',
-  'url("images/guns/ares.png")',
-  'url("images/guns/odin.png")'
+  'url("images/guns/shorty.webp")',
+  'url("images/guns/frenzy.webp")',
+  'url("images/guns/ghost.webp")',
+  'url("images/guns/sheriff.webp")',
+  'url("images/guns/stinger.webp")',
+  'url("images/guns/spectre.webp")',
+  'url("images/guns/bucky.webp")',
+  'url("images/guns/judge.webp")',
+  'url("images/guns/bulldog.webp")',
+  'url("images/guns/guardian.webp")',
+  'url("images/guns/phantom.webp")',
+  'url("images/guns/vandal.webp")',
+  'url("images/guns/marshal.webp")',
+  'url("images/guns/outlaw.webp")',
+  'url("images/guns/operator.webp")',
+  'url("images/guns/ares.webp")',
+  'url("images/guns/odin.webp")'
 ];
 
 const priceList = [
@@ -1669,30 +1744,30 @@ const priceList = [
 ];
 
 const abilitySymb = [
-  'url("images/abilitycards/arc rose.png")', //0
-  'url("images/abilitycards/barrier orb.png")', //1
-  'url("images/abilitycards/cloudburst.png")', //2
-  'url("images/abilitycards/contigency.png")', //3
-  'url("images/abilitycards/dark cover.png")', //4
-  'url("images/abilitycards/double tap.png")', //5
-  'url("images/abilitycards/guiding light.png")', //6
-  'url("images/abilitycards/healing orb.png")', //7
-  'url("images/abilitycards/meddle.png")', //8
-  'url("images/abilitycards/owl drone.png")', //9
-  'url("images/abilitycards/paranoia.png")', //10
-  'url("images/abilitycards/pick me up.png")', //11
-  'url("images/abilitycards/razorvine.png")', //12
-  'url("images/abilitycards/recon bolt.png")', //13
-  'url("images/abilitycards/regrowth.png")', //14
-  'url("images/abilitycards/ruse.png")',  //15
-  'url("images/abilitycards/shear.png")', //16
-  'url("images/abilitycards/shock bolt.png")', //17
-  'url("images/abilitycards/slow orb.png")', //18
-  'url("images/abilitycards/shrouded step.png")', //19
-  'url("images/abilitycards/tailwind.png")', //20
-  'url("images/abilitycards/trailblazer.png")', //21
-  'url("images/abilitycards/undercut.png")', //22
-  'url("images/abilitycards/updraft.png")' //23
+  'url("images/abilitycards/arc rose.webp")', //0
+  'url("images/abilitycards/barrier orb.webp")', //1
+  'url("images/abilitycards/cloudburst.webp")', //2
+  'url("images/abilitycards/contigency.webp")', //3
+  'url("images/abilitycards/dark cover.webp")', //4
+  'url("images/abilitycards/double tap.webp")', //5
+  'url("images/abilitycards/guiding light.webp")', //6
+  'url("images/abilitycards/healing orb.webp")', //7
+  'url("images/abilitycards/meddle.webp")', //8
+  'url("images/abilitycards/owl drone.webp")', //9
+  'url("images/abilitycards/paranoia.webp")', //10
+  'url("images/abilitycards/pick me up.webp")', //11
+  'url("images/abilitycards/razorvine.webp")', //12
+  'url("images/abilitycards/recon bolt.webp")', //13
+  'url("images/abilitycards/regrowth.webp")', //14
+  'url("images/abilitycards/ruse.webp")',  //15
+  'url("images/abilitycards/shear.webp")', //16
+  'url("images/abilitycards/shock bolt.webp")', //17
+  'url("images/abilitycards/slow orb.webp")', //18
+  'url("images/abilitycards/shrouded step.webp")', //19
+  'url("images/abilitycards/tailwind.webp")', //20
+  'url("images/abilitycards/trailblazer.webp")', //21
+  'url("images/abilitycards/undercut.webp")', //22
+  'url("images/abilitycards/updraft.webp")' //23
 ];
 
 const abilityIcon = [
@@ -1815,7 +1890,7 @@ function createCard(id, initialX, initialY, buttonId) {
 
       cardElement.weaponName = imgSelect
           .replace('url("images/guns/', '')
-          .replace('.png")', '');
+          .replace('.webp")', '');
 
       console.log("Created gun card:", cardElement.weaponName);
 
@@ -1829,19 +1904,19 @@ function createCard(id, initialX, initialY, buttonId) {
       if(buttonId === "ab1"){
           cardElement.ability = abilitySymb[qIndex]
               .replace('url("images/abilitycards/', "")
-              .replace('.png")', "");
+              .replace('.webp")', "");
           console.log(cardElement.type);
       }
       else if(buttonId === "ab2"){
           cardElement.ability = abilitySymb[eIndex]
               .replace('url("images/abilitycards/', "")
-              .replace('.png")', "");
+              .replace('.webp")', "");
           console.log(cardElement.type);
       }
       else if(buttonId === "ab3"){
           cardElement.ability = abilitySymb[cIndex]
               .replace('url("images/abilitycards/', "")
-              .replace('.png")', "");
+              .replace('.webp")', "");
           console.log(cardElement.type);
       }
       const abIndex = abilitySymb.indexOf(imgSelect);
@@ -1850,10 +1925,9 @@ function createCard(id, initialX, initialY, buttonId) {
 
 
   if (buttonId !== "randBtn" && buttonId !== "ab1" && buttonId !== "ab2" && buttonId !== "ab3"){
-      back.style.backgroundImage = "url(images/guns/back.png)";
+      back.style.backgroundImage = "url(images/guns/back.webp)";
   } else {
       back.style.backgroundImage = imgSelect.replace('images/abilitycards', 'images/backs')
-          .replace('.png', '.webp')
   }
 
 
@@ -2007,7 +2081,7 @@ socket.on("enemySpawnedCard", (data) => {
   enemycard.style.left = window.innerWidth/2 + "px";
   enemycard.style.top = window.innerHeight/2 + "px";
 
-  enemycard.style.backgroundImage = "url(images/abilitycards/back.png)";
+  enemycard.style.backgroundImage = "url(images/abilitycards/back.webp)";
   enemycard.deckOponent = true;
   deckCardsOponent.push(enemycard);
   cardsGame.push(enemycard);
@@ -2348,6 +2422,21 @@ function updateAgentPositionsOnResize() {
         let el = document.getElementById(nameOrEl);
         moveToDrop(el, drops[i]);
     }
+
+
+    // Move enemy agents if present (enemy_<name> -> drop1/2/3 in array order)
+    // If you spawn enemies in the same order, adapt as needed
+    const enemyEls = [];
+    // gather existing enemy elements in DOM order (drop1..3)
+    if (d1) enemyEls.push({el: document.getElementById("enemy_" + (agentsChosen[0] || "")), drop: d1});
+    if (d2) enemyEls.push({el: document.getElementById("enemy_" + (agentsChosen[1] || "")), drop: d2});
+    if (d3) enemyEls.push({el: document.getElementById("enemy_" + (agentsChosen[2] || "")), drop: d3});
+    // But more robust: move any #enemy_* elements found to the earliest free droppers
+    const allEnemyNodes = Array.from(document.querySelectorAll("[id^='enemy_']"));
+    const enemyDroppers = [d1, d2, d3].filter(Boolean);
+    allEnemyNodes.forEach((node, idx) => {
+        moveToDrop(node, enemyDroppers[idx]);
+    });
 }
 
 function roundOver() {
