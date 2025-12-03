@@ -487,6 +487,7 @@ function effectLUT(agent, effect){
         effect.name === "contingency" ||
         effect.name === "shear"
     ) {
+        agent.hitChanceMultiplier = 0.5;
         agent.isSelectable = false;
         agent.classList.remove("selectable");
         agent.style.pointerEvents = "none";
@@ -498,6 +499,8 @@ function effectLUT(agent, effect){
         //lowers your chance of hit
         agent.hitChanceMultiplier = 0.5;
 
+    } else {
+        agent.hitChanceMultiplier = 1;
     }
 }
 
@@ -697,6 +700,12 @@ function SelectToAttack(agent) {
 function damageDisplay(agentId){
     let agent = document.getElementById(agentId);
 
+    if(agentSelectedToAttack.hitChanceMultiplier === 0 ||
+        agentSelectedToAttack.hitChanceMultiplier === null ||
+        agentSelectedToAttack.hitChanceMultiplier === undefined) {
+        agentSelectedToAttack.hitChanceMultiplier = 1;
+    }
+
     weaponDamageLUT(agentSelectedToAttack.weapon);
 
 
@@ -711,41 +720,66 @@ function damageDisplayHide(agentId) {
     agent.querySelector(".heart").style.color = "white";
 }
 let damageDealt = 0;
-let apCostW = 2
-function damageAgent(agentId) {
-    let agent = document.getElementById(agentId);
-    console.log("damaging agent:", agent.id);
-    weaponDamageLUT(agentSelectedToAttack.weapon)
-    console.log(`Firing ${ammo} shots with ${agent.weapon}. Damage: ${damage}, Hit Chance: ${chanceToHit}%`);
 
-    if(apCostW !== 2){
-        apCostW = activeCard.ap;
+const weaponAP = {
+    classic: 2,
+    shorty: 3,
+    frenzy: 3,
+    ghost: 3,
+    sheriff: 3,
+    stinger: 4,
+    spectre: 4,
+    bucky: 4,
+    judge: 4,
+    bulldog: 4,
+    guardian: 4,
+    phantom: 4,
+    vandal: 4,
+    marshal: 3,
+    outlaw: 4,
+    operator: 5,
+    ares: 3,
+    odin: 5
+};
+
+function damageAgent(agentId) {
+    let agent = document.getElementById(agentId); // This is the TARGET (enemy being hit)
+    console.log("damaging agent:", agent.id);
+
+    // Get the weapon from the ATTACKER (agentSelectedToAttack), not the target!
+    let weaponName = agentSelectedToAttack.weapon ?? "classic";
+
+    console.log(`Attacker: ${agentSelectedToAttack.id}, Weapon: ${weaponName}`);
+
+    // Get weapon damage/ammo/hit chance based on attacker's weapon
+    weaponDamageLUT(weaponName);
+
+    console.log(`Firing ${ammo} shots with ${weaponName}. Damage: ${damage}, Hit Chance: ${chanceToHit}%`);
+
+    // Get AP cost for this weapon
+    let apCostW = weaponAP[weaponName];
+
+    if (apCostW === undefined) {
+        console.error(`No AP cost defined for weapon: ${weaponName}`);
+        apCostW = 2; // Fallback
     }
 
+    console.log(`AP cost for ${weaponName}: ${apCostW}, Current AP: ${currentAP}`);
     if (apCostW > 0 || !apCostW) {
         if (!canAfford(apCostW)) {
             flashNotEnoughAP();
-            isLocked = 0;
-
-            // RETURN CARD TO DECK
-
-            document.querySelectorAll(".isPlaceable").forEach(el => {
-                el.classList.remove("isPlaceable");
-            });
             return;
         }
         // else we can afford: spend AP now
         spendAP(apCostW);
         // optionally emit AP change / sync to server:
         // socket.emit("updateAP", { playerId: myId, currentAP });
-        damageDealt = 0;
-        for (let i = 0; i < ammo; i++) {
-            const randomChance = Math.floor(Math.random() * 100);
-            console.log(`Firing ${ammo} shots with ${agentSelectedToAttack.weapon}. Damage: ${damage}, Hit Chance: ${chanceToHit}%`);
-            console.log(agentSelectedToAttack.hitChanceMultiplier);
+
             damageDealt = 0;
             for (let i = 0; i < ammo; i++) {
                 const randomChance = Math.floor(Math.random() * 100);
+                console.log(`Firing ${ammo} shots with ${agentSelectedToAttack.weapon}. Damage: ${damage}, Hit Chance: ${chanceToHit}%`);
+                console.log(agentSelectedToAttack.hitChanceMultiplier);
 
                 if (randomChance < chanceToHit * agentSelectedToAttack.hitChanceMultiplier) {
                     // HIT confirmed!
@@ -786,7 +820,6 @@ function damageAgent(agentId) {
         /*    setTimeout(() => {
                 switchPlayer();
             }, 1000);*/
-    }
 }
 
 let damage = 0;
@@ -794,8 +827,8 @@ let ammo = 0;
 let chanceToHit = 0;
 function weaponDamageLUT(weapon){
     if(weapon === "classic"){
-        damage = 2;
-        ammo = 5;
+        damage = 1;
+        ammo = 2;
         chanceToHit = 75;
     }else if(weapon === "shorty"){
         damage = 1;
@@ -2387,8 +2420,6 @@ function createCard(id, initialX, initialY, buttonId) {
           cardElement.ap = 2;
       }
 
-      apCostW = cardElement.ap;
-
   } else if (buttonId === "randBtn"){
     cardElement.price = 0;
   } else {
@@ -2936,4 +2967,5 @@ function roundOver() {
   creds = creds + 200;
   credsText.innerHTML = creds;
   updateSpawnerButtons();
+  refillAP(7);
 }
