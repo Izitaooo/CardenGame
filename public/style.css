@@ -532,6 +532,7 @@ body {
   position: fixed;
   top: 1vw;
   left: 1vw;
+    z-index: 10000;
 }
 
 .slider {
@@ -1302,9 +1303,9 @@ body {
 
 #APhold {
     position: fixed;
-    top: 33vh;
+    top: 31.5vh;
     left: 3vw;
-    width: 2vw;
+    width: 4vw;
     height: 20vw;
     z-index: 3;
     display: flex;
@@ -1315,8 +1316,10 @@ body {
 
 .AP {
     width: 100%;
-    background-color: #dca61e;
-    height: 2.5vw;
+    height: 4.5vw;
+    background-image: url("images/GEM.svg");
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 /* make used AP dim */
@@ -1336,6 +1339,18 @@ body {
     100% { transform: translateX(0) }
 }
 
+.round-announcement {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 10vw;
+    font-weight: bold;
+    color: #dca61e;
+    z-index: 9999;
+    pointer-events: none;
+    font-family: "fabiola-capitals", sans-serif;
+}
+
 #endScreen {
     top: -100vh;
     position: fixed;
@@ -1349,7 +1364,6 @@ body {
     justify-content: center;
     align-items: center;
     background-color: #38334a;
-
 }
 
 #endText {
