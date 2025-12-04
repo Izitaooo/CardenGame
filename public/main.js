@@ -151,6 +151,7 @@ let enemyAgent1;
 let enemyAgent2;
 
 let lockInPressed = false;
+let wpn = document.querySelectorAll(".wpn")
 function lockIn() {
   console.log("lock in");
   if (agentsChosen.length === 3 && playersInRoom === 2) {
@@ -246,8 +247,15 @@ function lockIn() {
           overwrite: true,
           onComplete: () => {
             // restore after this element finishes animating
+
             data.element.classList.remove("animating");
-            data.element.style.pointerEvents = ""; // revert to stylesheet default
+            data.element.style.pointerEvents = "";
+
+            wpn.forEach((weapon) => {
+                weapon.style.opacity = "100%";
+
+            })
+            // revert to stylesheet default
             // optionally reset will-change if you set it elsewhere
           },
         });
@@ -739,6 +747,33 @@ const weaponAP = {
     operator: 5,
     ares: 3,
     odin: 5
+};
+
+const abilityAP = {
+    arcRose: 2,
+    barrierOrb: 2,
+    cloudburst: 1,
+    contingency: 2,
+    darkCover: 2,
+    doubleTap: 3,
+    guidingLight: 3,
+    healingOrb: 2,
+    meddle: 2,
+    owlDrone: 2,
+    paranoia: 3,
+    pickMeUp: 3,
+    razorvine: 3,
+    reconBolt: 2,
+    regrowth: 2,
+    ruse: 2,
+    shear: 3,
+    shockBolt: 2,
+    slowOrb: 3,
+    shroudedStep: 2,
+    tailwind: 3,
+    trailblazer: 3,
+    undercut: 3,
+    updraft: 2
 };
 
 const dropSound = new Howl({
@@ -1442,9 +1477,10 @@ function mouseMove(e) {
 }
 
 let endScreen = document.getElementById("endScreen");
-let wpn = document.querySelectorAll(".wpn")
 
 let enemyAgentElements;
+
+let apShow = document.querySelectorAll(".apShow")
 
 function mouseUp() {
   console.log("MouseUp:", activeCard?.id);
@@ -1782,6 +1818,7 @@ function mouseUp() {
             document.querySelector(`#${agent.id} .wpn`).className = "wpn";
             document.querySelector(`#${agent.id} .wpn`).classList.add(agent.weapon);
 
+            document.querySelector(`#${agent.id} .apShow`).textContent = weaponAP[activeCard.weaponName];
 
             document.removeEventListener("mousemove", mouseMove);
             document.removeEventListener("mouseup", mouseUp);
@@ -2442,23 +2479,134 @@ function createCard(id, initialX, initialY, buttonId) {
     cardElement.price = 0;
   } else {
       cardElement.type = "ability"
+
+      let abilityApShow = document.createElement('div');
+      abilityApShow.className = 'apValue';
+
+      cardElement.appendChild(abilityApShow);
+
       // Calculate the type directly from the index you already have
       if(buttonId === "ab1"){
-          cardElement.ability = abilitySymb[qIndex]
-              .replace('url("images/abilitycards/', "")
+          const abNameQ = abilitySymb[qIndex].
+                replace('url("images/abilitycards/', "")
               .replace('.webp")', "");
+
+          if(abNameQ === "meddle"){
+              abilityApShow.textContent = "2";
+              back.innerHTML = "1.5x damage on your shots.";
+          }
+          else if(abNameQ === "slow orb"){
+              abilityApShow.textContent = "3";
+              back.innerHTML = "Enemy cant play the game for one round.";
+          }
+          else if(abNameQ === "trailblazer"){
+              abilityApShow.textContent = "3";
+              back.innerHTML = "1.5x damage on your shots.";
+          }
+          else if(abNameQ === "shear"){
+              abilityApShow.textContent = "3";
+              back.innerHTML = "Tanks damage while active.";
+          }
+          else if(abNameQ === "shock bolt"){
+              abilityApShow.textContent = "2";
+              back.innerHTML = "Deals 2 damage.";
+          }
+          else if(abNameQ === "paranoia"){
+              abilityApShow.textContent = "3";
+              back.innerHTML = "Lowers enemies chances to hit a shot.";
+          }
+          else if(abNameQ === "updraft"){
+              abilityApShow.textContent = "2";
+              back.innerHTML = "Gains better positioning, slightly higher chance to hit your shots.";
+          }
+          else if(abNameQ === "undercut"){
+              abilityApShow.textContent = "3";
+              back.innerHTML = "1.5x damage on your shots.";
+          }
+
+          cardElement.ability = abNameQ
           console.log(cardElement.type);
       }
       else if(buttonId === "ab2"){
-          cardElement.ability = abilitySymb[eIndex]
-              .replace('url("images/abilitycards/', "")
+          const abNameE = abilitySymb[eIndex].
+          replace('url("images/abilitycards/', "")
               .replace('.webp")', "");
+
+          if(abNameE === "ruse"){
+              abilityApShow.textContent = "2";
+              back.innerHTML = "Lowers chances of hitting a shot on both the agent affected and the agents shooting at the affected agent.";
+          }
+          else if(abNameE === "guiding light"){
+              abilityApShow.textContent = "3";
+              back.innerHTML = "Lowers enemies chances to hit a shot.";
+          }
+          else if(abNameE === "double tap"){
+              abilityApShow.textContent = "3";
+              back.innerHTML = "ignores first bullet which hit Iso.";
+          }
+          else if(abNameE === "healing orb"){
+              abilityApShow.textContent = "2";
+              back.innerHTML = "Heals agent for 4 hp, 2 hp added each turn.";
+          }
+          else if(abNameE === "dark cover"){
+              abilityApShow.textContent = "2";
+              back.innerHTML = "Lowers chances of hitting a shot on both the agent affected and the agents shooting at the affected agent.";
+          }
+          else if(abNameE === "recon bolt"){
+              abilityApShow.textContent = "2";
+              back.innerHTML = "Significantly higher chance to hit your shots.";
+          }
+          else if(abNameE === "tailwind"){
+              abilityApShow.textContent = "3";
+              back.innerHTML = "A jett ability to shoot 2 times.";
+          }
+          else if(abNameE === "arc rose"){
+              abilityApShow.textContent = "2";
+              back.innerHTML = "Lowers enemies chances to hit a shot.";
+          }
+
+          cardElement.ability = abNameE
           console.log(cardElement.type);
       }
       else if(buttonId === "ab3"){
-          cardElement.ability = abilitySymb[cIndex]
-              .replace('url("images/abilitycards/', "")
+          const abNameC = abilitySymb[cIndex].
+          replace('url("images/abilitycards/', "")
               .replace('.webp")', "");
+
+          if(abNameC === "razorvine"){
+              abilityApShow.textContent = "3";
+              back.innerHTML = "When applied, opponents which shoot get damaged for 2hp";
+          }
+          else if(abNameC === "cloudburst"){
+              abilityApShow.textContent = "1";
+              back.innerHTML = "Lowers chances of hitting a shot on both the agent affected and the agents shooting at the affected agent.";
+          }
+          else if(abNameC === "contigency"){
+              abilityApShow.textContent = "2";
+              back.innerHTML = "Agent cant be shot but also cant shoot";
+          }
+          else if(abNameC === "owl drone"){
+              abilityApShow.textContent = "2";
+              back.innerHTML = "Significantly higher chance to hit your shots.";
+          }
+          else if(abNameC === "regrowth"){
+              abilityApShow.textContent = "2";
+              back.innerHTML = "Heals agent for 4 hp, 1 hp added each turn.";
+          }
+          else if(abNameC === "barrier orb"){
+              abilityApShow.textContent = "2";
+              back.innerHTML = "Tanks damage while active.";
+          }
+          else if(abNameC === "pick me up"){
+              abilityApShow.textContent = "2";
+              back.innerHTML = "When clove shoots it heals them.";
+          }
+          else if(abNameC === "shrouded step"){
+              abilityApShow.textContent = "2";
+              back.innerHTML = "Gains better positioning, slightly higher chance to hit your shots.";
+          }
+
+          cardElement.ability = abNameC
           console.log(cardElement.type);
       }
       const abIndex = abilitySymb.indexOf(imgSelect);
@@ -2476,11 +2624,39 @@ function createCard(id, initialX, initialY, buttonId) {
   // TODO [yell]: // BACK INFO
 
   if (imgSelect === cardSymb[0]) {
-    back.innerHTML = "THIS IS A SHORTY";
+    back.innerHTML = "Sometimes all someone needs is a shorty. Fires 5 bullets with heavy spread";
   } else if (imgSelect === cardSymb[1]) {
-    back.innerHTML = "THIS IS A FRENZY";
+    back.innerHTML = "The frenzy is a beast. Make sure to handle it with care. Shoots 4 times";
   } else if (imgSelect === cardSymb[2]) {
-    back.innerHTML = "THIS IS A GHOST";
+    back.innerHTML = "This is a ghost. It shoots only 2 times but packs quite a punch.";
+  } else if (imgSelect === cardSymb[3]) {
+      back.innerHTML = "A heavy duty revolver called the sheriff. 2 shots, 2 bodies.";
+  } else if (imgSelect === cardSymb[4]) {
+      back.innerHTML = "An extremly fast firing SMG. 7 shots.";
+  } else if (imgSelect === cardSymb[5]) {
+      back.innerHTML = "The spectre is a spectacle to watch. Fires 5 shots";
+  } else if (imgSelect === cardSymb[6]) {
+      back.innerHTML = "Pump action shotgun. Many such cases";
+  } else if (imgSelect === cardSymb[7]) {
+      back.innerHTML = "Automatic shotgun with high damage.";
+  } else if (imgSelect === cardSymb[8]) {
+      back.innerHTML = "Ruff up your enemies with the bulldog.";
+  } else if (imgSelect === cardSymb[9]) {
+      back.innerHTML = "Patience twin, just take your time.";
+  } else if (imgSelect === cardSymb[10]) {
+      back.innerHTML = "Balanced. Accurate. Spicy.";
+  } else if (imgSelect === cardSymb[11]) {
+      back.innerHTML = "Rebel against the status quo with the vandal.";
+  } else if (imgSelect === cardSymb[12]) {
+      back.innerHTML = "BOOM HEADSHOT!";
+  } else if (imgSelect === cardSymb[13]) {
+      back.innerHTML = "2 shots, 2 bodies... deja vu?";
+  } else if (imgSelect === cardSymb[14]) {
+      back.innerHTML = "A weapon of mass destruction. 1 shot is all that is needed.";
+  } else if (imgSelect === cardSymb[15]) {
+      back.innerHTML = "Ares almost sounds like a god lol.";
+  } else if (imgSelect === cardSymb[16]) {
+      back.innerHTML = "The odin is definitely a god.";
   }
 
   // style faces with CSS backface-visibility like earlier
