@@ -2431,44 +2431,12 @@ function createCard(id, initialX, initialY, buttonId) {
 
       console.log("Created gun card:", cardElement.weaponName);
 
-      // assign AP cost based on weapon
-      if (cardElement.weaponName === "shorty") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "frenzy") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "ghost") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "sheriff") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "stinger") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "spectre") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "bucky") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "judge") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "bulldog") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "guardian") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "phantom") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "vandal") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "marshal") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "outlaw") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "operator") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "ares") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "odin") {
-          cardElement.ap = 4;
-      } else {
-          cardElement.ap = 2;
-      }
+      const apValue = document.createElement('div');
+      apValue.className = 'apValue';
+
+      cardElement.appendChild(apValue);
+
+      apValue.textContent = weaponAP[cardElement.weaponName];
 
   } else if (buttonId === "randBtn"){
     cardElement.price = 0;

@@ -1339,6 +1339,22 @@ body {
     100% { transform: translateX(0) }
 }
 
+.apValue {
+    position: relative;
+    bottom: -85%;
+    right: -80%;
+    width: 2.5vw;
+    height: 2.5vw;
+    border-radius: 50%;
+    background-color: #dca61e;
+    z-index: 4;
+    text-align: center;
+    font-family: "corsario-variable", sans-serif;
+    color: white;
+    line-height: 2.5vw;
+    font-size: 1.7vw;
+}
+
 .round-announcement {
     position: fixed;
     top: 50%;
