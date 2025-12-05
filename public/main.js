@@ -151,6 +151,7 @@ let enemyAgent1;
 let enemyAgent2;
 
 let lockInPressed = false;
+let wpn = document.querySelectorAll(".wpn")
 function lockIn() {
   console.log("lock in");
   if (agentsChosen.length === 3 && playersInRoom === 2) {
@@ -246,8 +247,15 @@ function lockIn() {
           overwrite: true,
           onComplete: () => {
             // restore after this element finishes animating
+
             data.element.classList.remove("animating");
-            data.element.style.pointerEvents = ""; // revert to stylesheet default
+            data.element.style.pointerEvents = "";
+
+            wpn.forEach((weapon) => {
+                weapon.style.opacity = "100%";
+
+            })
+            // revert to stylesheet default
             // optionally reset will-change if you set it elsewhere
           },
         });
@@ -820,9 +828,8 @@ function damageDisplay(agentId){
 
     weaponDamageLUT(agentSelectedToAttack.weapon);
 
-
-    let damageCalc =agent.health - (damage * ammo * agentSelectedToAttack.hitChanceMultiplier) * agent.damageMultiplier;
-    agent.querySelector(".heart").textContent = damageCalc.toString();
+    let damageCalcShow =agent.health - (damage * ammo * agentSelectedToAttack.hitChanceMultiplier) * agent.damageMultiplier;
+    agent.querySelector(".heart").textContent = damageCalcShow.toString();
     agent.querySelector(".heart").style.color = "red";
 }
 function damageDisplayHide(agentId) {
@@ -854,6 +861,67 @@ const weaponAP = {
     odin: 5
 };
 
+const abilityAP = {
+    arcRose: 2,
+    barrierOrb: 2,
+    cloudburst: 1,
+    contingency: 2,
+    darkCover: 2,
+    doubleTap: 3,
+    guidingLight: 3,
+    healingOrb: 2,
+    meddle: 2,
+    owlDrone: 2,
+    paranoia: 3,
+    pickMeUp: 3,
+    razorvine: 3,
+    reconBolt: 2,
+    regrowth: 2,
+    ruse: 2,
+    shear: 3,
+    shockBolt: 2,
+    slowOrb: 3,
+    shroudedStep: 2,
+    tailwind: 3,
+    trailblazer: 3,
+    undercut: 3,
+    updraft: 2
+};
+
+const dropSound = new Howl({
+    src: ["audio/Mystbloom Kill 4.mp3"],
+    volume: 0.1,
+});
+const deckSound = new Howl({
+    src: ["audio/Cryostasis Kill 1.mp3"],
+    volume: 0.15,
+});
+const shopSound = new Howl({
+    src: ["audio/shopSound.mp3"],
+    volume: 6,
+    preload: true
+});
+const gunSounds = {
+    classic: new Howl({ src: ["audio/Pistols/classicTap.mp3"], volume: 2 }),
+    shorty: new Howl({ src: ["audio/Shotguns/shortyTap.mp3"], volume: 2 }),
+    frenzy: new Howl({ src: ["audio/Pistols/frenzyTap.mp3"], volume: 2 }),
+    ghost: new Howl({ src: ["audio/Pistols/ghostTap.mp3"], volume: 2 }),
+    sheriff: new Howl({ src: ["audio/Pistols/sheriffTap.mp3"], volume: 2 }),
+    bucky: new Howl({ src: ["audio/Shotguns/buckyTap.mp3"], volume: 2 }),
+    judge: new Howl({ src: ["audio/Shotguns/judgeTap.mp3"], volume: 2 }),
+    marshal: new Howl({ src: ["audio/Snipers/marshalTap.mp3"], volume: 2 }),
+    operator: new Howl({ src: ["audio/Snipers/operatorTap.mp3"], volume: 1.5 }),
+    bulldog: new Howl({ src: ["audio/Rifles/bulldogTap.mp3"], volume: 2 }),
+    guardian: new Howl({ src: ["audio/Rifles/guardianTap.mp3"], volume: 2 }),
+    phantom: new Howl({ src: ["audio/Rifles/phantomTap.mp3"], volume: 2 }),
+    vandal: new Howl({ src: ["audio/Rifles/vandalTap.mp3"], volume: 2 }),
+    ares: new Howl({ src: ["audio/LMGs/aresTap.mp3"], volume: 2 }),
+    outlaw: new Howl({ src: ["audio/Snipers/outlawTap.mp3"], volume: 5.5 }),
+    stinger: new Howl({ src: ["audio/SMGs/stingerTap.mp3"], volume: 5.5 }),
+    spectre: new Howl({ src: ["audio/SMGs/spectreTap.mp3"], volume: 5.5 }),
+    odin: new Howl({ src: ["audio/LMGs/odinTap.mp3"], volume: 5.5 }),
+};
+
 function damageAgent(agentId) {
     let agent = document.getElementById(agentId); // This is the TARGET (enemy being hit)
     console.log("damaging agent:", agent.id);
@@ -877,61 +945,66 @@ function damageAgent(agentId) {
     }
 
     console.log(`AP cost for ${weaponName}: ${apCostW}, Current AP: ${currentAP}`);
-    if (apCostW > 0 || !apCostW) {
-        if (!canAfford(apCostW)) {
-            flashNotEnoughAP();
-            return;
-        }
-        // else we can afford: spend AP now
-        spendAP(apCostW);
-        // optionally emit AP change / sync to server:
-        // socket.emit("updateAP", { playerId: myId, currentAP });
 
-            damageDealt = 0;
+    if (!canAfford(apCostW)) {
+        flashNotEnoughAP();
+        return;
+    }
 
-            for (let i = 0; i < ammo; i++) {
-                const randomChance = Math.floor(Math.random() * 100);
-                console.log(`Firing ${ammo} shots with ${agentSelectedToAttack.weapon}. Damage: ${damage}, Hit Chance: ${chanceToHit}%`);
-                console.log("😭agent.enemyHitChanceMultiplier: "+agent.enemyHitChanceMultiplier);
-                console.log("😭agentSelectedToAttack.hitChanceMultiplier: "+agentSelectedToAttack.hitChanceMultiplier);
-                console.log("agent.damageMultiplier: "+agent.damageMultiplier);
+    // else we can afford: spend AP now
+    spendAP(apCostW);
 
-                console.log("enemychancetohit: " + agent.enemyHitChanceMultiplier)
+    damageDealt = 0;
 
-                if (randomChance < chanceToHit * agentSelectedToAttack.hitChanceMultiplier * agent.enemyHitChanceMultiplier) {
-                    // HIT confirmed!
-                    agent.health -= damage * agent.damageMultiplier;
-                    damageDealt += damage * agent.damageMultiplier;
-                    console.log(`Shot ${i + 1}: HIT! Health remaining: ${agent.health}`);
+    for (let i = 0; i < ammo; i++) {
+        setTimeout(() => {
+            const randomChance = Math.floor(Math.random() * 100);
+            console.log(`Firing shot ${i + 1}/${ammo} with ${agentSelectedToAttack.weapon}. Damage: ${damage}, Hit Chance: ${chanceToHit * agentSelectedToAttack.hitChanceMultiplier}%`);
+            console.log(weaponName)
+            console.log("😭agent.enemyHitChanceMultiplier: "+agent.enemyHitChanceMultiplier);
+            console.log("😭agentSelectedToAttack.hitChanceMultiplier: "+agentSelectedToAttack.hitChanceMultiplier);
+            console.log("agent.damageMultiplier: "+agent.damageMultiplier);
+            console.log("enemychancetohit: " + agent.enemyHitChanceMultiplier)
 
-                    // OPTIONAL: Add a check here if the agent is defeated
-                    if (agent.health <= 0) {
-                        console.log("Agent defeated!");
-                        agent.health = 0;
-                        gsap.to(agent, {
-                            filter: "grayscale(1)",
-                            duration: 0.5,
-                        });
-                        if (enemyAgent0.health <= 0 && enemyAgent1.health <= 0 && enemyAgent2.health <= 0) {
-                            console.log("YESS, HELL YEAH, I WOONNNN YEYYYY 😃")
-                            endScreen.style.top = "0vh";
-                        }
-                        break; // Stop firing if the target is defeated
-                    }
-                } else {
-                    // MISS confirmed!
-                    console.log(`Shot ${i + 1}: MISS. Health remaining: ${agent.health}`);
+            if (randomChance < chanceToHit * agentSelectedToAttack.hitChanceMultiplier) {
+                // HIT confirmed!
+                if(weaponName !== "shorty" &&
+                weaponName !== "bucky" &&
+                weaponName !== "judge") {
+                    gunSounds[weaponName].play();
                 }
+
+                agent.health -= damage * agent.damageMultiplier;
+                damageDealt += damage * agent.damageMultiplier;
+                console.log(`Shot ${i + 1}: HIT! Health remaining: ${agent.health}`);
+
+                const healthDisplay = agent.querySelector(".heart");
+                if (healthDisplay) {
+                    healthDisplay.textContent = agent.health;
+                }
+
+                // Check if the agent is defeated
+                if (agent.health <= 0) {
+                    console.log("Agent defeated!");
+                    agent.health = 0;
+                    gsap.to(agent, {
+                        filter: "grayscale(1)",
+                        duration: 0.5,
+                    });
+                    if (enemyAgent0.health <= 0 && enemyAgent1.health <= 0 && enemyAgent2.health <= 0) {
+                        console.log("YESS, HELL YEAH, I WOONNNN YEYYYY 😃");
+                        endScreen.style.top = "0vh";
+                    }
+                }
+            } else {
+                // MISS confirmed!
+                console.log(`Shot ${i + 1}: MISS. Health remaining: ${agent.health}`);
             }
 
-            console.log("New health:", agent.health);
-
-            // Update the health display
-            const healthDisplay = agent.querySelector(".heart");
-            if (healthDisplay) {
-                healthDisplay.textContent = agent.health;
-            }
-            if (agentSelectedToAttack.damageWhenAttacking){
+            // On last shot, emit damage and switch player
+            if (i === ammo - 1) {
+                console.log("New health:", agent.health);
+                if (agentSelectedToAttack.damageWhenAttacking){
                 if (agentSelectedToAttack.health - 2 < 0){
                     agentSelectedToAttack.health = 0
                     gsap.to(agentSelectedToAttack, {
@@ -948,95 +1021,120 @@ function damageAgent(agentId) {
                     healthDisplayAttacking.style.color = "white";
                 }
             }
-            socket.emit("damageAgent", agentId, damageDealt);//2 is only for now, later replace with varriabnle!
-            switchPlayer();
-        }
-        /*    setTimeout(() => {
+            socket.emit("damageAgent", agentId, damageDealt);
                 switchPlayer();
-            }, 1000);*/
+            }
+        }, i * 150 * gunSpeed);
+    }
+    if(weaponName === "shorty" ||
+        weaponName === "bucky" ||
+        weaponName === "judge")
+    {
+        gunSounds[weaponName].play();
+    }
 }
 
 let damage = 0;
 let ammo = 0;
 let chanceToHit = 0;
+let gunSpeed = 0;
 function weaponDamageLUT(weapon){
     if(weapon === "classic"){
         damage = 1;
         ammo = 2;
         chanceToHit = 75;
+        gunSpeed = 1.3;
     }else if(weapon === "shorty"){
         damage = 1;
         ammo = 5;
         chanceToHit = 45;
+        gunSpeed = 0.5;
     }else if(weapon === "frenzy"){
         damage = 1;
         ammo = 4;
         chanceToHit = 55;
+        gunSpeed = 1;
     }else if(weapon === "ghost"){
         damage = 2;
         ammo = 2;
         chanceToHit = 65;
+        gunSpeed = 1.3;   // nmarizuje damageAgent funkci jak rychle zbran ma strilet, pouzito pro upravu jak rychle opakovat sound effect
     }else if(weapon === "sheriff"){
         damage = 4;
         ammo = 2;
         chanceToHit = 50;
+        gunSpeed = 2;
     }else if(weapon === "bucky"){
         damage = 1;
         ammo = 12;
-        chanceToHit = 50;
+        chanceToHit = 30;
+        gunSpeed = 0.5;
     }else if(weapon === "judge"){
         damage = 1;
         ammo = 16;
         chanceToHit = 55;
+        gunSpeed = 0.5;
     }else if(weapon === "stinger"){
         damage = 1;
         ammo = 7;
         chanceToHit = 60;
+        gunSpeed = 0.9;
     }else if(weapon === "spectre"){
         damage = 1;
         ammo = 5;
         chanceToHit = 70;
+        gunSpeed = 1.1;
     }else if(weapon === "bulldog"){
         damage = 2;
         ammo = 4;
         chanceToHit = 75;
+        gunSpeed = 1.4;
     }else if(weapon === "guardian"){
         damage = 4;
-        ammo = 3;
-        chanceToHit = 80;
+        ammo = 2;
+        chanceToHit = 75;
+        gunSpeed = 1.8;
     }else if(weapon === "phantom"){
         damage = 3;
         ammo = 3;
         chanceToHit = 75;
+        gunSpeed = 1.3;
     }else if(weapon === "vandal"){
         damage = 4;
         ammo = 3;
         chanceToHit = 70;
+        gunSpeed = 1.4;
     }else if(weapon === "ares"){
         damage = 1;
         ammo = 10;
         chanceToHit = 40;
+        gunSpeed = 0.8;
     }else if(weapon === "odin"){
         damage = 1;
         ammo = 15;
         chanceToHit = 60;
+        gunSpeed = 1;
     }else if(weapon === "marshal"){
         damage = 3;
         ammo = 1;
         chanceToHit = 80;
+        gunSpeed = 1;
     }else if(weapon === "outlaw"){
         damage = 4;
         ammo = 2;
-        chanceToHit = 75;
+        chanceToHit = 80;
+        gunSpeed = 3;
     }else if(weapon === "operator"){
         damage = 9;
         ammo = 1;
         chanceToHit = 90;
+        gunSpeed = 1;
     }else {
         // Default values
         damage = 1;
         ammo = 2;
         chanceToHit = 60;
+        gunSpeed = 1;
     }
 }
 
@@ -1109,20 +1207,6 @@ function volumeUpdate() {
 volumeSlider.addEventListener("input", volumeUpdate);
 window.addEventListener("DOMContentLoaded", () => {
   volumeUpdate.call(volumeSlider);
-});
-
-const dropSound = new Howl({
-  src: ["audio/Mystbloom Kill 4.mp3"],
-  volume: 0.1,
-});
-const deckSound = new Howl({
-  src: ["audio/Cryostasis Kill 1.mp3"],
-  volume: 0.15,
-});
-const shopSound = new Howl({
-    src: ["audio/shopSound.mp3"],
-    volume: 6,
-    preload: true
 });
 
 let cardsGame = [];
@@ -1529,9 +1613,10 @@ function mouseMove(e) {
 }
 
 let endScreen = document.getElementById("endScreen");
-let wpn = document.querySelectorAll(".wpn")
 
 let enemyAgentElements;
+
+let apShow = document.querySelectorAll(".apShow")
 
 function mouseUp() {
   console.log("MouseUp:", activeCard?.id);
@@ -1877,6 +1962,7 @@ function mouseUp() {
             document.querySelector(`#${agent.id} .wpn`).className = "wpn";
             document.querySelector(`#${agent.id} .wpn`).classList.add(agent.weapon);
 
+            document.querySelector(`#${agent.id} .apShow`).textContent = weaponAP[activeCard.weaponName];
 
             document.removeEventListener("mousemove", mouseMove);
             document.removeEventListener("mouseup", mouseUp);
@@ -1901,6 +1987,7 @@ function mouseUp() {
         activeCard.style.display = "none";
       }, 300);
     } else {
+        shopSound.play()
       creds = creds - activeCard.price;
       credsText.innerHTML = creds + "c";
       updateSpawnerButtons();
@@ -1935,7 +2022,6 @@ function mouseUp() {
         } else if (container === 0) {
             dropper = randBtn;
         }
-    //}
 
 
     activeCard.style.setProperty("--border-animation", "none");
@@ -2532,66 +2618,145 @@ function createCard(id, initialX, initialY, buttonId) {
 
       console.log("Created gun card:", cardElement.weaponName);
 
-      // assign AP cost based on weapon
-      if (cardElement.weaponName === "shorty") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "frenzy") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "ghost") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "sheriff") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "stinger") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "spectre") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "bucky") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "judge") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "bulldog") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "guardian") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "phantom") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "vandal") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "marshal") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "outlaw") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "operator") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "ares") {
-          cardElement.ap = 4;
-      } else if (cardElement.weaponName === "odin") {
-          cardElement.ap = 4;
-      } else {
-          cardElement.ap = 2;
-      }
+      const apValue = document.createElement('div');
+      apValue.className = 'apValue';
+
+      cardElement.appendChild(apValue);
+
+      apValue.textContent = weaponAP[cardElement.weaponName];
 
   } else if (buttonId === "randBtn"){
     cardElement.price = 0;
   } else {
       cardElement.type = "ability"
+
+      let abilityApShow = document.createElement('div');
+      abilityApShow.className = 'apValue';
+
+      cardElement.appendChild(abilityApShow);
+
       // Calculate the type directly from the index you already have
       if(buttonId === "ab1"){
-          cardElement.ability = abilitySymb[qIndex]
-              .replace('url("images/abilitycards/', "")
+          const abNameQ = abilitySymb[qIndex].
+                replace('url("images/abilitycards/', "")
               .replace('.webp")', "");
+
+          if(abNameQ === "meddle"){
+              abilityApShow.textContent = "2";
+              back.innerHTML = "1.5x damage on your shots.";
+          }
+          else if(abNameQ === "slow orb"){
+              abilityApShow.textContent = "3";
+              back.innerHTML = "Enemy cant play the game for one round.";
+          }
+          else if(abNameQ === "trailblazer"){
+              abilityApShow.textContent = "3";
+              back.innerHTML = "1.5x damage on your shots.";
+          }
+          else if(abNameQ === "shear"){
+              abilityApShow.textContent = "3";
+              back.innerHTML = "Tanks damage while active.";
+          }
+          else if(abNameQ === "shock bolt"){
+              abilityApShow.textContent = "2";
+              back.innerHTML = "Deals 2 damage.";
+          }
+          else if(abNameQ === "paranoia"){
+              abilityApShow.textContent = "3";
+              back.innerHTML = "Lowers enemies chances to hit a shot.";
+          }
+          else if(abNameQ === "updraft"){
+              abilityApShow.textContent = "2";
+              back.innerHTML = "Gains better positioning, slightly higher chance to hit your shots.";
+          }
+          else if(abNameQ === "undercut"){
+              abilityApShow.textContent = "3";
+              back.innerHTML = "1.5x damage on your shots.";
+          }
+
+          cardElement.ability = abNameQ
           console.log(cardElement.type);
       }
       else if(buttonId === "ab2"){
-          cardElement.ability = abilitySymb[eIndex]
-              .replace('url("images/abilitycards/', "")
+          const abNameE = abilitySymb[eIndex].
+          replace('url("images/abilitycards/', "")
               .replace('.webp")', "");
+
+          if(abNameE === "ruse"){
+              abilityApShow.textContent = "2";
+              back.innerHTML = "Lowers chances of hitting a shot on both the agent affected and the agents shooting at the affected agent.";
+          }
+          else if(abNameE === "guiding light"){
+              abilityApShow.textContent = "3";
+              back.innerHTML = "Lowers enemies chances to hit a shot.";
+          }
+          else if(abNameE === "double tap"){
+              abilityApShow.textContent = "3";
+              back.innerHTML = "ignores first bullet which hit Iso.";
+          }
+          else if(abNameE === "healing orb"){
+              abilityApShow.textContent = "2";
+              back.innerHTML = "Heals agent for 4 hp, 2 hp added each turn.";
+          }
+          else if(abNameE === "dark cover"){
+              abilityApShow.textContent = "2";
+              back.innerHTML = "Lowers chances of hitting a shot on both the agent affected and the agents shooting at the affected agent.";
+          }
+          else if(abNameE === "recon bolt"){
+              abilityApShow.textContent = "2";
+              back.innerHTML = "Significantly higher chance to hit your shots.";
+          }
+          else if(abNameE === "tailwind"){
+              abilityApShow.textContent = "3";
+              back.innerHTML = "A jett ability to shoot 2 times.";
+          }
+          else if(abNameE === "arc rose"){
+              abilityApShow.textContent = "2";
+              back.innerHTML = "Lowers enemies chances to hit a shot.";
+          }
+
+          cardElement.ability = abNameE
           console.log(cardElement.type);
       }
       else if(buttonId === "ab3"){
-          cardElement.ability = abilitySymb[cIndex]
-              .replace('url("images/abilitycards/', "")
+          const abNameC = abilitySymb[cIndex].
+          replace('url("images/abilitycards/', "")
               .replace('.webp")', "");
+
+          if(abNameC === "razorvine"){
+              abilityApShow.textContent = "3";
+              back.innerHTML = "When applied, opponents which shoot get damaged for 2hp";
+          }
+          else if(abNameC === "cloudburst"){
+              abilityApShow.textContent = "1";
+              back.innerHTML = "Lowers chances of hitting a shot on both the agent affected and the agents shooting at the affected agent.";
+          }
+          else if(abNameC === "contigency"){
+              abilityApShow.textContent = "2";
+              back.innerHTML = "Agent cant be shot but also cant shoot";
+          }
+          else if(abNameC === "owl drone"){
+              abilityApShow.textContent = "2";
+              back.innerHTML = "Significantly higher chance to hit your shots.";
+          }
+          else if(abNameC === "regrowth"){
+              abilityApShow.textContent = "2";
+              back.innerHTML = "Heals agent for 4 hp, 1 hp added each turn.";
+          }
+          else if(abNameC === "barrier orb"){
+              abilityApShow.textContent = "2";
+              back.innerHTML = "Tanks damage while active.";
+          }
+          else if(abNameC === "pick me up"){
+              abilityApShow.textContent = "2";
+              back.innerHTML = "When clove shoots it heals them.";
+          }
+          else if(abNameC === "shrouded step"){
+              abilityApShow.textContent = "2";
+              back.innerHTML = "Gains better positioning, slightly higher chance to hit your shots.";
+          }
+
+          cardElement.ability = abNameC
           console.log(cardElement.type);
       }
       const abIndex = abilitySymb.indexOf(imgSelect);
@@ -2609,11 +2774,39 @@ function createCard(id, initialX, initialY, buttonId) {
   // TODO [yell]: // BACK INFO
 
   if (imgSelect === cardSymb[0]) {
-    back.innerHTML = "THIS IS A SHORTY";
+    back.innerHTML = "Sometimes all someone needs is a shorty. Fires 5 bullets with heavy spread";
   } else if (imgSelect === cardSymb[1]) {
-    back.innerHTML = "THIS IS A FRENZY";
+    back.innerHTML = "The frenzy is a beast. Make sure to handle it with care. Shoots 4 times";
   } else if (imgSelect === cardSymb[2]) {
-    back.innerHTML = "THIS IS A GHOST";
+    back.innerHTML = "This is a ghost. It shoots only 2 times but packs quite a punch.";
+  } else if (imgSelect === cardSymb[3]) {
+      back.innerHTML = "A heavy duty revolver called the sheriff. 2 shots, 2 bodies.";
+  } else if (imgSelect === cardSymb[4]) {
+      back.innerHTML = "An extremly fast firing SMG. 7 shots.";
+  } else if (imgSelect === cardSymb[5]) {
+      back.innerHTML = "The spectre is a spectacle to watch. Fires 5 shots";
+  } else if (imgSelect === cardSymb[6]) {
+      back.innerHTML = "Pump action shotgun. Many such cases";
+  } else if (imgSelect === cardSymb[7]) {
+      back.innerHTML = "Automatic shotgun with high damage.";
+  } else if (imgSelect === cardSymb[8]) {
+      back.innerHTML = "Ruff up your enemies with the bulldog.";
+  } else if (imgSelect === cardSymb[9]) {
+      back.innerHTML = "Patience twin, just take your time.";
+  } else if (imgSelect === cardSymb[10]) {
+      back.innerHTML = "Balanced. Accurate. Spicy.";
+  } else if (imgSelect === cardSymb[11]) {
+      back.innerHTML = "Rebel against the status quo with the vandal.";
+  } else if (imgSelect === cardSymb[12]) {
+      back.innerHTML = "BOOM HEADSHOT!";
+  } else if (imgSelect === cardSymb[13]) {
+      back.innerHTML = "2 shots, 2 bodies... deja vu?";
+  } else if (imgSelect === cardSymb[14]) {
+      back.innerHTML = "A weapon of mass destruction. 1 shot is all that is needed.";
+  } else if (imgSelect === cardSymb[15]) {
+      back.innerHTML = "Ares almost sounds like a god lol.";
+  } else if (imgSelect === cardSymb[16]) {
+      back.innerHTML = "The odin is definitely a god.";
   }
 
   // style faces with CSS backface-visibility like earlier
@@ -3119,4 +3312,46 @@ function roundOver() {
   credsText.innerHTML = creds;
   updateSpawnerButtons();
   refillAP(7);
+  textShowUp();
+}
+
+function textShowUp() {
+
+    const roundText = document.createElement('div');
+    roundText.textContent = 'New Round!';
+    roundText.className = 'round-announcement';
+
+    document.body.appendChild(roundText);
+
+    // GSAP animation timeline
+    const tl = gsap.timeline({
+        onComplete: () => {
+            // Remove element after animation completes
+            roundText.remove();
+        }
+    });
+
+    // Animate: right -> center -> left
+    tl.fromTo(roundText,
+        {
+            x: window.innerWidth, // Start from right off-screen
+            opacity: 0
+        },
+        {
+            x: window.innerWidth / 2 - roundText.offsetWidth / 2, // Move to center
+            opacity: 1,
+            duration: 0.6,
+            ease: 'power2.out'
+        }
+    )
+        .to(roundText, {
+            duration: 0.8, // Stay in center
+            ease: 'none'
+        })
+        .to(roundText, {
+            x: -roundText.offsetWidth, // Move left off-screen
+            opacity: 0,
+            duration: 0.6,
+            ease: 'power2.in'
+        })
 }
