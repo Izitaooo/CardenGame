@@ -415,7 +415,16 @@ function updateTurnState(myAgents) {
                 agentEl.classList.remove("selectable");
                 agentEl.style.pointerEvents = "none";
             }
-
+            myAgents.forEach((agentEl) => {
+                agentEl.damageMultiplier = 1;
+                agentEl.hitChanceMultiplier = 1;
+                agentEl.enemyHitChanceMultiplier = 1;
+                agentEl.damageWhenAttacking = false;
+                agentEl.isSelectable = true;
+                agentEl.effects.forEach((effect) => {
+                    effectLUT(agentEl, effect)
+                })
+            })
         });
         document.getElementById("youPlaying").classList.add("active");
         document.getElementById("enemyPlaying").classList.remove("active");
@@ -459,7 +468,10 @@ socket.on("rolesSwitched", () => {
         });
 
         agentElements.forEach((agentEl) => {
+            agentEl.damageMultiplier = 1;
             agentEl.hitChanceMultiplier = 1;
+            agentEl.enemyHitChanceMultiplier = 1;
+            agentEl.damageWhenAttacking = false;
             agentEl.isSelectable = true;
             agentEl.effects.forEach((effect) => {
                 effectLUT(agentEl, effect)
@@ -477,30 +489,82 @@ socket.on("rolesSwitched", () => {
 
 
 function effectLUT(agent, effect){
+    // Only handle stats/permissions here
     if (effect.name === "arc rose" ||
         effect.name === "guiding light" ||
         effect.name === "paranoia"
     ){
         agent.hitChanceMultiplier = 0.5;
-        //lower hit percentage
-    }else if(effect.name === "barrier orb" ||
+    } else if(effect.name === "barrier orb" ||
         effect.name === "contingency" ||
         effect.name === "shear"
     ) {
-        agent.hitChanceMultiplier = 0.5;
+        //agent.hitChanceMultiplier = 0.5;
         agent.isSelectable = false;
         agent.classList.remove("selectable");
         agent.style.pointerEvents = "none";
-        //block agent from attacking
-    }else if(effect.name === "cloudburst" ||
+    } else if(effect.name === "cloudburst" ||
         effect.name === "dark cover" ||
         effect.name === "ruse"
     ){
-        //lowers your chance of hit
+        agent.enemyHitChanceMultiplier = 0.5
         agent.hitChanceMultiplier = 0.5;
+    } else if(effect.name === "meddle" ||
+        effect.name === "undercut"
+    ){
+        agent.damageMultiplier = 1.5;
+    } else if(effect.name === "owl drone" ||
+    effect.name === "recon bolt"){
+        agent.enemyHitChanceMultiplier = 1.5;
+    } else if(effect.name === "slow orb"){
+        agent.isSelectable = false;
+        agent.classList.remove("selectable");
+        agent.style.pointerEvents = "none";
+    } else if(effect.name === "razorvine"){
+        agent.damageWhenAttacking = true;
+    }
 
-    } else {
-        agent.hitChanceMultiplier = 1;
+    else {
+        //agent.hitChanceMultiplier = 1.5;
+    }
+}
+
+// Executes the logic for turn-based abilities (Healing, Regrowth, etc.)
+function executeTurnAbilities(agent, effect) {
+    if (effect.name === "healing orb") {
+        console.log(`Executing Healing Orb on ${agent.id}`);
+        // Logic: Heals 2 HP (max 25)
+        if (agent.health < 23) {
+            agent.health += 2;
+        } else {
+            agent.health = 25;
+        }
+        updateHealthUI(agent);
+    }
+    else if (effect.name === "regrowth") {
+        console.log(`Executing Regrowth on ${agent.id}`);
+        // Logic: Heals 1 HP (max 25)
+        if (agent.health < 25) {
+            agent.health += 1;
+            updateHealthUI(agent);
+        }
+    }
+}
+
+// Updates the visual heart text on the agent card
+function updateHealthUI(agent) {
+    const heartText = agent.querySelector(".heart");
+    if (heartText) {
+        // Ensure we update just the text node if possible, or reset innerHTML safely
+        if(heartText.childNodes.length > 0 && heartText.childNodes[0].nodeType === 3) {
+            heartText.childNodes[0].nodeValue = agent.health;
+        } else {
+            // Fallback if structure is different
+            heartText.innerText = agent.health;
+        }
+
+        // Optional: Add a green flash or color change to indicate healing
+        gsap.fromTo(heartText, {color: "#00ff00"}, {color: "white", duration: 1});
     }
 }
 
@@ -575,6 +639,14 @@ function switchPlayer() {
             el.removeEventListener("mouseleave", enemyMouseLeaveHandlers[el.id])
             delete enemyMouseLeaveHandlers[el.id]
         }
+        if (enemySelfDamageHoverHandlers[el.id]){
+            el.removeEventListener("mouseover", enemySelfDamageHoverHandlers[el.id]);
+            delete enemySelfDamageHoverHandlers[el.id];
+        }
+        if (enemySelfDamageLeaveHandlers[el.id]){
+            el.removeEventListener("mouseleave", enemySelfDamageLeaveHandlers[el.id]);
+            delete enemySelfDamageLeaveHandlers[el.id];
+        }
         damageDisplayHide(el.id);
     });
 
@@ -587,34 +659,31 @@ function switchPlayer() {
 }
 function deleteEffects(agent){
     for (let i = agent.effects.length - 1; i >= 0; i--) {
+
+
+        executeTurnAbilities(agent, agent.effects[i]);
+
         agent.effects[i].duration--;
 
         console.log(`${agent.id} - ${agent.effects[i].name}: ${agent.effects[i].duration} rounds left`);
 
         // Remove effect if duration reaches 0
         if (agent.effects[i].duration <= 0) {
-            console.log(`Removing ${agent.effects[i].name} from ${agent.id}`);
+            // ... existing removal logic ...
 
-
-            // effect you are removing
+            // Re-enable selection for wall effects
             const effectName = agent.effects[i].name.trim().replace(/["')]/g, "");
-
-            // Check if this was a blocking effect
             if (effectName === "barrier orb" ||
                 effectName === "contingency" ||
-                effectName === "shear") {
-
-                // Re-enable selection
+                effectName === "shear" ||
+                effectName === "slow orb") {
                 agent.isSelectable = true;
-                agent.style.pointerEvents = "auto"; // Restore pointer events immediately
+                agent.style.pointerEvents = "auto";
             }
 
-    // find all slots
+            // ... existing slot clearing logic ...
             const slots = document.querySelectorAll(`#${agent.id} .effects > div`);
-
-    // loop through and clear the one that matches
             for (const slot of slots) {
-                // backgroundImage can return full url(), so we check if it includes the file name
                 if (slot.style.backgroundImage.includes(`${effectName}.webp`)) {
                     slot.style.backgroundImage = "";
                     slot.style.opacity = "0";
@@ -622,9 +691,7 @@ function deleteEffects(agent){
                 }
             }
 
-    // now remove effect from array
             agent.effects.splice(i, 1);
-
         }
     }
 }
@@ -633,13 +700,17 @@ const enemyClickHandlers = {};
 const enemyHoverHandlers = {}
 const enemyMouseLeaveHandlers = {}
 
+const enemySelfDamageHoverHandlers = {};
+const enemySelfDamageLeaveHandlers = {};
 
 let agentSelectedToAttack;
 function SelectToAttack(agent) {
 
     const agentEl = document.getElementById(agent);
 
-    if (agentEl.health <= 0 || agentEl.isSelectable === false) {
+    if (agentEl.health <= 0 || agentEl.isSelectable === false /*||
+        agentEl.effects.some(effect =>
+            effect.name === "barrier orb")*/) {
         console.log(`Cannot select: ${agent}`);
         return; // Stop the function!! if blocked or dead
     }
@@ -652,6 +723,7 @@ function SelectToAttack(agent) {
     });
 
     // Remove damageable from ALL enemy agents and clean up their listeners
+// Remove damageable from ALL enemy agents and clean up their listeners
     document.querySelectorAll(".agentSelect.enemy").forEach((el) => {
         el.classList.remove("damageable");
         el.style.pointerEvents = "none";
@@ -669,6 +741,22 @@ function SelectToAttack(agent) {
             el.removeEventListener("mouseleave", enemyMouseLeaveHandlers[el.id])
             delete enemyMouseLeaveHandlers[el.id]
         }
+
+        // --- ADD THIS BLOCK ---
+        if (enemySelfDamageHoverHandlers[el.id]){
+            el.removeEventListener("mouseover", enemySelfDamageHoverHandlers[el.id]);
+            delete enemySelfDamageHoverHandlers[el.id];
+        }
+        if (enemySelfDamageLeaveHandlers[el.id]){
+            el.removeEventListener("mouseleave", enemySelfDamageLeaveHandlers[el.id]);
+            delete enemySelfDamageLeaveHandlers[el.id];
+        }
+        // ---------------------
+
+        // Also ensure visuals are reset immediately
+        if(agentEl && agentEl.damageWhenAttacking) {
+            displaySelfDamageHide(agentEl);
+        }
     });
 
     // If it wasn't selected, select it now and make enemies damageable
@@ -678,24 +766,48 @@ function SelectToAttack(agent) {
 
         document.querySelectorAll(".agentSelect.enemy").forEach((el) => {
             // Only make them interactive if they are alive
-            if (el.health > 0) {
+            if (el.health > 0 && !el.effects.some(effect =>
+                effect.name === "barrier orb" ||
+                effect.name === "contingency" ||
+                effect.name === "shear"/* ||
+                effect.name === "slow orb"*/
+            )) {
                 console.log("making damageable:", el.id);
                 el.classList.add("damageable");
                 el.style.pointerEvents = "auto";
 
-
+                console.log("damageWhenAttacking??:", agentEl.damageWhenAttacking);
                 enemyHoverHandlers[el.id] = () => damageDisplay(el.id);
                 el.addEventListener("mouseover", enemyHoverHandlers[el.id]);
+
+                if(agentEl.damageWhenAttacking){
+                    enemySelfDamageHoverHandlers[el.id] = () => displaySelfDamage(agentEl);
+                    el.addEventListener("mouseover", enemySelfDamageHoverHandlers[el.id]);
+                }
 
                 enemyMouseLeaveHandlers[el.id] = () => damageDisplayHide(el.id);
                 el.addEventListener("mouseleave", enemyMouseLeaveHandlers[el.id])
 
+                if(agentEl.damageWhenAttacking){
+                    enemySelfDamageLeaveHandlers[el.id] = () => displaySelfDamageHide(agentEl);
+                    el.addEventListener("mouseleave", enemySelfDamageLeaveHandlers[el.id]);
+                }
                 // Create and store the handler
                 enemyClickHandlers[el.id] = () => damageAgent(el.id);
                 el.addEventListener("click", enemyClickHandlers[el.id]);
             }
         });
     }
+}
+function displaySelfDamage(agent){
+    let damageCalc =agent.health - 2;
+    agent.querySelector(".heart").textContent = damageCalc.toString();
+    agent.querySelector(".heart").style.color = "red";
+}
+function displaySelfDamageHide(agent){
+    let damageCalc =agent.health;
+    agent.querySelector(".heart").textContent = damageCalc.toString();
+    agent.querySelector(".heart").style.color = "white";
 }
 function damageDisplay(agentId){
     let agent = document.getElementById(agentId);
@@ -709,7 +821,7 @@ function damageDisplay(agentId){
     weaponDamageLUT(agentSelectedToAttack.weapon);
 
 
-    let damageCalc =agent.health - damage * ammo * agentSelectedToAttack.hitChanceMultiplier;
+    let damageCalc =agent.health - (damage * ammo * agentSelectedToAttack.hitChanceMultiplier) * agent.damageMultiplier;
     agent.querySelector(".heart").textContent = damageCalc.toString();
     agent.querySelector(".heart").style.color = "red";
 }
@@ -776,15 +888,20 @@ function damageAgent(agentId) {
         // socket.emit("updateAP", { playerId: myId, currentAP });
 
             damageDealt = 0;
+
             for (let i = 0; i < ammo; i++) {
                 const randomChance = Math.floor(Math.random() * 100);
                 console.log(`Firing ${ammo} shots with ${agentSelectedToAttack.weapon}. Damage: ${damage}, Hit Chance: ${chanceToHit}%`);
-                console.log(agentSelectedToAttack.hitChanceMultiplier);
+                console.log("😭agent.enemyHitChanceMultiplier: "+agent.enemyHitChanceMultiplier);
+                console.log("😭agentSelectedToAttack.hitChanceMultiplier: "+agentSelectedToAttack.hitChanceMultiplier);
+                console.log("agent.damageMultiplier: "+agent.damageMultiplier);
 
-                if (randomChance < chanceToHit * agentSelectedToAttack.hitChanceMultiplier) {
+                console.log("enemychancetohit: " + agent.enemyHitChanceMultiplier)
+
+                if (randomChance < chanceToHit * agentSelectedToAttack.hitChanceMultiplier * agent.enemyHitChanceMultiplier) {
                     // HIT confirmed!
-                    agent.health -= damage;
-                    damageDealt += damage;
+                    agent.health -= damage * agent.damageMultiplier;
+                    damageDealt += damage * agent.damageMultiplier;
                     console.log(`Shot ${i + 1}: HIT! Health remaining: ${agent.health}`);
 
                     // OPTIONAL: Add a check here if the agent is defeated
@@ -813,6 +930,23 @@ function damageAgent(agentId) {
             const healthDisplay = agent.querySelector(".heart");
             if (healthDisplay) {
                 healthDisplay.textContent = agent.health;
+            }
+            if (agentSelectedToAttack.damageWhenAttacking){
+                if (agentSelectedToAttack.health - 2 < 0){
+                    agentSelectedToAttack.health = 0
+                    gsap.to(agentSelectedToAttack, {
+                        filter: "grayscale(1)",
+                        duration: 0.5,
+                    });
+                }else{
+                    agentSelectedToAttack.health -= 2;
+
+                }
+                const healthDisplayAttacking = agentSelectedToAttack.querySelector(".heart");
+                if (healthDisplayAttacking) {
+                    healthDisplayAttacking.textContent = agentSelectedToAttack.health;
+                    healthDisplayAttacking.style.color = "white";
+                }
             }
             socket.emit("damageAgent", agentId, damageDealt);//2 is only for now, later replace with varriabnle!
             switchPlayer();
@@ -1110,6 +1244,9 @@ console.log("card type: " + cardElement.type);
         cardElement.ability === "barrier orb"
         || cardElement.ability === "contigency"
         || cardElement.ability === "shear"
+        || cardElement.ability === "cloudburst"
+        || cardElement.ability === "dark cover"
+        || cardElement.ability === "ruse"
     ){
         myAgents.forEach(agentEl => {
             agentEl.classList.add("isPlaceable");
@@ -1285,18 +1422,18 @@ function mouseMove(e) {
         domRect1.bottom < domRect5.top ||
         domRect1.left > domRect5.right
       ) && activeCard.ability !== "arc rose"
-        && activeCard.ability !== "cloudburst"
-        && activeCard.ability !== "dark cover"
+        /*        && activeCard.ability !== "cloudburst"
+                && activeCard.ability !== "dark cover"*/
         && activeCard.ability !== "guiding light"
         && activeCard.ability !== "meddle"
         && activeCard.ability !== "owl drone"
         && activeCard.ability !== "paranoia"
         && activeCard.ability !== "razorvine"
         && activeCard.ability !== "recon bolt"
-        && activeCard.ability !== "ruse"
-/*        && activeCard.ability !== "barrier orb"
-        && activeCard.ability !== "contigency"
-        && activeCard.ability !== "shear"*/
+        /*        && activeCard.ability !== "ruse"*/
+        /*        && activeCard.ability !== "barrier orb"
+                && activeCard.ability !== "contigency"
+                && activeCard.ability !== "shear"*/
         && activeCard.ability !== "shock bolt"
         && activeCard.ability !== "slow orb"
         && activeCard.ability !== "trailblazer"
@@ -1314,18 +1451,18 @@ function mouseMove(e) {
         domRect1.bottom < domRect6.top ||
         domRect1.left > domRect6.right
       ) && activeCard.ability !== "arc rose"
-        && activeCard.ability !== "cloudburst"
-        && activeCard.ability !== "dark cover"
+        /*        && activeCard.ability !== "cloudburst"
+                && activeCard.ability !== "dark cover"*/
         && activeCard.ability !== "guiding light"
         && activeCard.ability !== "meddle"
         && activeCard.ability !== "owl drone"
         && activeCard.ability !== "paranoia"
         && activeCard.ability !== "razorvine"
         && activeCard.ability !== "recon bolt"
-        && activeCard.ability !== "ruse"
-/*        && activeCard.ability !== "barrier orb"
-        && activeCard.ability !== "contigency"
-        && activeCard.ability !== "shear"*/
+        /*        && activeCard.ability !== "ruse"*/
+        /*        && activeCard.ability !== "barrier orb"
+                && activeCard.ability !== "contigency"
+                && activeCard.ability !== "shear"*/
         && activeCard.ability !== "shock bolt"
         && activeCard.ability !== "slow orb"
         && activeCard.ability !== "trailblazer"
@@ -1343,15 +1480,15 @@ function mouseMove(e) {
         domRect1.bottom < domRect7.top ||
         domRect1.left > domRect7.right
       ) && activeCard.ability !== "arc rose"
-        && activeCard.ability !== "cloudburst"
-        && activeCard.ability !== "dark cover"
+/*        && activeCard.ability !== "cloudburst"
+        && activeCard.ability !== "dark cover"*/
         && activeCard.ability !== "guiding light"
         && activeCard.ability !== "meddle"
         && activeCard.ability !== "owl drone"
         && activeCard.ability !== "paranoia"
         && activeCard.ability !== "razorvine"
         && activeCard.ability !== "recon bolt"
-        && activeCard.ability !== "ruse"
+/*        && activeCard.ability !== "ruse"*/
 /*        && activeCard.ability !== "barrier orb"
         && activeCard.ability !== "contigency"
         && activeCard.ability !== "shear"*/
@@ -1451,19 +1588,19 @@ function mouseUp() {
         console.log("barrier orb on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    }*/ else if (activeCard.ability === "cloudburst" && (container === 4 || container === 5 || container === 6)) {
+    }*/ /*else if (activeCard.ability === "cloudburst" && (container === 4 || container === 5 || container === 6)) {
         console.log("cloudburst on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } /*else if (activeCard.ability === "contigency" && (container === 1 || container === 2 || container === 3)){
+    }*/ /*else if (activeCard.ability === "contigency" && (container === 1 || container === 2 || container === 3)){
         console.log("contigency on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    }*/ else if (activeCard.ability === "dark cover" && (container === 4 || container === 5 || container === 6)) {
+    }*/ /*else if (activeCard.ability === "dark cover" && (container === 4 || container === 5 || container === 6)) {
         console.log("dark cover on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.ability === "double tap" && (container === 1 || container === 2 || container === 3)){
+    }*/ else if (activeCard.ability === "double tap" && (container === 1 || container === 2 || container === 3)){
         console.log("double tap on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
@@ -1503,11 +1640,11 @@ function mouseUp() {
         console.log("regrowth on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } else if (activeCard.ability === "ruse" && (container === 4 || container === 5 || container === 6)) {
+    } /*else if (activeCard.ability === "ruse" && (container === 4 || container === 5 || container === 6)) {
         console.log("ruse on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
-    } /*else if (activeCard.ability === "shear" && (container === 4 || container === 5 || container === 6)) {
+    }*/ /*else if (activeCard.ability === "shear" && (container === 4 || container === 5 || container === 6)) {
         console.log("shear on invalid container - forcing return to deck");
         container = null;
         isLocked = 0;
@@ -1574,6 +1711,9 @@ function mouseUp() {
 
                 agent.effects.unshift(effectObj);
 
+                executeTurnAbilities(agent, effectObj);
+
+                //updateEffects(agent, true);
                 let effectName = agent.effects[0].name.trim();
                 effectName = effectName.replace(/["')]/g, "");
 
@@ -1593,6 +1733,7 @@ function mouseUp() {
                     effectObj.ap = 3;
                 } else if (effectName === "healing orb") {
                     effectObj.ap = 2;
+                    effectObj.duration = 1;
                 } else if (effectName === "meddle") {
                     effectObj.ap = 2;
                 } else if (effectName === "owl drone") {
@@ -1615,6 +1756,7 @@ function mouseUp() {
                     effectObj.ap = 2;
                 } else if (effectName === "slow orb") {
                     effectObj.ap = 3;
+                    effectObj.duration = 1;
                 } else if (effectName === "shrouded step") {
                     effectObj.ap = 2;
                 } else if (effectName === "tailwind") {
@@ -1659,7 +1801,10 @@ function mouseUp() {
                 }
 
                 agentElements.forEach((agentEl) => {
+                    agentEl.damageMultiplier = 1;
                     agentEl.hitChanceMultiplier = 1;
+                    agentEl.enemyHitChanceMultiplier = 1;
+                    agentEl.damageWhenAttacking = false;
                     agentEl.isSelectable = true;
                     agentEl.effects.forEach((effect) => {
                         effectLUT(agentEl, effect)
@@ -1668,7 +1813,7 @@ function mouseUp() {
                 socket.emit("effectApplied", {
                     agentIndex: agentIndex,
                     effectName: activeCard.ability,
-                    duration: 4,
+                    duration: effectObj.duration + 1,
                     isFriendly: container >= 4 // true if 4,5,6 (your agents), false if 1,2,3 (enemies)
                 });
 
@@ -2014,12 +2159,18 @@ socket.on("enemyAppliedEffect", (data) => {
 
         agent.effects.unshift(effectObj);
         console.log(`Effect ${data.effectName} applied to ${agent.id}`);
+
+        executeTurnAbilities(agent, effectObj);
+
         updateEffects(agent, false);
     }
     const agentElements = document.querySelectorAll(".agentSelect");
 
     agentElements.forEach((agentEl) => {
+        agentEl.damageMultiplier = 1;
         agentEl.hitChanceMultiplier = 1;
+        agentEl.enemyHitChanceMultiplier = 1;
+        agentEl.damageWhenAttacking = false;
         agentEl.isSelectable = true;
         agentEl.effects.forEach((effect) => {
             effectLUT(agentEl, effect)
