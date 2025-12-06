@@ -317,6 +317,13 @@ socket.on("enemyChose", (data) => {
             });
         }
     }
+    const enemyAgentElements = enemyAgents
+        .map(name => document.getElementById("enemy_" + name));
+
+    enemyAgent0 = enemyAgentElements[0];
+    enemyAgent1 = enemyAgentElements[1];
+    enemyAgent2 = enemyAgentElements[2];
+
     ImPlaying = true;
     MainGameLoop();
 });
@@ -576,6 +583,32 @@ function executeTurnAbilities(agent, effect) {
             agent.health = 0;
         }
         updateHealthUI(agent);
+
+
+        if (agent.health <= 0) {
+            console.log("Agent defeated!");
+            agent.health = 0;
+            gsap.to(agent, {
+                filter: "grayscale(1)",
+                duration: 0.5,
+            });
+            if (
+                enemyAgent0.health <= 0 &&
+                enemyAgent1.health <= 0 &&
+                enemyAgent2.health <= 0
+            ) {
+                console.log("YESS, HELL YEAH, I WOONNNN YEYYYY ðŸ˜ƒ");
+                endScreen.style.top = "0vh";
+            }
+            if (
+                agent0.health <= 0 &&
+                agent1.health <= 0 &&
+                agent2.health <= 0
+            ) {
+                console.log("😭😭😭 I lost");
+                endScreen.style.top = "0vh";
+            }
+        }
     }
 
     // Mark as executed so it won't run again
@@ -890,22 +923,44 @@ function displaySelfDamageHide(agent) {
 function damageDisplay(agentId) {
     let agent = document.getElementById(agentId);
 
+
+
+
     if (
         agentSelectedToAttack.hitChanceMultiplier === 0 ||
         agentSelectedToAttack.hitChanceMultiplier === null ||
-        agentSelectedToAttack.hitChanceMultiplier === undefined
+        agentSelectedToAttack.hitChanceMultiplier === undefined ||
+        agent.damageMultiplier === 0 ||
+        agent.damageMultiplier === null ||
+        agent.damageMultiplier === undefined
     ) {
+        agentSelectedToAttack.damageMultiplier = 1;
         agentSelectedToAttack.hitChanceMultiplier = 1;
+        agentSelectedToAttack.enemyHitChanceMultiplier = 1;
+        agentSelectedToAttack.damageWhenAttacking = false;
+        agentSelectedToAttack.isSelectable = true;
+        agentSelectedToAttack.healOnAttacking = false;
+        agentSelectedToAttack.damageMitigation = false;
+        agentSelectedToAttack.shootTwoTimes = false;
+        agent.damageMultiplier = 1;
+        agent.hitChanceMultiplier = 1;
+        agent.enemyHitChanceMultiplier = 1;
+        agent.damageWhenAttacking = false;
+        agent.isSelectable = true;
+        agent.healOnAttacking = false;
+        agent.damageMitigation = false;
+        agent.shootTwoTimes = false;
     }
 
     weaponDamageLUT(agentSelectedToAttack.weapon);
 
-    let damageCalcShow =
-        agent.health -
-        damage *
-        ammo *
-        agentSelectedToAttack.hitChanceMultiplier *
+    console.log("damage: "+damage);
+    console.log("ammo: "+ammo);
+    console.log("hit chance mult: "+agentSelectedToAttack.hitChanceMultiplier);
+    console.log("damage mult: "+agent.damageMultiplier);
+    let damageCalcShow = agent.health - damage * ammo * agentSelectedToAttack.hitChanceMultiplier *
         agent.damageMultiplier;
+    console.log("damage calculated:  "+damageCalcShow);
     agent.querySelector(".heart").textContent = damageCalcShow.toString();
     agent.querySelector(".heart").style.color = "red";
 }
@@ -1121,13 +1176,17 @@ function damageAgent(agentId) {
             if (i === ammo - 1) {
                 console.log("New health:", agent.health);
                 if (agentSelectedToAttack.damageWhenAttacking) {
+
                     if (agentSelectedToAttack.health - 2 < 0) {
+
                         agentSelectedToAttack.health = 0;
                         gsap.to(agentSelectedToAttack, {
                             filter: "grayscale(1)",
                             duration: 0.5,
                         });
+
                     } else {
+
                         agentSelectedToAttack.health -= 2;
                     }
                     const healthDisplayAttacking =
@@ -1136,8 +1195,17 @@ function damageAgent(agentId) {
                         healthDisplayAttacking.textContent = agentSelectedToAttack.health;
                         healthDisplayAttacking.style.color = "white";
                     }
+                    if (agent0.health <= 0 &&
+                        agent1.health <= 0 &&
+                        agent2.health <= 0)
+                    {
+                        console.log("I lost 😭😭😭😭😭");
+                        endScreen.style.top = "0vh";
+                    }
+                    socket.emit("selfDamageAgent", agentSelectedToAttack.id);
+
                 }
-                socket.emit("damageAgent", agentId, damageDealt);
+                /*socket.emit("damageAgent", agentId, damageDealt);*/
 
                 if(agentSelectedToAttack.healOnAttacking){
                     if (agentSelectedToAttack.health > 23){
@@ -1166,6 +1234,7 @@ function damageAgent(agentId) {
                     console.log(agent.effects);
                     socket.emit("removeDoubleTap", agentId);
                 }
+                socket.emit("damageAgent", agentId, damageDealt);
                 if (agentSelectedToAttack.shootTwoTimes){
                     console.log("Shooting two times due to Tailwind!");
                     agentSelectedToAttack.shootTwoTimes = false;
@@ -1177,6 +1246,7 @@ function damageAgent(agentId) {
 
                 }
             }
+
         }, i * 150 * gunSpeed);
     }
     if (
@@ -1186,7 +1256,34 @@ function damageAgent(agentId) {
     ) {
         gunSounds[weaponName].play();
     }
+    //socket.emit("damageAgent", agentId, damageDealt);
 }
+socket.on("selfDamageAgent", (agentId) => {
+    let agent = document.getElementById("enemy_"+agentId);
+    console.log("Self damaging your agent:", agent.id);
+    console.log("old health:", agent.health);
+    agent.health -= 2;
+    // Check if the agent is defeated
+    if (agent.health <= 0) {
+        console.log("Agent defeated!");
+        agent.health = 0;
+        console.log("agent health should be zero:    "+agent.health);
+        agent.classList.remove("selectable");
+        agent.classList.remove("selected");
+        agent.style.pointerEvents = "none";
+        gsap.to(agent, {
+            filter: "grayscale(1)",
+            duration: 0.5,
+        });
+        if (enemyAgent0.health <= 0 &&
+            enemyAgent1.health <= 0 &&
+            enemyAgent2.health <= 0)
+        {
+            console.log("YESS, HELL YEAH, I WOONNNN YEYYYY ðŸ˜ƒ");
+            endScreen.style.top = "0vh";
+        }
+    }
+})
 
 socket.on("removeDoubleTap", (agentId) => {
     console.log("removing Double Tap!");
@@ -1311,19 +1408,25 @@ socket.on("damageAgent", (agentId, damage) => {
     console.log("Enemy damaging your agent:", agent.id);
     console.log("old health:", agent.health);
     agent.health -= damage;
-
+    // Check if the agent is defeated
     if (agent.health <= 0) {
         console.log("Agent defeated!");
         agent.health = 0;
-
+        console.log("agent health should be zero:    "+agent.health);
         agent.classList.remove("selectable");
         agent.classList.remove("selected");
         agent.style.pointerEvents = "none";
-
         gsap.to(agent, {
             filter: "grayscale(1)",
             duration: 0.5,
         });
+        if (agent0.health <= 0 &&
+            agent1.health <= 0 &&
+            agent2.health <= 0)
+        {
+            console.log("I lost 😭😭😭😭😭");
+            endScreen.style.top = "0vh";
+        }
     }
     console.log("New health:", agent.health);
     agent.querySelector(".heart").innerHTML = agent.health;

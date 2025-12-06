@@ -114,6 +114,10 @@ io.on("connection", (socket) => {
         const playerRoom = players[socket.id].room;
         socket.to(playerRoom).emit("damageAgent", agentId, damage);
     })
+    socket.on("selfDamageAgent", (agentId) => {
+        const playerRoom = players[socket.id].room;
+        socket.to(playerRoom).emit("selfDamageAgent", agentId);
+    })
     socket.on("removeDoubleTap", (agentId) => {
         const playerRoom = players[socket.id].room;
         socket.to(playerRoom).emit("removeDoubleTap", agentId);
