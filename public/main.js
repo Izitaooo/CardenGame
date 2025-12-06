@@ -430,6 +430,9 @@ function updateTurnState(myAgents) {
                 agentEl.enemyHitChanceMultiplier = 1;
                 agentEl.damageWhenAttacking = false;
                 agentEl.isSelectable = true;
+                agentEl.healOnAttacking = false;
+                agentEl.damageMitigation = false;
+                agentEl.shootTwoTimes = false;
                 agentEl.effects.forEach((effect) => {
                     effectLUT(agentEl, effect);
                 });
@@ -481,6 +484,9 @@ socket.on("rolesSwitched", () => {
             agentEl.enemyHitChanceMultiplier = 1;
             agentEl.damageWhenAttacking = false;
             agentEl.isSelectable = true;
+            agentEl.healOnAttacking = false;
+            agentEl.damageMitigation = false;
+            agentEl.shootTwoTimes = false;
             agentEl.effects.forEach((effect) => {
                 effectLUT(agentEl, effect);
             });
@@ -500,7 +506,7 @@ function effectLUT(agent, effect) {
         effect.name === "guiding light" ||
         effect.name === "paranoia"
     ) {
-        agent.hitChanceMultiplier = 0.5;
+        agent.hitChanceMultiplier *= 0.5;
     } else if (
         effect.name === "barrier orb" ||
         effect.name === "contingency" ||
@@ -514,22 +520,35 @@ function effectLUT(agent, effect) {
         effect.name === "dark cover" ||
         effect.name === "ruse"
     ) {
-        agent.enemyHitChanceMultiplier = 0.5;
-        agent.hitChanceMultiplier = 0.5;
+        agent.enemyHitChanceMultiplier *= 0.5;
+        agent.hitChanceMultiplier *= 0.5;
     } else if (effect.name === "meddle" || effect.name === "undercut") {
-        agent.damageMultiplier = 1.5;
+        agent.damageMultiplier *= 1.5;
     } else if (effect.name === "owl drone" || effect.name === "recon bolt") {
-        agent.enemyHitChanceMultiplier = 1.5;
-    } else if (effect.name === "slow orb" || "trailblazer") {
+        agent.enemyHitChanceMultiplier *= 1.5;
+    } else if (effect.name === "slow orb" || effect.name === "trailblazer") {
         agent.isSelectable = false;
         agent.classList.remove("selectable");
         agent.style.pointerEvents = "none";
     } else if (effect.name === "razorvine") {
         agent.damageWhenAttacking = true;
     }
+    else if( effect.name === "double tap") {
+        agent.damageMitigation = true;
+    }
+    else if( effect.name === "pick me up") {
+        agent.healOnAttacking = true;
+    }
+    else if( effect.name === "shrouded step" || effect.name === "updraft" ) {
+        agent.hitChanceMultiplier *= 2;
+    }
+    else if( effect.name === "tailwind" ) {
+        agent.shootTwoTimes = true;
+    } else{
+    }
+
     // Removed shock bolt from here - it's now only in executeTurnAbilities
 }
-
 // Executes the logic for turn-based abilities (Healing, Regrowth, etc.)
 function executeTurnAbilities(agent, effect) {
     // Don't execute if already executed
@@ -626,6 +645,9 @@ function switchPlayer() {
             agentEl.enemyHitChanceMultiplier = 1;
             agentEl.damageWhenAttacking = false;
             agentEl.isSelectable = true;
+            agentEl.healOnAttacking = false;
+            agentEl.damageMitigation = false;
+            agentEl.shootTwoTimes = false;
             agentEl.effects.forEach((effect) => {
                 effectLUT(agentEl, effect);
             });
@@ -670,41 +692,73 @@ function switchPlayer() {
 }
 function deleteEffects(agent) {
     for (let i = agent.effects.length - 1; i >= 0; i--) {
-        executeTurnAbilities(agent, agent.effects[i]);
+        const effect = agent.effects[i]; // store reference so splice won't break us
+        if (!effect) continue;
 
-        agent.effects[i].duration--;
+        executeTurnAbilities(agent, effect);
 
-        console.log(
-            `${agent.id} - ${agent.effects[i].name}: ${agent.effects[i].duration} rounds left`
-        );
+        effect.duration--;
+        console.log(`${agent.id} - ${effect.name}: ${effect.duration} rounds left`);
 
-        // Remove effect if duration reaches 0
-        if (agent.effects[i].duration <= 0) {
-            // ... existing removal logic ...
-
-            // Re-enable selection for wall effects
-            const effectName = agent.effects[i].name.trim().replace(/["')]/g, "");
-            if (
-                effectName === "barrier orb" ||
-                effectName === "contingency" ||
-                effectName === "shear" ||
-                effectName === "slow orb"
-            ) {
+        // Re-enable selection for wall effects when they expire
+        if (effect.duration <= 0) {
+            const effectName = effect.name.trim().replace(/["')]/g, "");
+            if (["barrier orb", "contingency", "shear", "slow orb"].includes(effectName)) {
                 agent.isSelectable = true;
                 agent.style.pointerEvents = "auto";
             }
 
-            // ... existing slot clearing logic ...
+            // clear UI slot that matches this effect
             const slots = document.querySelectorAll(`#${agent.id} .effects > div`);
             for (const slot of slots) {
-                if (slot.style.backgroundImage.includes(`${effectName}.webp`)) {
+                if (slot.style.backgroundImage && slot.style.backgroundImage.includes(`${effectName}.webp`)) {
                     slot.style.backgroundImage = "";
                     slot.style.opacity = "0";
                     break;
                 }
             }
 
+            // remove the effect from the array
             agent.effects.splice(i, 1);
+            console.log("deleted expired effect:", effectName);
+            continue; // next iteration (effect at i removed)
+        }
+
+        console.log("deleteing📦");
+        console.log(effect);
+        console.log(agent.damageMitigation);
+
+        // Special case for double tap: check name string, not the object equality
+        if (effect.name && effect.name.trim().toLowerCase() === "double tap" && agent.damageMitigation === false) {
+            console.log("deleteing double tap 📦📦📦");
+            const effectName = effect.name.trim().replace(/["')]/g, "");
+
+            const slots = document.querySelectorAll(`#${agent.id} .effects > div`);
+            for (const slot of slots) {
+                if (slot.style.backgroundImage && slot.style.backgroundImage.includes(`${effectName}.webp`)) {
+                    slot.style.backgroundImage = "";
+                    slot.style.opacity = "0";
+                    break;
+                }
+            }
+            agent.effects.splice(i, 1);
+            console.log("removed double tap for", agent.id);
+        }
+
+        if (effect.name && effect.name.trim().toLowerCase() === "tailwind" && agent.shootTwoTimes === false) {
+            console.log("deleteing tailwind 📦📦📦");
+            const effectName = effect.name.trim().replace(/["')]/g, "");
+
+            const slots = document.querySelectorAll(`#${agent.id} .effects > div`);
+            for (const slot of slots) {
+                if (slot.style.backgroundImage && slot.style.backgroundImage.includes(`${effectName}.webp`)) {
+                    slot.style.backgroundImage = "";
+                    slot.style.opacity = "0";
+                    break;
+                }
+            }
+            agent.effects.splice(i, 1);
+            console.log("removed tailwind for", agent.id);
         }
     }
 }
@@ -949,6 +1003,7 @@ function damageAgent(agentId) {
     let agent = document.getElementById(agentId); // This is the TARGET (enemy being hit)
     console.log("damaging agent:", agent.id);
 
+
     // Get the weapon from the ATTACKER (agentSelectedToAttack), not the target!
     let weaponName = agentSelectedToAttack.weapon ?? "classic";
 
@@ -981,11 +1036,25 @@ function damageAgent(agentId) {
     // else we can afford: spend AP now
     spendAP(apCostW);
 
+
+/*    if (agent.damageMitigation){
+        console.log("Damage mitigated by Double Tap!");
+        agent.damageMitigation = false;
+        deleteEffects(agent);
+        return;
+    }*/
+
     damageDealt = 0;
 
     for (let i = 0; i < ammo; i++) {
         setTimeout(() => {
-            const randomChance = Math.floor(Math.random() * 100);
+
+            let randomChance = Math.floor(Math.random() * 100);
+
+            if (agent.damageMitigation){
+                randomChance = 101; // automatic miss
+            }
+
             console.log(
                 `Firing shot ${i + 1}/${ammo} with ${
                     agentSelectedToAttack.weapon
@@ -1069,7 +1138,44 @@ function damageAgent(agentId) {
                     }
                 }
                 socket.emit("damageAgent", agentId, damageDealt);
-                switchPlayer();
+
+                if(agentSelectedToAttack.healOnAttacking){
+                    if (agentSelectedToAttack.health > 23){
+                        agentSelectedToAttack.health = 25;
+                    }else{
+                        agentSelectedToAttack.health += 2;
+                    }
+                    console.log("Healing attacker for 2 HP due to Pick Me Up!");
+                    const healthDisplayAttacking =
+                        agentSelectedToAttack.querySelector(".heart");
+
+                    if (healthDisplayAttacking) {
+
+                        healthDisplayAttacking.textContent = agentSelectedToAttack.health;
+                        gsap.fromTo(
+                            healthDisplayAttacking,
+                            {color: "#00ff00"},
+                            {color: "white", duration: 1}
+                        );
+                    }
+                }
+                if (agent.damageMitigation){
+                    console.log("Damage mitigated by Double Tap!");
+                    agent.damageMitigation = false;
+                    deleteEffects(agent);
+                    console.log(agent.effects);
+                    socket.emit("removeDoubleTap", agentId);
+                }
+                if (agentSelectedToAttack.shootTwoTimes){
+                    console.log("Shooting two times due to Tailwind!");
+                    agentSelectedToAttack.shootTwoTimes = false;
+                    deleteEffects(agentSelectedToAttack);
+                    socket.emit("removeTailwind", agentSelectedToAttack.id);
+
+                }else{
+                    switchPlayer();
+
+                }
             }
         }, i * 150 * gunSpeed);
     }
@@ -1082,6 +1188,20 @@ function damageAgent(agentId) {
     }
 }
 
+socket.on("removeDoubleTap", (agentId) => {
+    console.log("removing Double Tap!");
+    let agent = document.getElementById(agentId.replace("enemy_", ""));
+    agent.damageMitigation = false;
+    deleteEffects(agent);
+    console.log(agent.effects);
+})
+socket.on("removeTailwind", (agentId) => {
+    console.log("removing Tailwind!");
+    let agent = document.getElementById("enemy_" + agentId);
+    agent.shootTwoTimes = false;
+    deleteEffects(agent);
+    console.log(agent.effects);
+})
 let damage = 0;
 let ammo = 0;
 let chanceToHit = 0;
@@ -2085,6 +2205,9 @@ function mouseUp() {
                     agentEl.enemyHitChanceMultiplier = 1;
                     agentEl.damageWhenAttacking = false;
                     agentEl.isSelectable = true;
+                    agentEl.healOnAttacking = false;
+                    agentEl.damageMitigation = false;
+                    agentEl.shootTwoTimes = false;
                     agentEl.effects.forEach((effect) => {
                         effectLUT(agentEl, effect);
                     });
@@ -2447,6 +2570,9 @@ socket.on("enemyAppliedEffect", (data) => {
         agentEl.enemyHitChanceMultiplier = 1;
         agentEl.damageWhenAttacking = false;
         agentEl.isSelectable = true;
+        agentEl.healOnAttacking = false;
+        agentEl.damageMitigation = false;
+        agentEl.shootTwoTimes = false;
         agentEl.effects.forEach((effect) => {
             effectLUT(agentEl, effect);
         });
