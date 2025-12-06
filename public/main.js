@@ -169,7 +169,7 @@ function lockIn() {
         for (let agent of agents) {
             if (agentsChosen.includes(agent)) {
                 const el = document.getElementById(agent);
-                el.health = 25; // Add custom property here
+                el.health = 40; // Add custom property here
                 el.isSelectable = true;
 
                 //console.log("is there");
@@ -343,7 +343,7 @@ function spawnEnemyAgent(agentName, dropper) {
     enemyAgent.style.pointerEvents = "none";
 
     // Add health property
-    enemyAgent.health = 25;
+    enemyAgent.health = 40;
     enemyAgent.effects = []; // âœ…
 
     const glint = document.createElement("div");
@@ -379,7 +379,7 @@ function spawnEnemyAgent(agentName, dropper) {
     // Add health display element
     const healthDisplay = document.createElement("div");
     healthDisplay.className = "heart";
-    healthDisplay.textContent = "25";
+    healthDisplay.textContent = "40";
     enemyAgent.appendChild(healthDisplay);
 
     document.body.appendChild(enemyAgent);
@@ -563,15 +563,15 @@ function executeTurnAbilities(agent, effect) {
 
     if (effect.name === "healing orb") {
         console.log(`Executing Healing Orb on ${agent.id}`);
-        if (agent.health < 23) {
+        if (agent.health < 38) {
             agent.health += 2;
         } else {
-            agent.health = 25;
+            agent.health = 40;
         }
         updateHealthUI(agent);
     } else if (effect.name === "regrowth") {
         console.log(`Executing Regrowth on ${agent.id}`);
-        if (agent.health < 25) {
+        if (agent.health < 40) {
             agent.health += 1;
             updateHealthUI(agent);
         }
@@ -1053,6 +1053,11 @@ const gunSounds = {
     spectre: new Howl({ src: ["audio/SMGs/spectreTap.mp3"], volume: 5.5 }),
     odin: new Howl({ src: ["audio/LMGs/odinTap.mp3"], volume: 5.5 }),
 };
+const missSound = new Howl({
+    src: ["audio/90784__kmoon__bullet_flyby_4.mp3"],
+    volume: 0.3,
+    preload: true,
+});
 
 function damageAgent(agentId) {
     let agent = document.getElementById(agentId); // This is the TARGET (enemy being hit)
@@ -1169,6 +1174,7 @@ function damageAgent(agentId) {
                 }
             } else {
                 // MISS confirmed!
+                missSound.play();
                 console.log(`Shot ${i + 1}: MISS. Health remaining: ${agent.health}`);
             }
 
@@ -1208,8 +1214,8 @@ function damageAgent(agentId) {
                 /*socket.emit("damageAgent", agentId, damageDealt);*/
 
                 if(agentSelectedToAttack.healOnAttacking){
-                    if (agentSelectedToAttack.health > 23){
-                        agentSelectedToAttack.health = 25;
+                    if (agentSelectedToAttack.health > 38){
+                        agentSelectedToAttack.health = 40;
                     }else{
                         agentSelectedToAttack.health += 2;
                     }
@@ -1980,6 +1986,7 @@ let endScreen = document.getElementById("endScreen");
 let enemyAgentElements;
 
 let apShow = document.querySelectorAll(".apShow");
+let backgroundEnd = document.getElementById("background2");
 
 function mouseUp() {
     console.log("MouseUp:", activeCard?.id);
@@ -2473,8 +2480,8 @@ function mouseUp() {
             }, 300);
         }
 
-        if (dragged && container !== 0) {
-            /*      let dmg;
+       /* if (dragged && container !== 0) {
+                  let dmg;
 
             if (
               getComputedStyle(activeCard).backgroundImage.includes("Artual.jpeg")
@@ -2485,10 +2492,10 @@ function mouseUp() {
             ) {
               dmg = 2;
             } else {
-              dmg = 3;
-            }*/
+              dmg = 40;
+            }
 
-/*            if (agent) {
+            if (agent) {
                 agent.health -= dmg;
 
                 if (agent.health <= 0) {
@@ -2501,16 +2508,17 @@ function mouseUp() {
                     if (agent0.health <= 0 && agent1.health <= 0 && agent2.health <= 0) {
                         console.log("i love cock so fucking mch");
                         endScreen.style.top = "0vh";
+                        backgroundEnd.style.opacity = "100%";
                     }
                 } else {
                     agent.querySelector(".heart").textContent = agent.health;
                 }
-            }*/
+            }
 
             console.log("Health:", agent0.health, "Name:", agent0.id);
             console.log("Health:", agent1.health, "Name:", agent1.id);
             console.log("Health:", agent2.health, "Name:", agent2.id);
-        }
+        } */
     } else if (
         isLocked === 0 &&
         deckCardsOponent.includes(activeCard) === false
@@ -3756,12 +3764,24 @@ function updateAgentPositionsOnResize() {
     });
 }
 
+let endAgree = 0
+
 function roundOver() {
-    creds = creds + 200;
-    credsText.innerHTML = creds;
-    updateSpawnerButtons();
-    refillAP(7);
-    textShowUp();
+    bothRound();
+    if(endAgree === 2){
+        creds = creds + 200;
+        credsText.innerHTML = creds;
+        updateSpawnerButtons();
+        refillAP(7);
+        textShowUp();
+        endAgree = 0;
+    }
+    switchPlayer();
+    // console.log(endAgree)
+}
+
+function bothRound(){
+    endAgree += 1
 }
 
 function textShowUp() {
