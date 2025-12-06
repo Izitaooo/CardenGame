@@ -122,6 +122,15 @@ io.on("connection", (socket) => {
         const playerRoom = players[socket.id].room;
         socket.to(playerRoom).emit("removeTailwind", agentId);
     })
+    // store per-room count
+    const roomEndAgree = {}; // e.g. { roomId: 0 }
+
+    socket.on("endAgreeRequest", () => {
+        const playerRoom = players[socket.id].room;
+        roomEndAgree[playerRoom] = (roomEndAgree[playerRoom] || 0) + 1;
+        console.log(roomEndAgree[playerRoom], "server room count");
+        io.to(playerRoom).emit("endAgreeCount", roomEndAgree[playerRoom]);
+    });
 
     socket.on("disconnect", (reason) => {
         console.log(reason);
