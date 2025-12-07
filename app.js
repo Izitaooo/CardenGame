@@ -127,6 +127,7 @@ io.on("connection", (socket) => {
         const playerRoom = players[socket.id].room;
         socket.to(playerRoom).emit("removeTailwind", agentId);
     })
+
     // store per-room count
     const roomEndAgree = {}; // e.g. { roomId: 0 }
 
