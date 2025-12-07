@@ -116,6 +116,7 @@ io.on("connection", (socket) => {
     })
     socket.on("selfDamageAgent", (agentId) => {
         const playerRoom = players[socket.id].room;
+        console.log("sending update to server about Dealing 2 self damage due to Razorvine\n")
         socket.to(playerRoom).emit("selfDamageAgent", agentId);
     })
     socket.on("removeDoubleTap", (agentId) => {

@@ -1208,6 +1208,7 @@ function damageAgent(agentId) {
                         console.log("I lost 😭😭😭😭😭");
                         endScreen.style.top = "0vh";
                     }
+                    console.log("sending update to server about Dealing 2 self damage due to Razorvine");
                     socket.emit("selfDamageAgent", agentSelectedToAttack.id);
 
                 }
@@ -1289,6 +1290,7 @@ socket.on("selfDamageAgent", (agentId) => {
             endScreen.style.top = "0vh";
         }
     }
+    updateHealthUI(agent);
 })
 
 socket.on("removeDoubleTap", (agentId) => {
