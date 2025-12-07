@@ -85,6 +85,18 @@ io.on("connection", (socket) => {
         socket.to(playerRoom).emit("enemyChose", data);
     })
 
+    socket.on("weaponApplied", (data) => {
+        const playerRoom = players[socket.id].room;
+        let agentId = data.agentId;
+        let weaponName = data.weaponName;
+
+        console.log("player in room :" + playerRoom + " applied weapon: " + weaponName + " to agent id: " + agentId);
+        socket.to(playerRoom).emit("weaponAppliedEnemy", {
+            agentId: agentId,
+            weaponName: weaponName
+        });
+    })
+
     socket.on("cardPos", (data) => {
         const playerRoom = players[socket.id].room;
 
@@ -128,6 +140,7 @@ io.on("connection", (socket) => {
         socket.to(playerRoom).emit("removeTailwind", agentId);
     })
     // store per-room count
+/*
     const roomEndAgree = {}; // e.g. { roomId: 0 }
 
     socket.on("endAgreeRequest", () => {
@@ -136,6 +149,18 @@ io.on("connection", (socket) => {
         console.log(roomEndAgree[playerRoom], "server room count");
         io.to(playerRoom).emit("endAgreeCount", roomEndAgree[playerRoom]);
     });
+*/
+
+
+    socket.on("playerRoundOver", () => {
+        const playerRoom = players[socket.id].room;
+        socket.to(playerRoom).emit("enemyRoundOver");
+    });
+
+    socket.on("playerRoundOverSetFalse", () => {
+        const playerRoom = players[socket.id].room;
+        socket.to(playerRoom).emit("enemyRoundOverSetFalse");
+    })
 
     socket.on("disconnect", (reason) => {
         console.log(reason);

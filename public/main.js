@@ -279,7 +279,7 @@ function lockIn() {
                   document.getElementById(agent).remove();
               }
           }*/
-    }
+
     if (!lockInPressed) {
         socket.emit("agentsLockedIn", {
             agentsChosen,
@@ -287,6 +287,7 @@ function lockIn() {
         ImPlaying = false;
         MainGameLoop();
         lockInPressed = true;
+    }
     }
 }
 let enemyAgents = [];
@@ -298,6 +299,9 @@ socket.on("enemyChose", (data) => {
         const dropper = document.getElementById("drop" + dropperNum);
 
         cardsGame.push(spawnEnemyAgent(agent, dropper));
+/*        document.querySelector(
+            `#${agent.id} .wpn`
+        ).style.opacity = "";*/
     });
 
     // Animate all enemy agents
@@ -344,11 +348,23 @@ function spawnEnemyAgent(agentName, dropper) {
 
     // Add health property
     enemyAgent.health = 40;
-    enemyAgent.effects = []; // âœ…
+    enemyAgent.effects = [];
 
     const glint = document.createElement("div");
     glint.className = "glint";
     enemyAgent.appendChild(glint);
+
+    // Add health display element
+    const healthDisplay = document.createElement("div");
+    healthDisplay.className = "heart";
+    healthDisplay.textContent = "40";
+    enemyAgent.appendChild(healthDisplay);
+
+    // Add wpn div (empty, no apShow)
+    const wpn = document.createElement("div");
+    wpn.className = "wpn";
+    wpn.style.opacity = "100%";
+    enemyAgent.appendChild(wpn);
 
     const effects = document.createElement("div");
     effects.className = "effects";
@@ -375,12 +391,6 @@ function spawnEnemyAgent(agentName, dropper) {
     effects.appendChild(ef5);
 
     effects.classList.add("enemyEF");
-
-    // Add health display element
-    const healthDisplay = document.createElement("div");
-    healthDisplay.className = "heart";
-    healthDisplay.textContent = "40";
-    enemyAgent.appendChild(healthDisplay);
 
     document.body.appendChild(enemyAgent);
 
@@ -1261,6 +1271,8 @@ function damageAgent(agentId) {
 
                 }else{
                     switchPlayer();
+                    playerRoundOverPressed = false;
+                    socket.emit("playerRoundOverSetFalse");
 
                 }
             }
@@ -2410,6 +2422,10 @@ function mouseUp() {
             document.removeEventListener("mousemove", mouseMove);
             document.removeEventListener("mouseup", mouseUp);
             dropSound.play();
+            socket.emit("weaponApplied", {
+                agentId: agent.id,
+                weaponName: activeCard.weaponName,
+            })
         }
     }
 
@@ -2433,6 +2449,10 @@ function mouseUp() {
             creds = creds - activeCard.price;
             credsText.innerHTML = creds + "c";
             updateSpawnerButtons();
+        }
+    } else  {
+        if (activeCard.type === "ability") {
+            switchPlayer();
         }
     }
 
@@ -2620,6 +2640,23 @@ function mouseUp() {
     document.removeEventListener("mousemove", mouseMove);
     document.removeEventListener("mouseup", mouseUp); // Not mouseMove
 }
+
+socket.on("weaponAppliedEnemy", (data) => {
+    console.log("Enemy applied weapon:", data);
+
+
+
+    const agent = document.getElementById("enemy_"+data.agentId);
+
+        agent.weapon = data.weaponName;
+        console.log("weapon applied: " + agent.weapon + " to " + agent.id);
+        document.querySelector(`#${agent.id} .wpn`).style.backgroundImage = `url('images/gunIcon/${agent.weapon}_killfeed.webp')`;
+        document.querySelector(`#${agent.id} .wpn`).className = "wpn";
+        document.querySelector(`#${agent.id} .wpn`).classList.add(agent.weapon);
+/*        document.querySelector(`#${agent.id} .apShow`).textContent =
+            weaponAP[data.weaponName];*/
+
+})
 
 function updateEffects(agent, doneWithCard) {
     let effectName = agent.effects[0].name.trim();
@@ -3384,9 +3421,11 @@ function spawnCard(e) {
     socket.emit("spawnedCard", {
         id: cardId,
     });
+    console.log("🃏🃏🃏EMITED CARD SPAWN ")
     //console.log("spawned and dragging card: " + cardId);
 }
 socket.on("enemySpawnedCard", (data) => {
+    console.log(" ♦️♦️♦️RECIEVED CARD SPAWN ")
     //console.log("enemy spawned card: " + data);
 
     const enemycard = document.createElement("div");
@@ -3400,6 +3439,15 @@ socket.on("enemySpawnedCard", (data) => {
     deckCardsOponent.push(enemycard);
     cardsGame.push(enemycard);
     document.querySelector(".container").appendChild(enemycard);
+    gsap.fromTo(enemycard, {
+        opacity: 0,
+        scale: 0.01,
+    }, {
+        opacity: 1,
+        scale: 1,
+        duration: 1,
+        ease: "ease.out",
+    })
     updateDeckPositionsOponent(0.5);
 });
 
@@ -3777,25 +3825,48 @@ function updateAgentPositionsOnResize() {
     });
 }
 
-let endAgree = 0
+let playerRoundOverPressed = false;
+let enemyRoundOverPressed = false;
 
 function roundOver() {
-    bothRound();
-    if(endAgree === 2){
+    if (ImPlaying){
+        bothRound();
+        if(playerRoundOverPressed && enemyRoundOverPressed){
+            creds = creds + 200;
+            credsText.innerHTML = creds;
+            updateSpawnerButtons();
+            refillAP(7);
+            textShowUp();
+            playerRoundOverPressed = false;
+            enemyRoundOverPressed = false;
+        }
+        switchPlayer();
+        // console.log(endAgree)
+    }
+
+}
+
+function bothRound(){
+    playerRoundOverPressed = true;
+    socket.emit("playerRoundOver", {});
+}
+
+socket.on("enemyRoundOver", (data) => {
+    enemyRoundOverPressed = true;
+    if(playerRoundOverPressed && enemyRoundOverPressed){
         creds = creds + 200;
         credsText.innerHTML = creds;
         updateSpawnerButtons();
         refillAP(7);
         textShowUp();
-        endAgree = 0;
+        playerRoundOverPressed = false;
+        enemyRoundOverPressed = false;
     }
-    switchPlayer();
-    // console.log(endAgree)
-}
+});
 
-function bothRound(){
-    endAgree += 1
-}
+socket.on("enemyRoundOverSetFalse", (data) => {
+    enemyRoundOverPressed = false;
+})
 
 function textShowUp() {
     const roundText = document.createElement("div");
