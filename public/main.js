@@ -1059,6 +1059,9 @@ const missSound = new Howl({
     preload: true,
 });
 
+let endText = document.getElementById("endText")
+
+
 function damageAgent(agentId) {
     let agent = document.getElementById(agentId); // This is the TARGET (enemy being hit)
     console.log("damaging agent:", agent.id);
@@ -1103,6 +1106,8 @@ function damageAgent(agentId) {
         deleteEffects(agent);
         return;
     }*/
+
+    let backgroundEnd = document.getElementById("background2");
 
     damageDealt = 0;
 
@@ -1169,6 +1174,8 @@ function damageAgent(agentId) {
                         enemyAgent2.health <= 0
                     ) {
                         console.log("YESS, HELL YEAH, I WOONNNN YEYYYY ðŸ˜ƒ");
+                        endText.innerHTML = "I won let's goooo!";
+                        backgroundEnd.style.opacity = "100%";
                         endScreen.style.top = "0vh";
                     }
                 }
@@ -1206,6 +1213,7 @@ function damageAgent(agentId) {
                         agent2.health <= 0)
                     {
                         console.log("I lost 😭😭😭😭😭");
+                        backgroundEnd.style.opacity = "100%";
                         endScreen.style.top = "0vh";
                     }
                     console.log("sending update to server about Dealing 2 self damage due to Razorvine");
@@ -1988,7 +1996,6 @@ let endScreen = document.getElementById("endScreen");
 let enemyAgentElements;
 
 let apShow = document.querySelectorAll(".apShow");
-let backgroundEnd = document.getElementById("background2");
 
 function mouseUp() {
     console.log("MouseUp:", activeCard?.id);
