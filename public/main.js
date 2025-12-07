@@ -2526,45 +2526,6 @@ function mouseUp() {
             }, 300);
         }
 
-       /* if (dragged && container !== 0) {
-                  let dmg;
-
-            if (
-              getComputedStyle(activeCard).backgroundImage.includes("Artual.jpeg")
-            ) {
-              dmg = 1;
-            } else if (
-              getComputedStyle(activeCard).backgroundImage.includes("tetoo.jpeg")
-            ) {
-              dmg = 2;
-            } else {
-              dmg = 40;
-            }
-
-            if (agent) {
-                agent.health -= dmg;
-
-                if (agent.health <= 0) {
-                    agent.querySelector(".heart").textContent = 0;
-                    console.log(agent.id);
-                    gsap.to(agent, {
-                        filter: "grayscale(1)",
-                        duration: 0.5,
-                    });
-                    if (agent0.health <= 0 && agent1.health <= 0 && agent2.health <= 0) {
-                        console.log("i love cock so fucking mch");
-                        endScreen.style.top = "0vh";
-                        backgroundEnd.style.opacity = "100%";
-                    }
-                } else {
-                    agent.querySelector(".heart").textContent = agent.health;
-                }
-            }
-
-            console.log("Health:", agent0.health, "Name:", agent0.id);
-            console.log("Health:", agent1.health, "Name:", agent1.id);
-            console.log("Health:", agent2.health, "Name:", agent2.id);
-        } */
     } else if (
         isLocked === 0 &&
         deckCardsOponent.includes(activeCard) === false
