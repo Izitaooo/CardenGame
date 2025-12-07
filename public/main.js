@@ -2463,7 +2463,9 @@ function mouseUp() {
         }
     } else  {
         if (activeCard.type === "ability") {
+            if (isLocked === 1 && activeCard.spawning === false) {
             switchPlayer();
+            }
         }
     }
 
