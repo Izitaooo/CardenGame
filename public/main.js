@@ -3900,11 +3900,15 @@ function bothRound(){
 socket.on("enemyRoundOver", (data) => {
     enemyRoundOverPressed = true;
     if(playerRoundOverPressed && enemyRoundOverPressed){
-        creds = creds + 200;
-        credsText.innerHTML = creds;
+        creds = creds + (500 + (roundCount * 100));
+        credsText.innerHTML = creds + "C";
         updateSpawnerButtons();
         refillAP(7);
         textShowUp();
+        moneyShowUp();
+        if (roundCount <= 6) {
+            roundCount = roundCount + 1;
+        }
         playerRoundOverPressed = false;
         enemyRoundOverPressed = false;
     }
