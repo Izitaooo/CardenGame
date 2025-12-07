@@ -3872,16 +3872,16 @@ let enemyRoundOverPressed = false;
 let roundCount = 1;
 
 function roundOver() {
-    if (ImPlaying){
+    if (ImPlaying) {
         bothRound();
-        if(playerRoundOverPressed && enemyRoundOverPressed){
+        if (playerRoundOverPressed && enemyRoundOverPressed) {
             creds = creds + (500 + (roundCount * 100));
             credsText.innerHTML = creds + "C";
             updateSpawnerButtons();
             refillAP(7);
             textShowUp();
             moneyShowUp();
-            if(roundCount <= 6){
+            if (roundCount <= 6) {
                 roundCount = roundCount + 1;
             }
             playerRoundOverPressed = false;
@@ -3890,6 +3890,7 @@ function roundOver() {
         switchPlayer();
         // console.log(endAgree)
     }
+}
 
 function bothRound(){
     playerRoundOverPressed = true;
