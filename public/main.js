@@ -3499,7 +3499,7 @@ socket.on("enemySpawnedCard", (data) => {
 
 function updateSpawnerButtons() {
     for (let btn of spawnButtons) {
-        const price = parseInt(btn.dataset.price) || 0;
+        const price = parseInt(btn.dataset.price) || 1;
         if (creds >= price) {
             // enable
             // we should add classlist here later
@@ -3679,6 +3679,7 @@ function abNames(agent) {
         ab1.querySelector(".priceWpn").innerText = abilityPrice[qIndex] + "c";
         ab2.querySelector(".priceWpn").innerText = abilityPrice[eIndex] + "c";
         ab3.querySelector(".priceWpn").innerText = abilityPrice[cIndex] + "c";
+
         ab1.style.backgroundSize = "2.3vw";
         ab2.style.backgroundSize = "2.9vw";
         ab3.style.backgroundSize = "2.8vw";
@@ -3692,6 +3693,7 @@ function abNames(agent) {
         ab1.querySelector(".priceWpn").innerText = abilityPrice[qIndex] + "c";
         ab2.querySelector(".priceWpn").innerText = abilityPrice[eIndex] + "c";
         ab3.querySelector(".priceWpn").innerText = abilityPrice[cIndex] + "c";
+
         ab1.style.backgroundSize = "2.75vw";
         ab2.style.backgroundSize = "2.75vw";
         ab3.style.backgroundSize = "3.2vw";
@@ -3705,6 +3707,7 @@ function abNames(agent) {
         ab1.querySelector(".priceWpn").innerText = abilityPrice[qIndex] + "c";
         ab2.querySelector(".priceWpn").innerText = abilityPrice[eIndex] + "c";
         ab3.querySelector(".priceWpn").innerText = abilityPrice[cIndex] + "c";
+
         ab1.style.backgroundSize = "2.2vw";
         ab2.style.backgroundSize = "3.2vw";
         ab3.style.backgroundSize = "2.7vw";
@@ -3718,6 +3721,7 @@ function abNames(agent) {
         ab1.querySelector(".priceWpn").innerText = abilityPrice[qIndex] + "c";
         ab2.querySelector(".priceWpn").innerText = abilityPrice[eIndex] + "c";
         ab3.querySelector(".priceWpn").innerText = abilityPrice[cIndex] + "c";
+
         ab1.style.backgroundSize = "3.2vw";
         ab2.style.backgroundSize = "3vw";
         ab3.style.backgroundSize = "3.2vw";
@@ -3731,6 +3735,7 @@ function abNames(agent) {
         ab1.querySelector(".priceWpn").innerText = abilityPrice[qIndex] + "c";
         ab2.querySelector(".priceWpn").innerText = abilityPrice[eIndex] + "c";
         ab3.querySelector(".priceWpn").innerText = abilityPrice[cIndex] + "c";
+
         ab1.style.backgroundSize = "3vw";
         ab2.style.backgroundSize = "2.5vw";
         ab3.style.backgroundSize = "2.75vw";
@@ -3744,6 +3749,7 @@ function abNames(agent) {
         ab1.querySelector(".priceWpn").innerText = abilityPrice[qIndex] + "c";
         ab2.querySelector(".priceWpn").innerText = abilityPrice[eIndex] + "c";
         ab3.querySelector(".priceWpn").innerText = abilityPrice[cIndex] + "c";
+
         ab1.style.backgroundSize = "3.2vw";
         ab2.style.backgroundSize = "2.7vw";
         ab3.style.backgroundSize = "3vw";
@@ -3757,6 +3763,7 @@ function abNames(agent) {
         ab1.querySelector(".priceWpn").innerText = abilityPrice[qIndex] + "c";
         ab2.querySelector(".priceWpn").innerText = abilityPrice[eIndex] + "c";
         ab3.querySelector(".priceWpn").innerText = abilityPrice[cIndex] + "c";
+
         ab1.style.backgroundSize = "2.8vw";
         ab2.style.backgroundSize = "2vw";
         ab3.style.backgroundSize = "3vw";
@@ -3770,6 +3777,7 @@ function abNames(agent) {
         ab1.querySelector(".priceWpn").innerText = abilityPrice[qIndex] + "c";
         ab2.querySelector(".priceWpn").innerText = abilityPrice[eIndex] + "c";
         ab3.querySelector(".priceWpn").innerText = abilityPrice[cIndex] + "c";
+
         ab1.style.backgroundSize = "2.7vw";
         ab2.style.backgroundSize = "2.9vw";
         ab3.style.backgroundSize = "3.5vw";
@@ -3778,6 +3786,8 @@ function abNames(agent) {
     ab1.style.backgroundImage = abilityIcon[qIndex];
     ab2.style.backgroundImage = abilityIcon[eIndex];
     ab3.style.backgroundImage = abilityIcon[cIndex];
+
+    updateSpawnerButtons();
 }
 
 menuExit.addEventListener("click", () => {
