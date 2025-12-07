@@ -56,7 +56,6 @@ let domRect5 = dropper4.getBoundingClientRect();
 let domRect6 = dropper5.getBoundingClientRect();
 let domRect7 = dropper6.getBoundingClientRect();
 
-const randBtn = document.getElementById("randBtn");
 const spawnButtons = document.querySelectorAll(".spawnButtons");
 
 const buttonMap = {
@@ -299,9 +298,6 @@ socket.on("enemyChose", (data) => {
         const dropper = document.getElementById("drop" + dropperNum);
 
         cardsGame.push(spawnEnemyAgent(agent, dropper));
-/*        document.querySelector(
-            `#${agent.id} .wpn`
-        ).style.opacity = "";*/
     });
 
     // Animate all enemy agents
@@ -666,7 +662,7 @@ function updateHealthUI(agent) {
 
 function switchPlayer() {
     ImPlaying = !ImPlaying;
-    //console.log(ImPlaying);
+    console.log(ImPlaying);
 
     const agentElements = document.querySelectorAll(".agentSelect");
     const myAgents = Array.from(agentElements).filter((el) =>
@@ -806,6 +802,7 @@ function deleteEffects(agent) {
             agent.effects.splice(i, 1);
             console.log("removed tailwind for", agent.id);
         }
+        updateAllDurationCounters(agent)
     }
 }
 // Store enemy click handlers globally
@@ -933,6 +930,10 @@ function displaySelfDamageHide(agent) {
     agent.querySelector(".heart").textContent = damageCalc.toString();
     agent.querySelector(".heart").style.color = "white";
 }
+
+let chanceShow = document.createElement("div");
+chanceShow.className = "chancing";
+
 function damageDisplay(agentId) {
     let agent = document.getElementById(agentId);
 
@@ -971,15 +972,24 @@ function damageDisplay(agentId) {
     console.log("ammo: "+ammo);
     console.log("hit chance mult: "+agentSelectedToAttack.hitChanceMultiplier);
     console.log("damage mult: "+agent.damageMultiplier);
-    let damageCalcShow = agent.health - damage * ammo * agentSelectedToAttack.hitChanceMultiplier *
-        agent.damageMultiplier;
+    let damageCalcShow = agent.health - (damage * agent.damageMultiplier) * ammo;
+    let damageChanceShow =
+        `${ammo}shots × ${chanceToHit * agentSelectedToAttack.hitChanceMultiplier}% `;
     console.log("damage calculated:  "+damageCalcShow);
+    console.log("damage percent:  "+damageChanceShow);
+
+    chanceShow.style.display = "initial";
+
+    chanceShow.textContent = damageChanceShow.toString();
+    agent.appendChild(chanceShow);
+
     agent.querySelector(".heart").textContent = damageCalcShow.toString();
     agent.querySelector(".heart").style.color = "red";
 }
 function damageDisplayHide(agentId) {
     let agent = document.getElementById(agentId);
     let damageCalc = agent.health;
+    chanceShow.style.display = "none";
     agent.querySelector(".heart").textContent = damageCalc.toString();
     agent.querySelector(".heart").style.color = "white";
 }
@@ -1123,6 +1133,16 @@ function damageAgent(agentId) {
 
 
     damageDealt = 0;
+    console.log(weaponName);
+    console.log(
+        "agent.enemyHitChanceMultiplier: " + agent.enemyHitChanceMultiplier
+    );
+    console.log(
+        "agentSelectedToAttack.hitChanceMultiplier: " +
+        agentSelectedToAttack.hitChanceMultiplier
+    );
+    console.log("agent.damageMultiplier: " + agent.damageMultiplier);
+    console.log("enemychancetohit: " + agent.enemyHitChanceMultiplier);
 
     for (let i = 0; i < ammo; i++) {
         setTimeout(() => {
@@ -1140,16 +1160,7 @@ function damageAgent(agentId) {
                     chanceToHit * agentSelectedToAttack.hitChanceMultiplier
                 }%`
             );
-            console.log(weaponName);
-            console.log(
-                "ðŸ˜­agent.enemyHitChanceMultiplier: " + agent.enemyHitChanceMultiplier
-            );
-            console.log(
-                "ðŸ˜­agentSelectedToAttack.hitChanceMultiplier: " +
-                agentSelectedToAttack.hitChanceMultiplier
-            );
-            console.log("agent.damageMultiplier: " + agent.damageMultiplier);
-            console.log("enemychancetohit: " + agent.enemyHitChanceMultiplier);
+
 
             if (
                 randomChance <
@@ -1335,12 +1346,7 @@ let ammo = 0;
 let chanceToHit = 0;
 let gunSpeed = 0;
 function weaponDamageLUT(weapon) {
-    if (weapon === "classic") {
-        damage = 1;
-        ammo = 2;
-        chanceToHit = 75;
-        gunSpeed = 1.3;
-    } else if (weapon === "shorty") {
+      if (weapon === "shorty") {
         damage = 1;
         ammo = 5;
         chanceToHit = 45;
@@ -1522,7 +1528,7 @@ let deckCards = [];
 let deckCardsOponent = [];
 
 let credsText = document.getElementById("money");
-let creds = 50000;
+let creds = 800;
 
 const handhitbox = document.getElementById("bottomhitbox");
 let cardSpacing = window.innerWidth * 0.06;
@@ -1685,7 +1691,7 @@ function mouseMove(e) {
     dropPlay = 1;
     dragged = true;
 
-    //console.log(isLocked);
+    console.log(isLocked);
 
     //console.log(agentsChosen);
 
@@ -2085,6 +2091,7 @@ function mouseUp() {
     }*/ else if (
         activeCard.ability === "double tap" &&
         (container !== agentsChosen.indexOf("iso") + 4)
+        && activeCard.spawning === false    // fixuje bug ktery delal ze karta se pri koupi da do decku i kdyz nebyla v buy zone
     ) {
         console.log("double tap on invalid container - forcing return to deck");
         container = null;
@@ -2127,6 +2134,7 @@ function mouseUp() {
     } else if (
         activeCard.ability === "pick me up" &&
         (container !== agentsChosen.indexOf("clove") + 4)
+        && activeCard.spawning === false    // fixuje bug ktery delal ze karta se pri koupi da do decku i kdyz nebyla v buy zone
     ) {
         console.log("index of clove:", agentsChosen.indexOf("clove"));
         console.log("container:", container);
@@ -2172,6 +2180,7 @@ function mouseUp() {
     } else if (
         activeCard.ability === "shrouded step" &&
         (container !== agentsChosen.indexOf("omen") + 4)
+        && activeCard.spawning === false    // fixuje bug ktery delal ze karta se pri koupi da do decku i kdyz nebyla v buy zone
     ) {
         console.log("shrouded step on invalid container - forcing return to deck");
         container = null;
@@ -2186,6 +2195,7 @@ function mouseUp() {
     } else if (
         activeCard.ability === "tailwind" &&
         (container !== agentsChosen.indexOf("jett") + 4)
+        && activeCard.spawning === false    // fixuje bug ktery delal ze karta se pri koupi da do decku i kdyz nebyla v buy zone
     ) {
         console.log("tailwind on invalid container - forcing return to deck");
         container = null;
@@ -2207,6 +2217,7 @@ function mouseUp() {
     } else if (
         activeCard.ability === "updraft" &&
         (container !== agentsChosen.indexOf("jett") + 4)
+        && activeCard.spawning === false    // fixuje bug ktery delal ze karta se pri koupi da do decku i kdyz nebyla v buy zone
     ) {
         console.log("updraft on invalid container - forcing return to deck");
         container = null;
@@ -2481,7 +2492,7 @@ function mouseUp() {
             dropper = dropper6;
             agent = agent2;
         } else if (container === 0) {
-            dropper = randBtn;
+            dropper = agent1;
         }
 
         activeCard.style.setProperty("--border-animation", "none");
@@ -2686,9 +2697,40 @@ function updateEffects(agent, doneWithCard) {
         if (!slot.style.backgroundImage || slot.style.backgroundImage === "none") {
             slot.style.opacity = "100%";
             slot.style.backgroundImage = `url('images/abilityIcon/${effectName}.webp')`;
+
+            // Add duration counter
+            let durationCounter = slot.querySelector('.duration-counter');
+            if (!durationCounter) {
+                durationCounter = document.createElement('div');
+                durationCounter.className = 'duration-counter';
+                slot.appendChild(durationCounter);
+            }
+            durationCounter.textContent = agent.effects[0].duration;
+            durationCounter.style.display = 'block';
+
             break; // stop after filling the first empty one
         }
     }
+}
+
+function updateAllDurationCounters(agent) {
+    const slots = document.querySelectorAll(`#${agent.id} .effects > div`);
+
+    slots.forEach((slot, index) => {
+        if (slot.style.backgroundImage && slot.style.backgroundImage !== "none") {
+            const effect = agent.effects[index];
+            if (effect) {
+                let durationCounter = slot.querySelector('.duration-counter');
+                if (!durationCounter) {
+                    durationCounter = document.createElement('div');
+                    durationCounter.className = 'duration-counter';
+                    slot.appendChild(durationCounter);
+                }
+                durationCounter.textContent = effect.duration;
+                durationCounter.style.display = 'block';
+            }
+        }
+    });
 }
 
 socket.on("enemyAppliedEffect", (data) => {
@@ -2698,7 +2740,7 @@ socket.on("enemyAppliedEffect", (data) => {
 
     // Reverse the target! AAAAAAAAAAAAAAAA
     if (data.isFriendly) {
-        // They applied to their agent â†’ your enemy
+        // They applied to their agent at your enemy
         const enemyAgentElements = enemyAgents
             .map((agentName) => document.getElementById("enemy_" + agentName))
             .filter((el) => el !== null);
@@ -2819,8 +2861,8 @@ function distanceFind(card = activeCard, cont = container) {
         shoot = hand.offsetLeft - domRect1.left;
         bang = hand.offsetTop - domRect1.top;
     } else if (cont === 0) {
-        shoot = randBtn.offsetLeft - domRect1.left;
-        bang = randBtn.offsetTop - domRect1.top;
+        shoot = dropper1.offsetLeft - domRect1.left;
+        bang = dropper1.offsetTop - domRect1.top;
         if (card.deckOponent === true) {
             shoot = null;
             bang = null;
@@ -2861,7 +2903,7 @@ socket.on("playerMoved", (data) => {
     else if (cont === 4) dropper = dropper4;
     else if (cont === 5) dropper = dropper5;
     else if (cont === 6) dropper = dropper6;
-    else if (cont === 0) dropper = randBtn;
+    else if (cont === 0) dropper = dropper1;
 
     if (cont === null) {
         // Move into opponent deck (local representation)
@@ -3471,7 +3513,7 @@ function updateSpawnerButtons() {
 let handDown = true;
 
 function handOpening() {
-    if (handDown === true && deckCards.length !== 0) {
+    if (handDown === true && deckCards.length !== 0 && ImPlaying === true) {
         //console.log(deckCards);
         handhitbox.style.height = "15.5vw";
         handhitbox.style.zIndex = "1";
@@ -3827,24 +3869,27 @@ function updateAgentPositionsOnResize() {
 
 let playerRoundOverPressed = false;
 let enemyRoundOverPressed = false;
+let roundCount = 1;
 
 function roundOver() {
     if (ImPlaying){
         bothRound();
         if(playerRoundOverPressed && enemyRoundOverPressed){
-            creds = creds + 200;
-            credsText.innerHTML = creds;
+            creds = creds + (500 + (roundCount * 100));
+            credsText.innerHTML = creds + "C";
             updateSpawnerButtons();
             refillAP(7);
             textShowUp();
+            moneyShowUp();
+            if(roundCount <= 6){
+                roundCount = roundCount + 1;
+            }
             playerRoundOverPressed = false;
             enemyRoundOverPressed = false;
         }
         switchPlayer();
         // console.log(endAgree)
     }
-
-}
 
 function bothRound(){
     playerRoundOverPressed = true;
@@ -3874,6 +3919,7 @@ function textShowUp() {
     roundText.className = "round-announcement";
 
     document.body.appendChild(roundText);
+
 
     // GSAP animation timeline
     const tl = gsap.timeline({
@@ -3905,6 +3951,49 @@ function textShowUp() {
             x: -roundText.offsetWidth, // Move left off-screen
             opacity: 0,
             duration: 0.6,
+            ease: "power2.in",
+        });
+}
+
+function moneyShowUp() {
+    const moneyText = document.createElement("div");
+    moneyText.textContent = 500+ (roundCount * 100) + "C Added";
+    moneyText.className = "money-announcement";
+    moneyText.style.zIndex = "4";
+
+    document.body.appendChild(moneyText);
+
+
+    // GSAP animation timeline
+    const tl = gsap.timeline({
+        onComplete: () => {
+            // Remove element after animation completes
+            moneyText.remove();
+        },
+    });
+
+    // Animate: right -> center -> left
+    tl.fromTo(
+        moneyText,
+        {
+            x: -window.innerWidth, // Start from right off-screen
+            opacity: 0,
+        },
+        {
+            x: window.innerWidth / 10 - moneyText.offsetWidth / 10, // Move to center
+            opacity: 1,
+            duration: 1.5,
+            ease: "power2.out",
+        }
+    )
+        .to(moneyText, {
+            duration: 4, // Stay in center
+            ease: "none",
+        })
+        .to(moneyText, {
+            x: -moneyText.offsetWidth, // Move left off-screen
+            opacity: 0,
+            duration: 1.5,
             ease: "power2.in",
         });
 }
