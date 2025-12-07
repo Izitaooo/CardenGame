@@ -598,6 +598,8 @@ function executeTurnAbilities(agent, effect) {
                 enemyAgent2.health <= 0
             ) {
                 console.log("YESS, HELL YEAH, I WOONNNN YEYYYY ðŸ˜ƒ");
+                endText.innerHTML = "I won let's goooo!";
+                backgroundEnd.style.opacity = "100%";
                 endScreen.style.top = "0vh";
             }
             if (
@@ -606,6 +608,7 @@ function executeTurnAbilities(agent, effect) {
                 agent2.health <= 0
             ) {
                 console.log("😭😭😭 I lost");
+                backgroundEnd.style.opacity = "100%";
                 endScreen.style.top = "0vh";
             }
         }
@@ -1060,7 +1063,7 @@ const missSound = new Howl({
 });
 
 let endText = document.getElementById("endText")
-
+let backgroundEnd = document.getElementById("background2");
 
 function damageAgent(agentId) {
     let agent = document.getElementById(agentId); // This is the TARGET (enemy being hit)
@@ -1107,7 +1110,7 @@ function damageAgent(agentId) {
         return;
     }*/
 
-    let backgroundEnd = document.getElementById("background2");
+
 
     damageDealt = 0;
 
@@ -1441,6 +1444,7 @@ socket.on("damageAgent", (agentId, damage) => {
             agent2.health <= 0)
         {
             console.log("I lost 😭😭😭😭😭");
+            backgroundEnd.style.opacity = "100%";
             endScreen.style.top = "0vh";
         }
     }
