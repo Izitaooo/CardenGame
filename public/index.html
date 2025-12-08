@@ -61,6 +61,11 @@
 
     const input = document.getElementById('playerInput');
 
+
+    input.addEventListener("input", (event) => {
+        event.target.value = event.target.value.toUpperCase();  // meni user input na uppercase aby nebyl zmatek mezi upper a lowercase
+    });
+
     createRoom = () => {
         const roomName = input.value;
 
