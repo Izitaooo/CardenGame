@@ -1,4 +1,6 @@
-$("#container").mousemove(function(e) {
+const container = document.getElementById("container");
+
+container.addEventListener("mousemove", (e) => {
     parallaxIt(e, "#backgroundIndex2", -50);
     parallaxIt(e, "#backgroundIndex", -25);
     parallaxIt(e, "#create", -15);
@@ -6,12 +8,15 @@ $("#container").mousemove(function(e) {
 });
 
 function parallaxIt(e, target, movement) {
-    var $this = $("#container");
-    var relX = e.pageX - $this.offset().left;
-    var relY = e.pageY - $this.offset().top;
+    const rect = container.getBoundingClientRect();
 
-    TweenMax.to(target, 1, {
-        x: (relX - $this.width() / 2) / $this.width() * movement,
-        y: (relY - $this.height() / 2) / $this.height() * movement
+    const relX = e.clientX - rect.left;
+    const relY = e.clientY - rect.top;
+
+    gsap.to(target, {
+        duration: 1,
+        x: ((relX - rect.width / 2) / rect.width) * movement,
+        y: ((relY - rect.height / 2) / rect.height) * movement,
+        ease: "power2.out"
     });
 }
