@@ -1546,15 +1546,7 @@ function mouseDown(e, cardElement) {
 
     if (handDown === true) {
         return;
-    } /* else {
-    for (let i = 0; i < deckCards.length; i++) {
-      deckCards[i].addEventListener("click", () => {
-        if (handDown === false) {
-          console.log("MOMMYYY");
-        }
-      });
     }
-  }*/
 
     console.log("MouseDown:", cardElement.id, activeCard.id);
 
@@ -1716,8 +1708,6 @@ function mouseMove(e) {
     }
 
     activeCard.deck = false;
-
-    activeCard.draggedAO = true;
 
     agent0.querySelector(".heart").textContent = agent0.health;
     agent1.querySelector(".heart").textContent = agent1.health;
@@ -2001,7 +1991,6 @@ function mouseMove(e) {
     if (handDown === false) {
         handhitbox.style.height = "5.5vw";
         handhitbox.style.zIndex = "99";
-        //cardSpacing = 180;
         cardSpacing = window.innerWidth * 0.06;
 
         updateDeckPositions(0.5);
@@ -2371,37 +2360,6 @@ function mouseUp() {
                 console.log("Current effects:", agent.effects);
 
                 updateEffects(agent, true);
-                /*                let effectName = agent.effects[0].name.trim();
-                        effectName = effectName.replace(/["')]/g, "");
-                        console.log(effectName)
-                        console.log(effectObj.ap)
-                        console.log(currentAP)
-
-                        activeCard.style.transition = "opacity 0.2s";
-                        activeCard.style.opacity = "0";
-
-                        setTimeout(() => {
-                            for (let i = 0; i < cardsGame.length; i++) {
-                                cardsGame[i].style.pointerEvents = "all";
-                            }
-                            activeCard.style.display = "none";
-                        }, 300);
-
-
-                        document.removeEventListener("mousemove", mouseMove);
-                        document.removeEventListener("mouseup", mouseUp);
-                        dropSound.play();
-
-                        for (let i = 1; i <= 5; i++) {
-                            const slot = document.querySelector(`#${agent.id} .ef${i}`);
-
-                            // check if empty
-                            if (!slot.style.backgroundImage || slot.style.backgroundImage === "none") {
-                                slot.style.opacity = "100%";
-                                slot.style.backgroundImage = `url('images/abilityIcon/${effectName}.webp')`;
-                                break; // stop after filling the first empty one
-                            }
-                        }*/
             }
         }
     }
@@ -2421,14 +2379,12 @@ function mouseUp() {
             agent.weapon = activeCard.weaponName; // Use the stored name!
             console.log("weapon applied: " + agent.weapon + " to " + agent.id);
 
-            document.querySelector(
-                `#${agent.id} .wpn`
-            ).style.backgroundImage = `url('images/gunIcon/${agent.weapon}_killfeed.webp')`;
+            document.querySelector(`#${agent.id} .wpn`).style.backgroundImage =
+                `url('images/gunIcon/${agent.weapon}_killfeed.webp')`;
             document.querySelector(`#${agent.id} .wpn`).className = "wpn";
             document.querySelector(`#${agent.id} .wpn`).classList.add(agent.weapon);
 
-            document.querySelector(`#${agent.id} .apShow`).textContent =
-                weaponAP[activeCard.weaponName];
+            document.querySelector(`#${agent.id} .apShow`).textContent = weaponAP[activeCard.weaponName];
 
             document.removeEventListener("mousemove", mouseMove);
             document.removeEventListener("mouseup", mouseUp);
@@ -2799,40 +2755,40 @@ function onCardSelected(cardElement) {
 function distanceFind(card = activeCard, cont = container) {
     if (!card) return 0;
     const domRect1 = card.getBoundingClientRect();
-    let shoot = 0;
-    let bang = 0;
+    let distanceX = 0;
+    let distanceY = 0;
 
     if (cont === 1) {
-        shoot = dropper1.offsetLeft - domRect1.left;
-        bang = dropper1.offsetTop - domRect1.top;
+        distanceX = dropper1.offsetLeft - domRect1.left;
+        distanceY = dropper1.offsetTop - domRect1.top;
     } else if (cont === 2) {
-        shoot = dropper2.offsetLeft - domRect1.left;
-        bang = dropper2.offsetTop - domRect1.top;
+        distanceX = dropper2.offsetLeft - domRect1.left;
+        distanceY = dropper2.offsetTop - domRect1.top;
     } else if (cont === 3) {
-        shoot = dropper3.offsetLeft - domRect1.left;
-        bang = dropper3.offsetTop - domRect1.top;
+        distanceX = dropper3.offsetLeft - domRect1.left;
+        distanceY = dropper3.offsetTop - domRect1.top;
     } else if (cont === 4) {
-        shoot = dropper4.offsetLeft - domRect1.left;
-        bang = dropper4.offsetTop - domRect1.top;
+        distanceX = dropper4.offsetLeft - domRect1.left;
+        distanceY = dropper4.offsetTop - domRect1.top;
     } else if (cont === 5) {
-        shoot = dropper5.offsetLeft - domRect1.left;
-        bang = dropper5.offsetTop - domRect1.top;
+        distanceX = dropper5.offsetLeft - domRect1.left;
+        distanceY = dropper5.offsetTop - domRect1.top;
     } else if (cont === 6) {
-        shoot = dropper6.offsetLeft - domRect1.left;
-        bang = dropper6.offsetTop - domRect1.top;
+        distanceX = dropper6.offsetLeft - domRect1.left;
+        distanceY = dropper6.offsetTop - domRect1.top;
     } else if (cont === null) {
-        shoot = hand.offsetLeft - domRect1.left;
-        bang = hand.offsetTop - domRect1.top;
+        distanceX = hand.offsetLeft - domRect1.left;
+        distanceY = hand.offsetTop - domRect1.top;
     } else if (cont === 0) {
-        shoot = dropper1.offsetLeft - domRect1.left;
-        bang = dropper1.offsetTop - domRect1.top;
+        distanceX = dropper1.offsetLeft - domRect1.left;
+        distanceY = dropper1.offsetTop - domRect1.top;
         if (card.deckOponent === true) {
-            shoot = null;
-            bang = null;
+            distanceX = null;
+            distanceY = null;
         }
     }
 
-    return Math.hypot(shoot, bang);
+    return Math.hypot(distanceX, distanceY);
 }
 
 /*window.onresize = function () {
@@ -3118,7 +3074,7 @@ function createCard(id, initialX, initialY, buttonId) {
         const apValue = document.createElement("div");
         apValue.className = "apValue";
 
-        cardElement.appendChild(apValue);
+        cardElement.appendChild(apValue);          //nastaveni ap value na predek karty zbrane
 
         apValue.textContent = weaponAP[cardElement.weaponName];
     } else if (buttonId === "randBtn") {
@@ -3360,17 +3316,12 @@ function createCard(id, initialX, initialY, buttonId) {
     });
 
     //Initialize the deck property
-    cardElement.deck = false;
-    cardElement.deleteTrigger = false;
-    cardElement.draggedAO = false; //maybe useless
-    cardElement.spawning = true;
-    cardElement.dmg = 25;
+    cardElement.deck = false;   // jestli je karta v decku
+    cardElement.deleteTrigger = false;  // trigger ktery oddela kartu, kdzy kartu upustite v shopu
+    cardElement.spawning = true;   // if card is in buy menu
+    cardElement.dmg = 25; // testing  stuff, ignore  this
 
     cardElement.addEventListener("mousedown", (e) => mouseDown(e, cardElement));
-
-    //mouseDown(cardElement);
-    //cardElement.addEventListener("mousemove", mouseMove);
-    //cardElement.addEventListener("mouseup", mouseUp);
 
     //Add to the DOM
     document.querySelector(".container").appendChild(cardElement);
@@ -3385,7 +3336,6 @@ function createCard(id, initialX, initialY, buttonId) {
         ease: "power2.out",
     });
 
-    // store and return
     allCards[id] = cardElement;
     return cardElement;
 }
@@ -3462,12 +3412,8 @@ function updateSpawnerButtons() {
     for (let btn of spawnButtons) {
         const price = parseInt(btn.dataset.price) || 1;
         if (creds >= price) {
-            // enable
-            // we should add classlist here later
             btn.style.pointerEvents = "all";
         } else {
-            // disable
-            // we should add classlist here later
             btn.style.pointerEvents = "none";
         }
     }
