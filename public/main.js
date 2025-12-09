@@ -724,6 +724,7 @@ function switchPlayer() {
         }
         damageDisplayHide(el.id);
     });
+    shootingFlag = false;
 
     // Don't recreate handlers - just use the existing ones
     updateTurnState(myAgents);
@@ -1082,12 +1083,16 @@ const missSound = new Howl({
     preload: true,
 });
 
+let shootingFlag = false;
+
 let endText = document.getElementById("endText")
 let backgroundEnd = document.getElementById("background2");
 
 function damageAgent(agentId) {
     let agent = document.getElementById(agentId); // This is the TARGET (enemy being hit)
     console.log("damaging agent:", agent.id);
+
+    shootingFlag = true;
 
 
     // Get the weapon from the ATTACKER (agentSelectedToAttack), not the target!
@@ -3791,7 +3796,7 @@ let enemyRoundOverPressed = false;
 let roundCount = 1;
 
 function roundOver() {
-    if (ImPlaying) {
+    if (ImPlaying && shootingFlag === false) {
         bothRound();
         if (playerRoundOverPressed && enemyRoundOverPressed) {
             creds = creds + (500 + (roundCount * 100));
