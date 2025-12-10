@@ -2739,6 +2739,7 @@ function refillAP(amount = maxAP) {
 
 function flashNotEnoughAP() {
     // example: add a 'shake' to APhold or briefly flash
+    shootingFlag = false;
     const holder = document.getElementById("APhold");
     if (!holder) return;
     holder.classList.add("not-enough");
